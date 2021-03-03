@@ -1,0 +1,27 @@
+{
+  "regex":  {
+    "mail_recipient": "username@suffix.com",
+    "_comment": "File finding patterns. Only single capture group accepted (for reverse/forward identifier)",
+    "file_pattern": "\\w{8,12}_\\w{8,10}(?:-\\d+)*_L\\d_(?:R)*(\\d{1}).fastq.gz"
+  },
+
+  "_comment": "Folders",
+  "folders":  {
+    "_comment": "Root folder for ALL output",
+    "results": "/tmp/MLST/results/",
+    "_comment": "Report collection folder",
+    "reports": "/tmp/MLST/reports/",
+    "_comment": "Log file position and name",
+    "log_file": "/tmp/MUTANT.log",
+    "_comment": "Root folder for input fasta sequencing data",
+    "seqdata": "/tmp/projects/"
+  },
+  
+  "_comment": "Thresholds for Displayed results",
+  "threshold":  {
+    "_comment": "SARS-CoV-2 thresholds",
+    "max_ambig_pangolin": 0.05,
+    "_comment": "Quality Control thresholds",
+    "bp_10x_fail": 95
+  }
+}
