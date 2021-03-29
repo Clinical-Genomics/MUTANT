@@ -55,8 +55,8 @@ class DeliverSC2:
 
         for sampleinfo in self.caseinfo:
             sample = sampleinfo["CG_ID_sample"]
-            region = sampleinfo["region_code"].replace(' ', '_')
-            lab = sampleinfo["lab_code"].replace(' ', '_')
+            region = sampleinfo["region_code"]
+            lab = sampleinfo["lab_code"]
 
             #rename makeConsensus
             prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
@@ -201,6 +201,6 @@ class DeliverSC2:
             sumfile = os.path.join(self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today))
             with open(sumfile, "a") as out:
                 summary = csv.writer(out)
-                summary.writerow([record["Customer_ID_sample"], record["selection_criteria"].split(".")[1].strip())
+                summary.writerow([record["Customer_ID_sample"], record["selection_criteria"]] )
 
 

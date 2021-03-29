@@ -28,7 +28,7 @@ class RunSC2:
         if outdir != "":
             resdir = outdir
         elif config != "":
-            general_config = self.get_json_data(config)
+            general_config = get_json(config)
             resdir = os.path.join(general_config["SARS-CoV-2"]["folders"]["results"], "{}_{}".format(
                 self.case, self.timestamp))
         else:
@@ -53,20 +53,3 @@ class RunSC2:
         out, err = proc.communicate()
         log.info(out)
         log.info(err)
-
-   def get_json_data(self, config):
-        if os.path.exists(config):
-            """Get sample information as json object"""
-            try:
-                with open(config) as json_file:
-                    data = json.load(json_file)
-            except Exception as e:
-                click.echo("Unable to read provided json file: {}. Exiting..".format(config))
-                click.echo(e)
-                sys.exit(-1)
-        else:
-            click.echo("Could not find supplied config: {}. Exiting..".format(config))
-            sys.exit(-1)
-        return data
-
-

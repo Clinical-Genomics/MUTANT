@@ -20,21 +20,6 @@ from mutant.assets.utils.parse import get_sarscov2_config
 WD = os.path.dirname(os.path.realpath(__file__))
 TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
 
-def get_json_data(config):
-    if os.path.exists(config):
-        """Get sample information as json object"""
-        try:
-            with open(config) as json_file:
-                data = json.load(json_file)
-        except Exception as e:
-            click.echo("Unable to read provided json file: {}. Exiting..".format(config))
-            click.echo(e)
-            sys.exit(-1)
-    else:
-        click.echo("Could not find supplied config: {}. Exiting..".format(config))
-        sys.exit(-1)
-    return data
-
 @click.group()
 @click.version_option(version)
 @click.pass_context
@@ -59,7 +44,7 @@ def sarscov2(ctx, input_folder, config_artic, config_case, config_mutant, outdir
 
     # Set base for output files (Move this section)
     if config_case != "":
-        caseinfo = get_json_data(config_case)
+        caseinfo = get_sarscov2_config(config_case)
         caseID = caseinfo[0]["case_ID"]
     else:
         caseID = "artic"
