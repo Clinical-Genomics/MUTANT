@@ -4,12 +4,12 @@ profiles {
         process.executor = 'local'
         process.time = '1h'
         process.memory = '8 GB'
-        process.cpus = 4
+        process.cpus = 1
     }
 }
 process {
     withLabel: largecpu {
-        cpus = 4
+        cpus = 2
     }
     withLabel: largemem {
         memory = '12 GB'
@@ -114,6 +114,7 @@ profiles {
         docker.enabled = true
         fixOwnership = true
         runOptions = "-u \$(id -u):\$(id -g)"
+        process.container = "clinicalgenomics/artic-ncov2019-illumina"
     }
     singularity {
         singularity.enabled = true
