@@ -7,16 +7,15 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
 ### Prereq
 * Install Java 8 or above (`java --version`)
-* Install singularity (`conda install -c conda-forge singularity`) or follow the installation instructions for
-  [mac and windows](https://sylabs.io/guides/3.8/admin-guide/installation.html#installation-on-windows-or-mac).
-  * See below for more information on using vagrant for running singularity. 
-* Alternatively, install [docker](https://www.docker.com/) and run MUTANT with docker images.
-* Install nextflow (`curl -s https://get.nextflow.io | bash`)
-* Path nextflow (`export PATH=$PATH:/MY/WORKING/DIR`)
+* Install [docker](https://www.docker.com/).
+* Alternatively, install singularity. 
+  * On linux: `conda install -c conda-forge singularity`
+  * On Mac/Windows follow the installation instructions [here](https://sylabs.io/guides/3.7/admin-guide/installation.html#installation-on-windows-or-mac).
+    * See information below on using vagrant for running singularity.
 
 ### Setup
-* `git clone --recurse-submodules --branch main https://github.com/Clinical-Genomics/MUTANT.git`
-* `cd MUTANT && source setup.sh D_mutant` 
+* `git clone --recurse-submodules https://github.com/Clinical-Genomics/MUTANT.git`
+* `cd MUTANT && source setup.sh D_mutant`
 * `source activate D_mutant`
 * Pull the latest image from Dockerhub or build images as described below.
 
@@ -33,7 +32,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 ### Self-test
 * `source activate D_mutant`
 * `cd MUTANT`
-* `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json` 
+* `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,docker --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json` 
 * Wait for pipeline completion (~3m). Check results in `./results/` 
 
 Or install MUTANT under S_mutant and run `cg workflow mutant start frankhusky` with results in `/home/proj/stage/mutant/cases/frankhusky`
@@ -60,9 +59,9 @@ The following script will push `artic-ncov2019-illumina:<version>` to Dockerhub.
 * `bash mutant/standalone/push_docker_image.sh <version>`
 
 ###Pull containers from Dockerhub
-* Automatically during analysis: Set singularity container to `clinicalgenomics/artic-ncov2019-illumina`
-* or pull singularity image manually: `singularity pull <MUTANTDIR>/mutant/externals/gms-artic/artic-ncov2019-illumina.sif docker://clinicalgenomics/artic-ncov2019-illumina:latest`
-* or pull docker image manually: `docker pull clinicalgenomics/artic-ncov2019-illumina:latest`
+* Automatically during analysis: Set container to `clinicalgenomics/artic-ncov2019-illumina`
+* or pull singularity image manually: `singularity pull <MUTANTDIR>/mutant/externals/gms-artic/artic-ncov2019-illumina.sif docker://clinicalgenomics/artic-ncov2019-illumina`
+* or pull docker image manually: `docker pull clinicalgenomics/artic-ncov2019-illumina`
 
 ## Singularity containers
 
