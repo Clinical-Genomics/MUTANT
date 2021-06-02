@@ -49,7 +49,7 @@ class RunSC2:
         if self.config_artic != "":
             confline = "-C {0}".format(self.config_artic)
 
-        cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} " "--directory {6} {7}".format(
+        cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} --directory {6} {7}".format(
             confline,
             nflog,
             workline,

@@ -8,7 +8,7 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 ### Prereq
 * Install Java 8 or above (`java --version`)
 * Install [docker](https://www.docker.com/).
-* Alternatively, install singularity. 
+* Alternatively, install singularity: 
   * On linux: `conda install -c conda-forge singularity`
   * On Mac/Windows follow the installation instructions [here](https://sylabs.io/guides/3.7/admin-guide/installation.html#installation-on-windows-or-mac).
     * See information below on using vagrant for running singularity.
@@ -58,7 +58,7 @@ The following script will push `artic-ncov2019-illumina:<version>` to Dockerhub.
 * `docker login --username=<>`
 * `bash mutant/standalone/push_docker_image.sh <version>`
 
-###Pull containers from Dockerhub
+### Pull containers from Dockerhub
 * Automatically during analysis: Set container to `clinicalgenomics/artic-ncov2019-illumina`
 * or pull singularity image manually: `singularity pull <MUTANTDIR>/mutant/externals/gms-artic/artic-ncov2019-illumina.sif docker://clinicalgenomics/artic-ncov2019-illumina`
 * or pull docker image manually: `docker pull clinicalgenomics/artic-ncov2019-illumina`
