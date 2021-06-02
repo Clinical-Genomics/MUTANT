@@ -21,7 +21,6 @@ Run in a tmux screen or similar if testing on a large dataset.
 **Test with cg**:
 - `us`
 - `cg workflow mutant start maturejay`
-- `cg workflow mutant store maturejay`
 
 ### Expected outcome:
 - [ ] Produced files contain expected values
