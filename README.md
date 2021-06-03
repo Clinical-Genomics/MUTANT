@@ -51,7 +51,7 @@ The containers can be built locally (not possible on hasta) using the instructio
 ### Build docker containers
 1. Start docker.
 2. `cd mutant/externals/gms-artic/`
-3. `docker build -f environments/illumina/Dockerfile artic-ncov2019-illumina:<version> .`
+3. `docker build -f environments/illumina/Dockerfile -t artic-ncov2019-illumina:<version> .`
 
 ### Push docker containers to Dockerhub
 The following script will push `artic-ncov2019-illumina:<version>` to Dockerhub.
