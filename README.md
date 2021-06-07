@@ -23,11 +23,11 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 * Put your changes in a branch. Make a Pull Request of said branch.
 * Run the `self-test`.
 * Fill in everything you can in the PR template.
-* Ping `@sylvinite` in some way and tell him said PR is done.
-* `@sylvinite` will review your PR & suggest changes.
+* Ping colleague and ask them to review your PR & suggest changes.
 * Integrate said changes. If the changes are only aestetic, simply mention you're done without rerunning any tests.
-* `@sylvinite` will merge your changes and version bump. `@sylvinite` will deploy, 
-  however, it is appreciated to pitch in if able.
+* Merge your changes and version bump. 
+* Deploy new version in production.
+
 
 ### Self-test
 * `source activate D_mutant`
