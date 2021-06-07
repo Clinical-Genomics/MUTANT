@@ -79,12 +79,13 @@ class ReportSC2:
         indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
 
         concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
-        concat.write("taxon,lineage,probability,pangoLEARN_version,status,note\n")
-
-
-        for item in glob.glob("{0}/*.csv".format(indir)):
+        pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
+        with open(pangolins[0], "r") as f:
+            header = f.readlines()[0]
+        concat.write(header)
+        for item in pangolins:
             single = open(item, "r")
-            concat.write('\n'.join(single.readlines()[1:]))
+            concat.write("\n".join(single.readlines()[1:]))
         concat.close()
 
     def create_concat_consensus(self):
