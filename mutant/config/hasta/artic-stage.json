@@ -1,18 +1,19 @@
 // Global default params, used in configs
 profiles {
-    local {
-        process.executor = 'local'
+    slurm {
+        process.executor = 'slurm'
+        process.clusterOptions = { "-A development --qos low" }
         process.time = '1h'
         process.memory = '8 GB'
-        process.cpus = 1
+        process.cpus = 4
     }
 }
 process {
     withLabel: largecpu {
-        cpus = 2
+        cpus = 6
     }
     withLabel: largemem {
-        memory = '12 GB'
+        memory = '24 GB'
     }
 }
 
@@ -26,7 +27,7 @@ params {
     help = false
     tracedir = "${params.outdir}/pipeline_info"
     // cache option makes it a bit easier to set conda or singularity cacheDir
-    cache = "${baseDir}/nf-cache/"
+    cache = "/home/proj/development/microbial/sars-cov-2/nf-cache/"
     // Scheme name
     scheme = 'nCoV-2019'
     // Scheme version
@@ -34,7 +35,7 @@ params {
     // gff file
     gff = "$baseDir/typing/MN908947.3.gff"
     // SARS-CoV-2 VOC
-    yaml = "${baseDir}/typing/SARS-CoV-2.types.yaml"
+    yaml = "$baseDir/typing/SARS-CoV-2.types.yaml"
 }
 
 if ( params.medaka || params.nanopolish ) {
@@ -88,9 +89,9 @@ if ( params.illumina ) {
         // Minimum coverage depth to call aa consequences of variant. Set to ivarMinDepth for consistency with consensus
         csqDpThreshold = 10
         // Java settings for picard tools. The "-Xmx" setting is useful if running into java memory issues
-        picardJavaSettings = ""
+        picardJavaSettings = "-Xmx10g"
         // Options for picard CollectWgsMetrics
-        wgsMetricsOptions = "--COVERAGE_CAP 10000 --LOCUS_ACCUMULATION_CAP 100000"
+        wgsMetricsOptions = "--COVERAGE_CAP 1000000 --LOCUS_ACCUMULATION_CAP 1000000"
         // Customization of multiQC report
         multiqcOptions = '--cl_config "picard_config: { general_stats_target_coverage: [10,30,50,100] }"'
     }
@@ -114,7 +115,6 @@ profiles {
         docker.enabled = true
         fixOwnership = true
         runOptions = "-u \$(id -u):\$(id -g)"
-        process.container = "clinicalgenomics/artic-ncov2019-illumina"
     }
     singularity {
         singularity.enabled = true

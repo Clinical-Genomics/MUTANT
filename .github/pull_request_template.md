@@ -1,14 +1,26 @@
 ### The purpose of the code changes are as follows:
 -  THING
 
-**How to prepare for test**:
-- `cd MUTANT`
-- `export PATH=$PATH:MUTANT_DIR`
-- `source activate CONDA_ENV`
-- `pip install -e .`
+### Preparations:
+
+**How to prepare mutant for test**:
+* `bash mutant/standalone/deploy_hasta_update.sh stage <MUTANT_branch>`
+
+**How to prepare cg for test**:
+- `us`
+- Paxa and update cg or other tools needed for the test:
+  - `paxa -u <user> -s hasta -r cg-stage`
+  - `paxa -u <user> -s hasta -r servers-stage`
+  - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-cg-stage.sh master`
+  - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-servers-stage.sh master`
+  
 
 ### How to test:
-- `mutant analyse sarscov2 tests/testdata/fasta_files --profiles local,singularity --config_artic mutant/config/local/artic.json --config_mutant mutant/config/local/mutant.json --config_case tests/testdata/MIC3109_artic.json`
+Run in a tmux screen or similar if testing on a large dataset.
+
+**Test with cg**:
+- `us`
+- `cg workflow mutant start maturejay`
 
 ### Expected outcome:
 - [ ] Produced files contain expected values

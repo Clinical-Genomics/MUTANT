@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-SCRIPT=$(readlink -f $0)
-scriptdir=`dirname $SCRIPT`
+set -e
+
 INSTANCE=$1
+BRANCH=$2
 
 OLDDIR=$(pwd)
 
@@ -14,8 +15,8 @@ fi
 #INSTANCE='stage' or INSTANCE='production'
 cd /home/proj/${INSTANCE}/mutant/MUTANT
 git fetch
-git checkout main
-git pull origin main
+git checkout $BRANCH
+git pull origin $BRANCH
 INITIAL="$(echo $INSTANCE | head -c 1)"
 source activate ${INITIAL^}_mutant
 pip install -e .
@@ -25,3 +26,6 @@ git fetch
 git checkout master
 git pull origin master
 cd ${OLDDIR}
+
+# Pull latest image
+singularity pull --force /home/proj/${INSTANCE}/mutant/MUTANT/mutant/externals/gms-artic/artic-ncov2019-illumina.sif docker://clinicalgenomics/artic-ncov2019-illumina:latest
