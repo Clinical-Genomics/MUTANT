@@ -563,9 +563,7 @@ class ReportSC2:
 #                    "format": "csv",
 #                    "id": self.case,
 #                    "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
-#                    "{}_{}_pangolin_classification.txt".format(
-#                        self.indir, rl, self.today
-#                    ),
+#                    "{}_{}_pangolin_classification.txt".format(self.indir, rl),
 #                    "path_index": "~",
 #                    "step": "typing",
 #                    "tag": "SARS-CoV-2-type",
