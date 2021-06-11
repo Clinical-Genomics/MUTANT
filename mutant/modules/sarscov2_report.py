@@ -590,17 +590,17 @@ class ReportSC2:
         for regionlab in self.regionlabs:
             rl = regionlab
             # Region split Pangolin typing
-            deliv["files"].append(
-                {
-                    "format": "csv",
-                    "id": self.case,
-                    "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
-                    "{}_{}_pangolin_classification.txt".format(self.indir, rl, self.today),
-                    "path_index": "~",
-                    "step": "typing",
-                    "tag": "SARS-CoV-2-type",
-                }
-            )
+            #deliv["files"].append(
+            #    {
+            #        "format": "csv",
+            #        "id": self.case,
+            #        "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
+            #        "{}_{}_pangolin_classification.txt".format(self.indir, rl, self.today),
+            #        "path_index": "~",
+            #        "step": "typing",
+            #        "tag": "SARS-CoV-2-type",
+            #    }
+            #)
 
             # Region split FoHM delivery file
             deliv["files"].append(
