@@ -53,6 +53,7 @@ class ReportSC2:
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
+        self.create_instrument_properties()
 
     def get_finished_slurm_ids(self) -> list:
         trace_file_path = Path(self.indir, "pipeline_info", "execution_trace.txt")
@@ -75,7 +76,6 @@ class ReportSC2:
             yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
 
     def create_concat_pangolin(self):
-
         indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
 
         concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
@@ -100,7 +100,6 @@ class ReportSC2:
         concat.close()
 
     def create_fohm_csv(self):
-
         """Creates a summary file for FoHM for each region-lab-combination"""
 
         # Add header to summary files
@@ -127,6 +126,36 @@ class ReportSC2:
                         record["selection_criteria"],
                     ]
                 )
+
+
+    def create_instrument_properties(self):
+        """Creates a summary file for FoHM for each region-lab-combination"""
+
+        propfile = os.path.join(
+            self.indir,"instrument.properties")
+
+        plfrm = "illumina"
+        lanes = "1"
+        ms = "N/A"
+        ml = "N/A"
+
+        for sample, data in self.articdata.items():
+            if ml == "N/A":
+                ml = data["method_libprep"]
+            elif ml != data["method_libprep"]:
+                ml = "INCONSISTENT"
+            if ms == "N/A":
+                ms = data["method_sequencing"]
+            elif ms != data["method_sequencing"]:
+                ms = "INCONSISTENT"
+
+
+
+        with open(propfile, "w") as prop:
+            prop.write("instrument={}\n".format(ms))
+            prop.write("plattform={}\n".format(plfrm))
+            prop.write("biblioteksmetod={}\n".format(ml))
+            prop.write("lanes={}\n".format(lanes))
 
     def create_sarscov2_resultfile(self):
         """Write summary csv report of Artic and Pangolin results"""
@@ -404,6 +433,18 @@ class ReportSC2:
         delivfile = "{}/{}_deliverables.yaml".format(self.indir, self.case)
 
         ## Per Case
+        # Instrument properties
+        deliv["files"].append(
+            {
+                "format": "txt",
+                "id": self.case,
+                "path": "{}/instrument.properties".format(self.indir),
+                "path_index": "~",
+                "step": "report",
+                "tag": "instrument-properties","fohm-delivery",
+            }
+        )
+
         # KS Report
         deliv["files"].append(
             {
@@ -558,17 +599,18 @@ class ReportSC2:
         for regionlab in self.regionlabs:
             rl = regionlab
             # Region split Pangolin typing
-#            deliv["files"].append(
-#                {
-#                    "format": "csv",
-#                    "id": self.case,
-#                    "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
-#                    "{}_{}_pangolin_classification.txt".format(self.indir, rl),
-#                    "path_index": "~",
-#                    "step": "typing",
-#                    "tag": "SARS-CoV-2-type",
-#                }
-#            )
+            deliv["files"].append(
+                {
+                    "format": "csv",
+                    "id": self.case,
+                    "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
+                    "{}_{}_pangolin_classification.txt".format(self.indir, rl, self.today),
+                    "path_index": "~",
+                    "step": "typing",
+                    "tag": "SARS-CoV-2-type",
+                }
+            )
+
             # Region split FoHM delivery file
             deliv["files"].append(
                 {
@@ -630,19 +672,19 @@ class ReportSC2:
             #        "tag": "reference-alignment-sorted",
             #    }
             #)
-            ## Variants (csq-vcf)
-            #deliv["files"].append(
-            #    {
-            #        "format": "vcf",
-            #        "id": sampleID,
-            #        "path": "{}/ncovIllumina_Genotyping_typeVariants/vcf/{}.vcf".format(
-            #            self.indir, base_sample
-            #        ),
-            #        "path_index": "~",
-            #        "step": "genotyping",
-            #        "tag": "variants",
-            #    }
-            #)
+            # Variants (vcf)
+            deliv["files"].append(
+                {
+                    "format": "vcf",
+                    "id": sampleID,
+                    "path": "{}/ncovIllumina_Genotyping_typeVariants/vcf/{}.vcf".format(
+                        self.indir, base_sample
+                    ),
+                    "path_index": "~",
+                    "step": "genotyping",
+                    "tag": "vcf-covid",
+                }
+            )
             ## Variants (tsv)
             #deliv["files"].append(
             #    {
