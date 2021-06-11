@@ -168,10 +168,10 @@ class ReportSC2:
         indir = self.indir
 
         summaryfile = os.path.join(
-            indir, "sars-cov-2_{}_results.csv".format(ticket, today)
-        )
+            indir, "sars-cov-2_{}_results.csv".format(ticket))
         with open(summaryfile, mode="w") as out:
             summary = csv.writer(out)
+            #Backrolled Mutations to Variants
             summary.writerow(
                 [
                     "Sample",
@@ -183,53 +183,44 @@ class ReportSC2:
                     "Lineage",
                     "PangoLEARN_version",
                     "VOC",
+                    "Variants",
                 ]
             )
             for sample, data in self.articdata.items():
-                selection = "-"
+                n_bases = 10x_bases = "0.0"
+                qc_status = "FALSE"
+                lineage = "None"
+                version = "1970-01-01" 
+                vocs = vocs_aa = '-'
+
+                if 'pct_n_bases' in data:
+                    n_bases = data['pct_n_bases']
+                if 'pct_10x_bases' in data:
+                    10x_bases = data['pct_10x_bases']
+                if 'qc' in data:
+                    qc_status = data['qc']
+                if 'lineage' in data:
+                    lineage = data['lineage']
+                if 'pangoLEARN_version' in data:
+                    version = data['pangoLEARN_version']
+                if 'VOC' in data:
+                    vocs = data['VOC']
+                if "VOC_aa" in data:
+                    vocs_aa = data['VOC_aa']
+
                 row = [
                     sample,
-                    data["selection_criteria"],
+                    selection,
                     ticket,
-                    data["pct_n_bases"],
-                    data["pct_10X_bases"],
-                    data["qc"],
-                    data["lineage"],
-                    data["pangoLEARN_version"],
-                    data["VOC"],
+                    n_bases,
+                    10x_bases,
+                    qc_status,
+                    lineage,
+                    version,
+                    vocs,
+                    vocs_aa
                 ]
-#        with open(summaryfile, mode="w") as out:
-#            summary = csv.writer(out)
-#            summary.writerow(
-#                [
-#                    "Sample",
-#                    "Selection",
-#                    "Region Code",
-#                    "Ticket",
-#                    "%N_bases",
-#                    "%10X_coverage",
-#                    "QC_pass",
-#                    "Lineage",
-#                    "PangoLEARN_version",
-#                    "VOC",
-#                    "Mutations",
-#                ]
-#            )
-#            for sample, data in self.articdata.items():
-#                selection = "-"
-#                row = [
-#                    sample,
-#                    data["selection_criteria"],
-#                    data["region_code"],
-#                    ticket,
-#                    data["pct_n_bases"],
-#                    data["pct_10X_bases"],
-#                    data["qc"],
-#                    data["lineage"],
-#                    data["pangoLEARN_version"],
-#                    data["VOC"],
-#                    data["VOC_aa"],
-#                ]
+
                 summary.writerow(row)
 
     def create_sarscov2_variantfile(self):
