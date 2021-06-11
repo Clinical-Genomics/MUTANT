@@ -187,16 +187,19 @@ class ReportSC2:
                 ]
             )
             for sample, data in self.articdata.items():
-                n_bases = 10x_bases = "0.0"
+                n_bases = tenx_bases = "0.0"
                 qc_status = "FALSE"
                 lineage = "None"
                 version = "1970-01-01" 
-                vocs = vocs_aa = '-'
+                vocs = vocs_aa = "-"
+                selection = "-"
 
+                if 'selection_criteria' in data:
+                    selection = data['selection_criteria']
                 if 'pct_n_bases' in data:
                     n_bases = data['pct_n_bases']
                 if 'pct_10x_bases' in data:
-                    10x_bases = data['pct_10x_bases']
+                    tenx_bases = data['pct_10x_bases']
                 if 'qc' in data:
                     qc_status = data['qc']
                 if 'lineage' in data:
@@ -213,7 +216,7 @@ class ReportSC2:
                     selection,
                     ticket,
                     n_bases,
-                    10x_bases,
+                    tenx_bases,
                     qc_status,
                     lineage,
                     version,
@@ -432,7 +435,7 @@ class ReportSC2:
                 "path": "{}/instrument.properties".format(self.indir),
                 "path_index": "~",
                 "step": "report",
-                "tag": "instrument-properties","fohm-delivery",
+                "tag": ["instrument-properties","fohm-delivery"],
             }
         )
 
