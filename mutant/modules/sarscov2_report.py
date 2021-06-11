@@ -190,7 +190,7 @@ class ReportSC2:
                 n_bases = tenx_bases = "0.0"
                 qc_status = "FALSE"
                 lineage = "None"
-                version = "1970-01-01" 
+                verzion = "1970-01-01" 
                 vocs = vocs_aa = "-"
                 selection = "-"
 
@@ -204,8 +204,8 @@ class ReportSC2:
                     qc_status = data['qc']
                 if 'lineage' in data:
                     lineage = data['lineage']
-                if 'pangoLEARN_version' in data:
-                    version = data['pangoLEARN_version']
+                if 'pangoLEARN_version' in data and data["pangoLEARN_version"] != "":
+                    verzion = data['pangoLEARN_version']
                 if 'VOC' in data:
                     vocs = data['VOC']
                 if "VOC_aa" in data:
@@ -219,7 +219,7 @@ class ReportSC2:
                     tenx_bases,
                     qc_status,
                     lineage,
-                    version,
+                    verzion,
                     vocs,
                     vocs_aa
                 ]
