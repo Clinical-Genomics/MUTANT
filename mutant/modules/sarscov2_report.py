@@ -435,7 +435,7 @@ class ReportSC2:
                 "path": "{}/instrument.properties".format(self.indir),
                 "path_index": "~",
                 "step": "report",
-                "tag": ["instrument-properties","fohm-delivery"],
+                "tag": "instrument-properties",
             }
         )
 
