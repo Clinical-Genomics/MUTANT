@@ -303,9 +303,6 @@ class ReportSC2:
         voc_strains['spike'] = classifications['spike'].tolist()
         voc_strains['class'] = classifications['class'].tolist()
 
-        #voc_pos_aa = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_pos_aa']
-        #voc_strains = get_json("{0}/standalone/voc_strains.json".format(WD))['voc_strains']
-
         artic_data = dict()
         var_all = dict()
         var_voc = dict()
@@ -362,9 +359,9 @@ class ReportSC2:
                 artic_data[sample].update(
                     {
                         "lineage": lineage,
-                        "pangolin_probability": line[2],
-                        "pangoLEARN_version": line[3],
-                        "pangolin_qc": line[4],
+                        "pangolin_probability": line[3],
+                        "pangoLEARN_version": line[-4],
+                        "pangolin_qc": line[-2],
                     }
                 )
 
@@ -413,9 +410,11 @@ class ReportSC2:
                 artic_data[key].update( {"VOC":"-"})
             elif artic_data[key]["lineage"] in voc_strains['lineage']:
                 index = voc_strains['lineage'].index(artic_data[key]['lineage'])
+                if voc_strains['class'][index] == "VOC":
+                    artic_data[key].update( {"VOC":"Yes"})
                 #Check for spike
-                if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
-                    artic_data[key].update( {"VOC":voc_strains['class'][index]} )
+                #if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
+                    #artic_data[key].update( {"VOC":voc_strains['class'][index]} )
 
 
 
