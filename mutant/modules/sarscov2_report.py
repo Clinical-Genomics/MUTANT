@@ -44,12 +44,13 @@ class ReportSC2:
         self.articdata = dict()
 
     def create_all_files(self):
+        self.load_lookup_dict()
+
         self.create_trailblazer_config()
         self.create_concat_pangolin()
         self.create_concat_consensus()
         self.create_deliveryfile()
         self.create_fohm_csv()
-        self.load_lookup_dict()
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
@@ -198,8 +199,8 @@ class ReportSC2:
                     selection = data['selection_criteria']
                 if 'pct_n_bases' in data:
                     n_bases = data['pct_n_bases']
-                if 'pct_10x_bases' in data:
-                    tenx_bases = data['pct_10x_bases']
+                if 'pct_10X_bases' in data:
+                    tenx_bases = data['pct_10X_bases']
                 if 'qc' in data:
                     qc_status = data['qc']
                 if 'lineage' in data:
