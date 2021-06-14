@@ -277,14 +277,16 @@ class ReportSC2:
 
         packing = dict(zip(casekeys, "-"*len(casekeys)))
 
-        #Packs with keys. Time consuming but not really
+        #Updates existing samples with defaults for case-config
         for k, v in self.articdata.items():
             self.articdata[k].update(packing)
-        #Writes caseconfig data where relevant
+        #Updates existing samples with provided case-config info
         for entry in self.caseinfo:
             k = entry['Customer_ID_sample']
             if k in self.articdata.keys():
                 self.articdata[k].update(entry)
+            else:
+                self.articdata[k] = entry
 
 
     def load_artic_results(self):
