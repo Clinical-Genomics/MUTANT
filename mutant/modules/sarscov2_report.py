@@ -130,7 +130,7 @@ class ReportSC2:
 
 
     def create_instrument_properties(self):
-        """Creates a summary file for FoHM for each region-lab-combination"""
+        """Creates a properties file with instrument information"""
 
         propfile = os.path.join(
             self.indir,"instrument.properties")
