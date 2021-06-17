@@ -103,6 +103,7 @@ class ReportSC2:
     def create_fohm_csv(self):
         """Creates a summary file for FoHM for each region-lab-combination"""
 
+        ## Region seperated
         # Add header to summary files
         for regionlab in self.regionlabs:
             sumfile = os.path.join(
@@ -127,6 +128,31 @@ class ReportSC2:
                         record["selection_criteria"],
                     ]
                 )
+
+        ##Complete file
+        # Add header to summary files
+        sumfile = os.path.join(
+            self.indir,
+            "complete_{}_komplettering.csv".format(self.today),
+        )
+        with open(sumfile, "w") as summary:
+            summary.write("provnummer,urvalskriterium,GISAID_accession\n")
+
+        # Write sample information to corresponding summary file
+        for record in self.caseinfo:
+            sumfile = os.path.join(
+                self.indir, "complete_{}_komplettering.csv".format(self.today)
+            )
+            with open(sumfile, "a") as out:
+                summary = csv.writer(out)
+                summary.writerow(
+                    [
+                        record["Customer_ID_sample"],
+                        record["selection_criteria"],
+                    ]
+                )
+
+
 
 
     def create_instrument_properties(self):
@@ -588,6 +614,18 @@ class ReportSC2:
                 "path_index": "~",
                 "step": "runinfo",
                 "tag": "logfile",
+            }
+        )
+        deliv["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": os.path.join(
+                    self.indir, "complete_{}_komplettering.csv".format(self.today)
+                ),
+                "path_index": "~",
+                "step": "report",
+                "tag": "SARS-CoV-2-info",
             }
         )
 
