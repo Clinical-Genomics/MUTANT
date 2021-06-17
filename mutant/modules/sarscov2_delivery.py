@@ -5,14 +5,8 @@
 
 """
 
-
-import csv
 import glob
 import os
-from datetime import date
-from pathlib import Path
-
-import yaml
 
 from mutant.modules.generic_parser import get_sarscov2_config
 
@@ -21,17 +15,10 @@ class DeliverySC2:
     def __init__(self, caseinfo, indir):
         self.casefile = caseinfo
         caseinfo = get_sarscov2_config(caseinfo)
-
-        regionlab_list = []
-        for record in caseinfo:
-            regionlab = "{}_{}".format(record["region_code"], record["lab_code"])
-            if regionlab not in regionlab_list:
-                regionlab_list.append(regionlab)
         self.caseinfo = caseinfo
         self.case = caseinfo[0]["case_ID"]
         self.ticket = caseinfo[0]["Customer_ID_project"]
         self.project = caseinfo[0]["Customer_ID_project"]
-        self.regionlabs = regionlab_list
         self.indir = indir
 
     def rename_deliverables(self):
@@ -55,7 +42,7 @@ class DeliverySC2:
             )
             for item in glob.glob("{0}/{1}.*".format(prefix, base_sample)):
                 newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
-                try: 
+                try:
                     os.symlink(item, newpath)
                 except Exception as e:
                     pass
@@ -64,11 +51,10 @@ class DeliverySC2:
             prefix = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
             for item in glob.glob("{0}/{1}.csq.vcf".format(prefix, base_sample)):
                 newpath = "{0}/{1}.vcf".format(prefix, base_sample)
-                try: 
+                try:
                     os.symlink(item, newpath)
                 except Exception as e:
                     pass
-
 
         ## Rename case files
 
@@ -76,20 +62,21 @@ class DeliverySC2:
         hit = glob.glob("{}/multiqc/*_multiqc.html".format(self.indir))
         if len(hit) == 1:
             hit = hit[0]
-            try: 
+            try:
                 os.symlink(hit, "{}/{}_multiqc.html".format(self.indir, self.ticket))
             except Exception as e:
                 pass
 
         # rename multiqc json
-        hit = glob.glob("{}/multiqc/*_multiqc_data/multiqc_data.json".format(self.indir))
+        hit = glob.glob(
+            "{}/multiqc/*_multiqc_data/multiqc_data.json".format(self.indir)
+        )
         if len(hit) == 1:
             hit = hit[0]
-            try: 
+            try:
                 os.symlink(hit, "{}/{}_multiqc.json".format(self.indir, self.ticket))
             except Exception as e:
                 pass
-          
 
         core_suffix = [
             ".qc.csv",
@@ -100,7 +87,7 @@ class DeliverySC2:
             hit = glob.glob("{0}/*{1}".format(self.indir, thing))
             if len(hit) == 1:
                 hit = hit[0]
-                try: 
+                try:
                     os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
                 except Exception as e:
                     pass
