@@ -93,8 +93,14 @@ class ReportSC2:
                 for line in data:
                     # Use sample name at taxon field
                     taxon_regex = "(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
-                    sample = re.sub(taxon_regex, r"\g<name>", line.split(",")[0])
-                    concat.write(sample + line[line.find(",") :])
+                    sample, subs = re.subn(taxon_regex, r"\g<name>", line.split(",")[0])
+                    if subs == 0:
+                        print(
+                            "Unable to rename taxon - using original: {}".format(pango)
+                        )
+                    else:
+                        line = sample + line[line.find(",") :]
+                    concat.write(line)
 
     def create_concat_consensus(self):
         """Concatenate consensus files"""
