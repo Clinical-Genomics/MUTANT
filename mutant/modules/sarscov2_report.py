@@ -92,9 +92,9 @@ class ReportSC2:
                 data = read_filelines(pango)[1:]
                 for line in data:
                     # Use sample name at taxon field
-                    sample = line.split(",")[0].split(".")[0].split("_")[-1]
-                    fohm_line = sample + line[line.find(",") :]
-                    concat.write(fohm_line)
+                    taxon_regex = "(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
+                    sample = re.sub(taxon_regex, r"\g<name>", line.split(",")[0])
+                    concat.write(sample + line[line.find(",") :])
 
     def create_concat_consensus(self):
         """Concatenate consensus files"""
@@ -258,7 +258,7 @@ class ReportSC2:
             json.dump(self.articdata, outfile)
 
     def load_lookup_dict(self):
-        """Loads articdata with data from various sources. Atm, artic output and the case          config input file"""
+        """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
         self.load_artic_results()
         self.load_case_config()
 
