@@ -11,30 +11,27 @@ import pandas
 import re
 import os
 import sys
-import yaml 
+import yaml
 
 from datetime import date
 from pathlib import Path
 
 from mutant import WD
-from mutant.modules.generic_parser import get_sarscov2_config, get_json, append_dict
+from mutant.modules.generic_parser import (
+    get_sarscov2_config,
+    append_dict,
+    read_filelines,
+)
 
 
 class ReportSC2:
     def __init__(self, caseinfo, indir, config_artic, fastq_dir, timestamp):
         self.casefile = caseinfo
         caseinfo = get_sarscov2_config(caseinfo)
-
-        regionlab_list = []
-        for record in caseinfo:
-            regionlab = "{}_{}".format(record["region_code"], record["lab_code"])
-            if regionlab not in regionlab_list:
-                regionlab_list.append(regionlab)
         self.caseinfo = caseinfo
         self.case = caseinfo[0]["case_ID"]
         self.ticket = caseinfo[0]["Customer_ID_project"]
         self.project = caseinfo[0]["Customer_ID_project"]
-        self.regionlabs = regionlab_list
         self.indir = indir
         self.config_artic = config_artic
         self.time = timestamp
@@ -57,6 +54,8 @@ class ReportSC2:
         self.create_instrument_properties()
 
     def get_finished_slurm_ids(self) -> list:
+        """Get slurm IDs"""
+
         trace_file_path = Path(self.indir, "pipeline_info", "execution_trace.txt")
         slurm_id_list = []
         with open(trace_file_path, "r") as trace_file_contents:
@@ -69,6 +68,8 @@ class ReportSC2:
         return slurm_id_list
 
     def create_trailblazer_config(self) -> None:
+        """Create Trailblazer config file"""
+
         trailblazer_config_path = Path(self.indir, "trailblazer_config.yaml")
         finished_slurm_ids = self.get_finished_slurm_ids()
         if not finished_slurm_ids:
@@ -77,22 +78,34 @@ class ReportSC2:
             yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
 
     def create_concat_pangolin(self):
-        indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
+        """Concatenate pangolin results"""
 
-        concat = open("{0}/{1}.pangolin.csv".format(self.indir, self.ticket), "w+")
+        indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
+        concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
         pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
-        with open(pangolins[0], "r") as f:
-            header = f.readlines()[0]
-        concat.write(header)
-        for item in pangolins:
-            single = open(item, "r")
-            concat.write("\n".join(single.readlines()[1:]))
-        concat.close()
+        # Copy header
+        header = read_filelines(pangolins[0])[0]
+        with open(concatfile, "w") as concat:
+            concat.write(header)
+            # Parse sample pangolin data
+            for pango in pangolins:
+                data = read_filelines(pango)[1:]
+                for line in data:
+                    # Use sample name at taxon field
+                    taxon_regex = "(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
+                    sample, subs = re.subn(taxon_regex, r"\g<name>", line.split(",")[0])
+                    if subs == 0:
+                        print(
+                            "Unable to rename taxon - using original: {}".format(pango)
+                        )
+                    else:
+                        line = sample + line[line.find(",") :]
+                    concat.write(line)
 
     def create_concat_consensus(self):
+        """Concatenate consensus files"""
 
         indir = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
-
         concat = open("{0}/{1}.consensus.fa".format(self.indir, self.ticket), "w+")
         for item in glob.glob("{0}/*.consensus.fa".format(indir)):
             single = open(item, "r")
@@ -101,26 +114,18 @@ class ReportSC2:
         concat.close()
 
     def create_fohm_csv(self):
-        """Creates a summary file for FoHM for each region-lab-combination"""
+        """Creates a summary file for FoHMs additional info"""
 
-        # Add header to summary files
-        for regionlab in self.regionlabs:
-            sumfile = os.path.join(
-                self.indir,
-                "{}_{}_komplettering.csv".format(regionlab, self.today),
-            )
-            with open(sumfile, "w") as summary:
-                summary.write("provnummer,urvalskriterium,GISAID_accession\n")
-
-        # Write sample information to corresponding summary file
-        for record in self.caseinfo:
-            region = record["region_code"]
-            lab = record["lab_code"]
-            sumfile = os.path.join(
-                self.indir, "{}_{}_{}_komplettering.csv".format(region, lab, self.today)
-            )
-            with open(sumfile, "a") as out:
-                summary = csv.writer(out)
+        sumfile = os.path.join(
+            self.indir,
+            "{}_komplettering.csv".format(self.ticket),
+        )
+        with open(sumfile, "w") as out:
+            summary = csv.writer(out)
+            # Add header
+            summary.writerow(["provnummer", "urvalskriterium", "GISAID_accession"])
+            # Write sample information
+            for record in self.caseinfo:
                 summary.writerow(
                     [
                         record["Customer_ID_sample"],
@@ -128,12 +133,10 @@ class ReportSC2:
                     ]
                 )
 
-
     def create_instrument_properties(self):
         """Creates a properties file with instrument information"""
 
-        propfile = os.path.join(
-            self.indir,"instrument.properties")
+        propfile = os.path.join(self.indir, "instrument.properties")
 
         plfrm = "illumina"
         lanes = "1"
@@ -149,8 +152,6 @@ class ReportSC2:
                 ms = data["method_sequencing"]
             elif ms != data["method_sequencing"]:
                 ms = "INCONSISTENT"
-
-
 
         with open(propfile, "w") as prop:
             prop.write("instrument={}\n".format(ms))
@@ -168,11 +169,10 @@ class ReportSC2:
             sys.exit(-1)
         indir = self.indir
 
-        summaryfile = os.path.join(
-            indir, "sars-cov-2_{}_results.csv".format(ticket))
+        summaryfile = os.path.join(indir, "sars-cov-2_{}_results.csv".format(ticket))
         with open(summaryfile, mode="w") as out:
             summary = csv.writer(out)
-            #Backrolled Mutations to Variants
+            # Backrolled Mutations to Variants
             summary.writerow(
                 [
                     "Sample",
@@ -191,26 +191,26 @@ class ReportSC2:
                 n_bases = tenx_bases = "0.0"
                 qc_status = "FALSE"
                 lineage = "None"
-                verzion = "1970-01-01" 
+                verzion = "1970-01-01"
                 vocs = vocs_aa = "-"
                 selection = "-"
 
-                if 'selection_criteria' in data:
-                    selection = data['selection_criteria']
-                if 'pct_n_bases' in data:
-                    n_bases = data['pct_n_bases']
-                if 'pct_10X_bases' in data:
-                    tenx_bases = data['pct_10X_bases']
-                if 'qc' in data:
-                    qc_status = data['qc']
-                if 'lineage' in data:
-                    lineage = data['lineage']
-                if 'pangoLEARN_version' in data and data["pangoLEARN_version"] != "":
-                    verzion = data['pangoLEARN_version']
-                if 'VOC' in data:
-                    vocs = data['VOC']
+                if "selection_criteria" in data:
+                    selection = data["selection_criteria"]
+                if "pct_n_bases" in data:
+                    n_bases = data["pct_n_bases"]
+                if "pct_10X_bases" in data:
+                    tenx_bases = data["pct_10X_bases"]
+                if "qc" in data:
+                    qc_status = data["qc"]
+                if "lineage" in data:
+                    lineage = data["lineage"]
+                if "pangoLEARN_version" in data and data["pangoLEARN_version"] != "":
+                    verzion = data["pangoLEARN_version"]
+                if "VOC" in data:
+                    vocs = data["VOC"]
                 if "VOC_aa" in data:
-                    vocs_aa = data['VOC_aa']
+                    vocs_aa = data["VOC_aa"]
 
                 row = [
                     sample,
@@ -222,7 +222,7 @@ class ReportSC2:
                     lineage,
                     verzion,
                     vocs,
-                    vocs_aa
+                    vocs_aa,
                 ]
 
                 summary.writerow(row)
@@ -236,9 +236,7 @@ class ReportSC2:
         today = self.today
 
         varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
-        varout = os.path.join(
-            indir, "sars-cov-2_{}_variants.csv".format(ticket, today)
-        )
+        varout = os.path.join(indir, "sars-cov-2_{}_variants.csv".format(ticket, today))
         if os.stat(varRep).st_size != 0:
             with open(varRep) as f, open(varout, mode="w") as out:
                 variants = f.readlines()
@@ -265,44 +263,43 @@ class ReportSC2:
         ) as outfile:
             json.dump(self.articdata, outfile)
 
-
-
     def load_lookup_dict(self):
-        """ Loads articdata with data from various sources. Atm, artic output and the case          config input file """
+        """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
         self.load_artic_results()
         self.load_case_config()
 
     def load_case_config(self):
-        """ Appends additional data to articdata dictionary """
+        """Appends additional data to articdata dictionary"""
         casekeys = self.caseinfo[0].keys()
 
-        packing = dict(zip(casekeys, "-"*len(casekeys)))
+        packing = dict(zip(casekeys, "-" * len(casekeys)))
 
-        #Updates existing samples with defaults for case-config
+        # Updates existing samples with defaults for case-config
         for k, v in self.articdata.items():
             self.articdata[k].update(packing)
-        #Updates existing samples with provided case-config info
+        # Updates existing samples with provided case-config info
         for entry in self.caseinfo:
-            k = entry['Customer_ID_sample']
+            k = entry["Customer_ID_sample"]
             if k in self.articdata.keys():
                 self.articdata[k].update(entry)
             else:
                 self.articdata[k] = entry
 
-
     def load_artic_results(self):
-        """Parse artic output directory for analysis results. Returns dictionary data object        """
+        """Parse artic output directory for analysis results. Returns dictionary data object"""
         indir = self.indir
         voc_pos = range(475, 486)
         muts = pandas.read_csv("{0}/standalone/spike_mutations.csv".format(WD), sep=",")
         # Magical unpacking into single list
         voc_pos_aa = sum(muts.values.tolist(), [])
 
-        classifications = pandas.read_csv("{0}/standalone/classifications.csv".format(WD), sep=",")
-        voc_strains = { 'lineage':'','spike':'','class':''}
-        voc_strains['lineage'] = classifications['lineage'].tolist()
-        voc_strains['spike'] = classifications['spike'].tolist()
-        voc_strains['class'] = classifications['class'].tolist()
+        classifications = pandas.read_csv(
+            "{0}/standalone/classifications.csv".format(WD), sep=","
+        )
+        voc_strains = {"lineage": "", "spike": "", "class": ""}
+        voc_strains["lineage"] = classifications["lineage"].tolist()
+        voc_strains["spike"] = classifications["spike"].tolist()
+        voc_strains["class"] = classifications["class"].tolist()
 
         artic_data = dict()
         var_all = dict()
@@ -312,7 +309,6 @@ class ReportSC2:
         files = [
             "*qc.csv",
             "*variant_summary.csv",
-            "*pangolin.csv",
         ]
         paths = list()
         for f in files:
@@ -349,22 +345,6 @@ class ReportSC2:
                     "artic_qc": line[7],
                     "qc": qc_flag,
                 }
-        # Parse Pangolin report data
-        with open(paths[2]) as f:
-            content = csv.reader(f)
-            next(content)
-            for line in content:
-                sample = line[0].split(".")[0].split("_")[-1]
-                lineage = line[1]
-
-                artic_data[sample].update(
-                    {
-                        "lineage": lineage,
-                        "pangolin_probability": line[3],
-                        "pangoLEARN_version": line[-4],
-                        "pangolin_qc": line[-2],
-                    }
-                )
 
         # Parse Variant report data
         if os.stat(paths[1]).st_size != 0:
@@ -378,6 +358,25 @@ class ReportSC2:
                     if (pos in voc_pos) or (variant in voc_pos_aa):
                         append_dict(var_voc, sample, variant)
                     append_dict(var_all, sample, variant)
+
+        # Parse Pangolin report data
+        pangodir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
+        pangolins = glob.glob("{0}/*.pangolin.csv".format(pangodir))
+        for path in pangolins:
+            with open(path) as f:
+                content = csv.reader(f)
+                next(content)  # Skip header
+                for line in content:
+                    sample = line[0].split(".")[0].split("_")[-1]
+                    artic_data[sample].update(
+                        {
+                            "lineage": line[1],
+                            "pangolin_probability": line[3],
+                            "pangoLEARN_version": line[-4],
+                            "pangolin_qc": line[-2],
+                        }
+                    )
+
         # Add variant data to results
         if var_voc:
             for sample in artic_data.keys():
@@ -400,29 +399,25 @@ class ReportSC2:
                 else:
                     artic_data[sample].update({"variants": "-"})
 
-
-        #Classification
+        # Classification
         for key, vals in artic_data.items():
-            #Packing
-            artic_data[key].update( {"VOC": "No" } )
+            # Packing
+            artic_data[key].update({"VOC": "No"})
 
-            #Check for lineage
+            # Check for lineage
             if artic_data[key]["lineage"] == "None":
-                artic_data[key].update( {"VOC":"-"})
-            elif artic_data[key]["lineage"] in voc_strains['lineage']:
-                index = voc_strains['lineage'].index(artic_data[key]['lineage'])
-                if voc_strains['class'][index] == "VOC":
-                    artic_data[key].update( {"VOC":"Yes"})
-                #Check for spike
-                #if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
-                    #artic_data[key].update( {"VOC":voc_strains['class'][index]} )
-
-
+                artic_data[key].update({"VOC": "-"})
+            elif artic_data[key]["lineage"] in voc_strains["lineage"]:
+                index = voc_strains["lineage"].index(artic_data[key]["lineage"])
+                if voc_strains["class"][index] == "VOC":
+                    artic_data[key].update({"VOC": "Yes"})
+                # Check for spike
+                # if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
+                # artic_data[key].update( {"VOC":voc_strains['class'][index]} )
 
         self.articdata.update(artic_data)
 
     def create_deliveryfile(self):
-
         """Create deliverables file"""
 
         deliv = {"files": []}
@@ -511,9 +506,9 @@ class ReportSC2:
                 "tag": "multiqc-json",
             }
         )
- 
+
         ## Artic Summary report
-        #deliv["files"].append(
+        # deliv["files"].append(
         #    {
         #        "format": "csv",
         #        "id": self.case,
@@ -522,9 +517,9 @@ class ReportSC2:
         #        "step": "report",
         #        "tag": "artic-sum",
         #    }
-        #)
+        # )
         ## Artic Variant report
-        #deliv["files"].append(
+        # deliv["files"].append(
         #    {
         #        "format": "csv",
         #        "id": self.case,
@@ -533,9 +528,9 @@ class ReportSC2:
         #        "step": "report",
         #        "tag": "artic-var",
         #    }
-        #)
+        # )
         ## Artic QC report
-        #deliv["files"].append(
+        # deliv["files"].append(
         #    {
         #        "format": "csv",
         #        "id": self.case,
@@ -544,7 +539,7 @@ class ReportSC2:
         #        "step": "result_aggregation",
         #        "tag": "artic-qc",
         #    }
-        #)
+        # )
 
         # Artic Json (Vogue) data
         deliv["files"].append(
@@ -591,35 +586,19 @@ class ReportSC2:
             }
         )
 
-        # Region split
-        for regionlab in self.regionlabs:
-            rl = regionlab
-            # Region split Pangolin typing
-            #deliv["files"].append(
-            #    {
-            #        "format": "csv",
-            #        "id": self.case,
-            #        "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/"
-            #        "{}_{}_pangolin_classification.txt".format(self.indir, rl, self.today),
-            #        "path_index": "~",
-            #        "step": "typing",
-            #        "tag": "SARS-CoV-2-type",
-            #    }
-            #)
-
-            # Region split FoHM delivery file
-            deliv["files"].append(
-                {
-                    "format": "csv",
-                    "id": self.case,
-                    "path": os.path.join(
-                        self.indir, "{}_{}_komplettering.csv".format(rl, self.today)
-                    ),
-                    "path_index": "~",
-                    "step": "report",
-                    "tag": "SARS-CoV-2-info",
-                }
-            )
+        # FoHM delivery file
+        deliv["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": os.path.join(
+                    self.indir, "{}_komplettering.csv".format(self.ticket)
+                ),
+                "path_index": "~",
+                "step": "report",
+                "tag": "SARS-CoV-2-info",
+            }
+        )
 
         # Per sample
         for record in self.caseinfo:
@@ -656,7 +635,7 @@ class ReportSC2:
             ## Commenting these to save space in CG. Can be reenabled dynamically
 
             ## Alignment (bam, sorted)
-            #deliv["files"].append(
+            # deliv["files"].append(
             #    {
             #        "format": "bam",
             #        "id": sampleID,
@@ -667,7 +646,7 @@ class ReportSC2:
             #        "step": "alignment",
             #        "tag": "reference-alignment-sorted",
             #    }
-            #)
+            # )
             # Variants (vcf)
             deliv["files"].append(
                 {
@@ -682,7 +661,7 @@ class ReportSC2:
                 }
             )
             ## Variants (tsv)
-            #deliv["files"].append(
+            # deliv["files"].append(
             #    {
             #        "format": "tsv",
             #        "id": sampleID,
@@ -693,7 +672,7 @@ class ReportSC2:
             #        "step": "variant-calling",
             #        "tag": "variants",
             #    }
-            #)
+            # )
 
         with open(delivfile, "w") as out:
             yaml.dump(deliv, out)

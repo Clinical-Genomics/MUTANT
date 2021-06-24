@@ -40,3 +40,14 @@ def get_sarscov2_config(config):
             caseinfo[i]["selection_criteria"].split(".")[1].strip()
         )
     return caseinfo
+
+
+def read_filelines(infile):
+    try:
+        with open(infile, "r") as f:
+            contents = f.readlines()
+    except Exception as e:
+        click.echo("Unable to read file: {}. Exiting..".format(infile))
+        click.echo(e)
+        sys.exit(-1)
+    return contents
