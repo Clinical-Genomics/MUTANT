@@ -21,6 +21,8 @@ class DeliverySC2:
         self.project = caseinfo[0]["Customer_ID_project"]
         self.indir = indir
 
+
+
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
@@ -43,7 +45,12 @@ class DeliverySC2:
             for item in glob.glob("{0}/{1}.*".format(prefix, base_sample)):
                 newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
                 try:
-                    os.symlink(item, newpath)
+                    with open(item, "r") as old_consensus_io:
+                        with open(newpath, "w") as new_consensus_io:
+                            new_consensus_io.write(f">{base_sample}")
+                            new_consensus_io.write("\n")
+                            new_consensus_io.writelines(old_consensus_io.readlines()[1:])
+
                 except Exception as e:
                     pass
 

@@ -43,6 +43,7 @@ class ReportSC2:
     def create_all_files(self):
         self.create_trailblazer_config()
         self.create_concat_pangolin()
+        self.create_concat_pangolin_fohm()
         #This works off concat pango and needs to occur after
         self.load_lookup_dict()
         self.create_concat_consensus()
@@ -99,8 +100,31 @@ class ReportSC2:
                             "Unable to rename taxon - using original: {}".format(pango)
                         )
                     else:
-                        line = sample + line[line.find(",") :]
+                        line = sample + line[line.find(","):]
                     concat.write(line)
+
+    def create_concat_pangolin_fohm(self):
+        """Concatenate pangolin results and format for fohm"""
+
+        indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
+        concatfile = "{0}/{1}_{2}_pangolin_classification_format3.txt".format(self.indir, self.ticket, str(date.today()))
+        pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
+        # Copy header
+        header = read_filelines(pangolins[0])[0]
+        with open(concatfile, "w") as concat:
+            concat.write(header)
+            # Parse sample pangolin data
+            for pango in pangolins:
+                with open(pango, "r") as pangolinfile:
+                    data = pangolinfile.readlines()[1]
+                    csv_items = data.split(",")
+                    for sample, data in self.articdata.items():
+                        if sample in csv_items[0]:
+                            if data.get("qc") != "TRUE":
+                                continue
+                            csv_items[0] = sample
+                            concat.write("".join(csv_items))
+
 
     def create_concat_consensus(self):
         """Concatenate consensus files"""
@@ -112,6 +136,9 @@ class ReportSC2:
             concat.write(single.read())
             concat.write("\n")
         concat.close()
+
+
+
 
     def create_fohm_csv(self):
         """Creates a summary file for FoHMs additional info"""
@@ -125,11 +152,13 @@ class ReportSC2:
             # Add header
             summary.writerow(["provnummer", "urvalskriterium", "GISAID_accession"])
             # Write sample information
-            for record in self.caseinfo:
+            for sample, data in self.articdata.items():
+                if data.get("qc") != "TRUE":
+                    continue
                 summary.writerow(
                     [
-                        record["Customer_ID_sample"],
-                        record["selection_criteria"],
+                        sample,
+                        data.get("selection_criteria", "Information saknas"),
                     ]
                 )
 
