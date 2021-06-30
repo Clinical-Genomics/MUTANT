@@ -128,7 +128,7 @@ class ReportSC2:
                             if data.get("qc") != "TRUE":
                                 continue
                             csv_items[0] = sample
-                            concat.write("".join(csv_items))
+                            concat.write(",".join(csv_items))
 
 
     def create_concat_consensus(self):
