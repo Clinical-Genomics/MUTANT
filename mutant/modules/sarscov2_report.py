@@ -116,8 +116,10 @@ class ReportSC2:
             # Parse sample pangolin data
             for pango in pangolins:
                 with open(pango, "r") as pangolinfile:
-                    data = pangolinfile.readlines()[1]
-                    csv_items = data.split(",")
+                    pango_data = pangolinfile.readlines()[1]
+                    csv_items = pango_data.split(",")
+                    print(pango_data)
+                    print(self.articdata.items())
                     for sample, data in self.articdata.items():
                         print(sample)
                         print(csv_items[0])
