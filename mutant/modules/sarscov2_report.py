@@ -119,6 +119,9 @@ class ReportSC2:
                     data = pangolinfile.readlines()[1]
                     csv_items = data.split(",")
                     for sample, data in self.articdata.items():
+                        print(sample)
+                        print(csv_items[0])
+                        print(data)
                         if sample in csv_items[0]:
                             if data.get("qc") != "TRUE":
                                 continue
