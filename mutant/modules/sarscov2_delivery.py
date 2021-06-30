@@ -50,6 +50,7 @@ class DeliverySC2:
                             new_consensus_io.write(f">{base_sample}\n{old_consensus_io.readlines()[1]}")
 
                 except Exception as e:
+                    print(e)
                     pass
 
             # rename typeVariants
