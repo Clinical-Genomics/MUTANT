@@ -48,7 +48,7 @@ class DeliverySC2:
                     with open(item, "r") as old_consensus_io:
                         with open(newpath, "w") as new_consensus_io:
                             new_consensus_io.write(f">{base_sample}\n")
-                            new_consensus_io.write(old_consensus_io.readlines()[1:])
+                            new_consensus_io.write(old_consensus_io.readlines()[0:])
 
                 except Exception as e:
                     pass
