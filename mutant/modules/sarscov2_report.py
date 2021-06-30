@@ -698,7 +698,7 @@ class ReportSC2:
                     ),
                     "path_index": "~",
                     "step": "consensus",
-                    "tag": "consensus-simple",
+                    "tag": "consensus-sample",
                 }
             )
 
