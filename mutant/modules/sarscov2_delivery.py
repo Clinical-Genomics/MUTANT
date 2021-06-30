@@ -42,7 +42,7 @@ class DeliverySC2:
             prefix = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(
                 self.indir
             )
-            for item in glob.glob("{0}/{1}.*".format(prefix, base_sample)):
+            for item in glob.glob("{0}/{1}.*.fa".format(prefix, base_sample)):
                 newpath = "{0}/{1}.consensus.fasta".format(prefix, base_sample)
                 try:
                     with open(item, "r") as old_consensus_io:

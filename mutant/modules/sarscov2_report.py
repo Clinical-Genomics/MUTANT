@@ -45,7 +45,7 @@ class ReportSC2:
         self.load_lookup_dict()
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm()
-        #This works off concat pango and needs to occur after
+        # This works off concat pango and needs to occur after
         self.create_concat_consensus()
         self.create_deliveryfile()
         self.create_fohm_csv()
@@ -96,18 +96,18 @@ class ReportSC2:
                     taxon_regex = "(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
                     sample, subs = re.subn(taxon_regex, r"\g<name>", line.split(",")[0])
                     if subs == 0:
-                        print(
-                            "Unable to rename taxon - using original: {}".format(pango)
-                        )
+                        print("Unable to rename taxon - using original: {}".format(pango))
                     else:
-                        line = sample + line[line.find(","):]
+                        line = sample + line[line.find(",") :]
                     concat.write(line)
 
     def create_concat_pangolin_fohm(self):
         """Concatenate pangolin results and format for fohm"""
 
         indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
-        concatfile = "{0}/{1}_{2}_pangolin_classification_format3.txt".format(self.indir, self.ticket, str(date.today()))
+        concatfile = "{0}/{1}_{2}_pangolin_classification_format3.txt".format(
+            self.indir, self.ticket, str(date.today())
+        )
         pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
         # Copy header
         header = read_filelines(pangolins[0])[0]
@@ -125,7 +125,6 @@ class ReportSC2:
                             csv_items[0] = sample
                             concat.write(",".join(csv_items))
 
-
     def create_concat_consensus(self):
         """Concatenate consensus files"""
 
@@ -136,9 +135,6 @@ class ReportSC2:
             concat.write(single.read())
             concat.write("\n")
         concat.close()
-
-
-
 
     def create_fohm_csv(self):
         """Creates a summary file for FoHMs additional info"""
@@ -287,9 +283,7 @@ class ReportSC2:
             print("No artic results loaded. Quitting create_jsonfile")
             sys.exit(-1)
 
-        with open(
-            "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
-        ) as outfile:
+        with open("{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w") as outfile:
             json.dump(self.articdata, outfile)
 
     def load_lookup_dict(self):
@@ -322,9 +316,7 @@ class ReportSC2:
         # Magical unpacking into single list
         voc_pos_aa = sum(muts.values.tolist(), [])
 
-        classifications = pandas.read_csv(
-            "{0}/standalone/classifications.csv".format(WD), sep=","
-        )
+        classifications = pandas.read_csv("{0}/standalone/classifications.csv".format(WD), sep=",")
         voc_strains = {"lineage": "", "spike": "", "class": ""}
         voc_strains["lineage"] = classifications["lineage"].tolist()
         voc_strains["spike"] = classifications["spike"].tolist()
@@ -346,11 +338,7 @@ class ReportSC2:
                 if len(hits) == 0:
                     raise Exception("File not found")
                 if len(hits) > 1:
-                    print(
-                        "Multiple hits for {0}/{1}, picking {2}".format(
-                            indir, f, hits[0]
-                        )
-                    )
+                    print("Multiple hits for {0}/{1}, picking {2}".format(indir, f, hits[0]))
                 paths.append(hits[0])
             except Exception as e:
                 print("Unable to find {0} in {1} ({2})".format(f, indir, e))
@@ -420,9 +408,7 @@ class ReportSC2:
             for sample in artic_data.keys():
                 if sample in var_all.keys():
                     if len(var_all[sample]) > 1:
-                        artic_data[sample].update(
-                            {"variants": ";".join(var_all[sample])}
-                        )
+                        artic_data[sample].update({"variants": ";".join(var_all[sample])})
                     else:
                         artic_data[sample].update({"variants": var_all[sample]})
                 else:
@@ -498,6 +484,20 @@ class ReportSC2:
                 "path_index": "~",
                 "step": "report",
                 "tag": "pangolin-typing",
+            }
+        )
+
+        # Pangolin typing for FOHM (only qcpass files)
+        deliv["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": "{}/{}_{}_pangolin_classification_format3.txt".format(
+                    self.indir, self.ticket, str(date.today())
+                ),
+                "path_index": "~",
+                "step": "report",
+                "tag": "pangolin-typing-fohm",
             }
         )
 
@@ -620,9 +620,7 @@ class ReportSC2:
             {
                 "format": "csv",
                 "id": self.case,
-                "path": os.path.join(
-                    self.indir, "{}_komplettering.csv".format(self.ticket)
-                ),
+                "path": os.path.join(self.indir, "{}_komplettering.csv".format(self.ticket)),
                 "path_index": "~",
                 "step": "report",
                 "tag": "SARS-CoV-2-info",
@@ -689,6 +687,21 @@ class ReportSC2:
                     "tag": "vcf-covid",
                 }
             )
+
+            # Single-file fasta
+            deliv["files"].append(
+                {
+                    "format": "fasta",
+                    "id": sampleID,
+                    "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/{}.consensus.fasta".format(
+                        self.indir, base_sample
+                    ),
+                    "path_index": "~",
+                    "step": "consensus",
+                    "tag": "consensus-simple",
+                }
+            )
+
             ## Variants (tsv)
             # deliv["files"].append(
             #    {
