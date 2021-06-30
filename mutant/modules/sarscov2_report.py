@@ -42,10 +42,10 @@ class ReportSC2:
 
     def create_all_files(self):
         self.create_trailblazer_config()
+        self.load_lookup_dict()
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm()
         #This works off concat pango and needs to occur after
-        self.load_lookup_dict()
         self.create_concat_consensus()
         self.create_deliveryfile()
         self.create_fohm_csv()
