@@ -3,7 +3,7 @@ name: Standard issue
 about: Literally a typical issue
 title: ''
 labels: Effort S, Enhancement, Gain S
-assignees: sylvinite
+assignees: talnor
 
 ---
 
