@@ -65,7 +65,7 @@ class DeliverySC2:
         ## Rename case files
 
         # rename multiqc
-        hit = glob.glob("{}/multiqc/*_multiqc.html".format(self.indir))
+        hit = glob.glob("{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html".format(self.indir))
         if len(hit) == 1:
             hit = hit[0]
             try:
@@ -75,7 +75,7 @@ class DeliverySC2:
 
         # rename multiqc json
         hit = glob.glob(
-            "{}/multiqc/*_multiqc_data/multiqc_data.json".format(self.indir)
+            "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json".format(self.indir)
         )
         if len(hit) == 1:
             hit = hit[0]
