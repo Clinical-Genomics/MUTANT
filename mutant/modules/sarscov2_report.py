@@ -418,20 +418,19 @@ class ReportSC2:
                     artic_data[sample].update({"variants": "-"})
 
         # Classification
-        for key, vals in artic_data.items():
+        for sample, vals in artic_data.items():
             # Packing
-            artic_data[key].update({"VOC": "No"})
+            artic_data[sample].update({"VOC": "No"})
 
             # Check for lineage
-            if artic_data[key]["lineage"] == "None":
-                artic_data[key].update({"VOC": "-"})
-            elif artic_data[key]["lineage"] in voc_strains["lineage"]:
-                index = voc_strains["lineage"].index(artic_data[key]["lineage"])
-                if voc_strains["class"][index] == "VOC":
-                    artic_data[key].update({"VOC": "Yes"})
+            if artic_data[sample]["lineage"] == "None":
+                artic_data[sample].update({"VOC": "-"})
+            elif artic_data[sample]["lineage"] in voc_strains["lineage"]:
+                index = voc_strains["lineage"].index(artic_data[sample]["lineage"])
                 # Check for spike
-                # if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
-                # artic_data[key].update( {"VOC":voc_strains['class'][index]} )
+                if pandas.isna(voc_strains["spike"][index]) or voc_strains["spike"][index] in artic_data[sample]["variants"]:
+                    # Add variant class
+                    artic_data[sample].update( {"VOC":voc_strains["class"][index]} )
 
         self.articdata.update(artic_data)
 
