@@ -32,3 +32,4 @@ git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-r
 
 # Pull latest image
 singularity pull --force /home/proj/${INSTANCE}/mutant/MUTANT/mutant/externals/gms-artic/artic-ncov2019-illumina.sif docker://clinicalgenomics/artic-ncov2019-illumina:latest
+chmod u=rwx,g=rx,o=rx mutant/externals/gms-artic/artic-ncov2019-illumina.sif
