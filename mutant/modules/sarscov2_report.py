@@ -202,6 +202,7 @@ class ReportSC2:
                 [
                     "Sample",
                     "Selection",
+                    "Region Code",
                     "Ticket",
                     "%N_bases",
                     "%10X_coverage",
@@ -222,6 +223,8 @@ class ReportSC2:
 
                 if "selection_criteria" in data:
                     selection = data["selection_criteria"]
+                if "region_code" in data:
+                    region = data["region_code"]
                 if "pct_n_bases" in data:
                     n_bases = data["pct_n_bases"]
                 if "pct_10X_bases" in data:
@@ -240,6 +243,7 @@ class ReportSC2:
                 row = [
                     sample,
                     selection,
+                    region,
                     ticket,
                     n_bases,
                     tenx_bases,
