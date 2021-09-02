@@ -197,7 +197,6 @@ class ReportSC2:
         summaryfile = os.path.join(indir, "sars-cov-2_{}_results.csv".format(ticket))
         with open(summaryfile, mode="w") as out:
             summary = csv.writer(out)
-            # Backrolled Mutations to Variants
             summary.writerow(
                 [
                     "Sample",
@@ -210,7 +209,7 @@ class ReportSC2:
                     "Lineage",
                     "PangoLEARN_version",
                     "VOC",
-                    "Variants",
+                    "Mutations",
                 ]
             )
             for sample, data in self.articdata.items():
