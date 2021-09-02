@@ -9,7 +9,6 @@ WD = os.path.dirname(os.path.realpath(__file__))
 TIMESTAMP = datetime.now().strftime("%y%m%d-%H%M%S")
 
 
-
 # Initialize log
 log = logging.getLogger("main_log")
 log.setLevel(logging.DEBUG)

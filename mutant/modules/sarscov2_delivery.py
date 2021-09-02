@@ -21,8 +21,6 @@ class DeliverySC2:
         self.project = caseinfo[0]["Customer_ID_project"]
         self.indir = indir
 
-
-
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
@@ -47,7 +45,9 @@ class DeliverySC2:
                 try:
                     with open(item, "r") as old_consensus_io:
                         with open(newpath, "w") as new_consensus_io:
-                            new_consensus_io.write(f">{base_sample}\n{old_consensus_io.readlines()[1]}")
+                            new_consensus_io.write(
+                                f">{base_sample}\n{old_consensus_io.readlines()[1]}"
+                            )
 
                 except Exception as e:
                     print(e)
@@ -65,7 +65,11 @@ class DeliverySC2:
         ## Rename case files
 
         # rename multiqc
-        hit = glob.glob("{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html".format(self.indir))
+        hit = glob.glob(
+            "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html".format(
+                self.indir
+            )
+        )
         if len(hit) == 1:
             hit = hit[0]
             try:
@@ -75,7 +79,9 @@ class DeliverySC2:
 
         # rename multiqc json
         hit = glob.glob(
-            "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json".format(self.indir)
+            "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json".format(
+                self.indir
+            )
         )
         if len(hit) == 1:
             hit = hit[0]

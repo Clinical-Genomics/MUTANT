@@ -15,6 +15,7 @@ from mutant.modules.generic_parser import get_json
 from mutant.modules.sarscov2_report import ReportSC2
 from mutant.modules.sarscov2_delivery import DeliverySC2
 
+
 @click.group()
 @click.version_option(version)
 @click.pass_context
@@ -62,7 +63,6 @@ def sarscov2(
     else:
         caseID = "artic"
     prefix = "{}_{}".format(caseID, TIMESTAMP)
-
 
     # Run
     run = RunSC2(
@@ -130,7 +130,6 @@ def sarscov2(ctx):
 def postproc(ctx, input_folder, config_artic, fastq_folder, config_case):
     """Applies all cg post-processing of the sarscov2 pipeline"""
 
-
     # Reports
     if config_case != "":
         report = ReportSC2(
@@ -176,15 +175,26 @@ def rename(ctx, input_folder, config_artic, config_case):
 
 @toolbox.command()
 @click.option("--input_folder", help="Folder with fastq to concatenate", required=True)
-@click.option("--app_tag", help="Application tag", required=False, default="CONCATENATE")
-@click.option("--date", help="Date to add to the concatenated file name, e.g. order date", required=False, default=None)
+@click.option(
+    "--app_tag", help="Application tag", required=False, default="CONCATENATE"
+)
+@click.option(
+    "--date",
+    help="Date to add to the concatenated file name, e.g. order date",
+    required=False,
+    default=None,
+)
 @click.pass_context
 def concatenate(ctx, input_folder, app_tag, date):
-    """ Concatenates fastq files if needed """
+    """Concatenates fastq files if needed"""
     if date:
-        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2} --date {3}".format(WD, input_folder, app_tag, date)
+        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2} --date {3}".format(
+            WD, input_folder, app_tag, date
+        )
     else:
-        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2}".format(WD, input_folder, app_tag)
+        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2}".format(
+            WD, input_folder, app_tag
+        )
     log.debug("Command ran: {}".format(cmd))
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
