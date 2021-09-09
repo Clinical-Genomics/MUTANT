@@ -16,40 +16,52 @@ from pathlib import Path
 PREFIX_TO_CONCATENATE = ["MWG", "MWL", "MWM", "MWR", "MWX", "CONCATENATE"]
 parser = ArgumentParser()
 
-parser.add_argument("-i",
-                    "--input_folder",
-                    dest="input_folder",
-                    help="Folder with fastq to concatenate",
-                    metavar="<PATH>",
-                    required=True,
-                    type=str)
-parser.add_argument("-a",
-                    "--app_tag",
-                    dest="app_tag",
-                    help="Application tag",
-                    metavar="<STRING>",
-                    required=False,
-                    type=str,
-                    default="CONCATENATE")
-parser.add_argument("-d",
-                    "--date",
-                    dest="date",
-                    help="Date to add to the concatenated file name, e.g. order date",
-                    metavar="<DATE>",
-                    required=False,
-                    type=str,
-                    default="")
+parser.add_argument(
+    "-i",
+    "--input_folder",
+    dest="input_folder",
+    help="Folder with fastq to concatenate",
+    metavar="<PATH>",
+    required=True,
+    type=str,
+)
+parser.add_argument(
+    "-a",
+    "--app_tag",
+    dest="app_tag",
+    help="Application tag",
+    metavar="<STRING>",
+    required=False,
+    type=str,
+    default="CONCATENATE",
+)
+parser.add_argument(
+    "-d",
+    "--date",
+    dest="date",
+    help="Date to add to the concatenated file name, e.g. order date",
+    metavar="<DATE>",
+    required=False,
+    type=str,
+    default="",
+)
 
 args = parser.parse_args()
 should_concatenate = False
 
 for prefix in PREFIX_TO_CONCATENATE:
     if args.app_tag.startswith(prefix):
-        print("Apptag %s identified, data generated with this application tag should be concatenated" % (args.app_tag))
+        print(
+            "Apptag %s identified, data generated with this application tag should be concatenated"
+            % (args.app_tag)
+        )
         should_concatenate = True
 
 if should_concatenate == False:
-    print("Data with application tag %s should not be concatenated, skipping concatenation" % (args.app_tag))
+    print(
+        "Data with application tag %s should not be concatenated, skipping concatenation"
+        % (args.app_tag)
+    )
     sys.exit(-1)
 
 for dir_name in os.listdir(args.input_folder):
@@ -77,7 +89,16 @@ for dir_name in os.listdir(args.input_folder):
         for i in range(len(same_direction)):
             cmd = cmd + " " + same_direction[i]
         if args.date:
-            output = dir_path + "/" + str(args.date) + "_" + dir_name + "_" + str(read_direction) + ".fastq.gz"
+            output = (
+                dir_path
+                + "/"
+                + str(args.date)
+                + "_"
+                + dir_name
+                + "_"
+                + str(read_direction)
+                + ".fastq.gz"
+            )
         else:
             output = dir_path + "/" + dir_name + "_" + str(read_direction) + ".fastq.gz"
         cmd = cmd + " > " + output

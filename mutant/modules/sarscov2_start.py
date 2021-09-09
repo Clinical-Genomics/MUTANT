@@ -12,7 +12,8 @@ from mutant.modules.generic_parser import get_json
 
 class RunSC2:
     def __init__(
-        self, input_folder, caseID, prefix, profiles, timestamp, WD, config_artic=""):
+        self, input_folder, caseID, prefix, profiles, timestamp, WD, config_artic=""
+    ):
 
         self.fastq = input_folder
         self.timestamp = timestamp
@@ -30,10 +31,12 @@ class RunSC2:
             resdir = outdir
         elif config != "":
             general_config = get_json(config)
-            resdir = os.path.abspath(os.path.join(
-                general_config["SARS-CoV-2"]["folders"]["results"],
-                "{}_{}".format(self.case, self.timestamp),
-            ))
+            resdir = os.path.abspath(
+                os.path.join(
+                    general_config["SARS-CoV-2"]["folders"]["results"],
+                    "{}_{}".format(self.case, self.timestamp),
+                )
+            )
         else:
             resdir = os.path.abspath("results")
         return resdir

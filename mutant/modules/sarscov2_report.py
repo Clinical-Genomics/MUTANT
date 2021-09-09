@@ -96,7 +96,9 @@ class ReportSC2:
                     taxon_regex = "(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
                     sample, subs = re.subn(taxon_regex, r"\g<name>", line.split(",")[0])
                     if subs == 0:
-                        print("Unable to rename taxon - using original: {}".format(pango))
+                        print(
+                            "Unable to rename taxon - using original: {}".format(pango)
+                        )
                     else:
                         line = sample + line[line.find(",") :]
                     concat.write(line)
@@ -197,11 +199,11 @@ class ReportSC2:
         summaryfile = os.path.join(indir, "sars-cov-2_{}_results.csv".format(ticket))
         with open(summaryfile, mode="w") as out:
             summary = csv.writer(out)
-            # Backrolled Mutations to Variants
             summary.writerow(
                 [
                     "Sample",
                     "Selection",
+                    "Region Code",
                     "Ticket",
                     "%N_bases",
                     "%10X_coverage",
@@ -209,7 +211,7 @@ class ReportSC2:
                     "Lineage",
                     "PangoLEARN_version",
                     "VOC",
-                    "Variants",
+                    "Mutations",
                 ]
             )
             for sample, data in self.articdata.items():
@@ -222,6 +224,8 @@ class ReportSC2:
 
                 if "selection_criteria" in data:
                     selection = data["selection_criteria"]
+                if "region_code" in data:
+                    region = data["region_code"]
                 if "pct_n_bases" in data:
                     n_bases = data["pct_n_bases"]
                 if "pct_10X_bases" in data:
@@ -240,6 +244,7 @@ class ReportSC2:
                 row = [
                     sample,
                     selection,
+                    region,
                     ticket,
                     n_bases,
                     tenx_bases,
@@ -283,7 +288,9 @@ class ReportSC2:
             print("No artic results loaded. Quitting create_jsonfile")
             sys.exit(-1)
 
-        with open("{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w") as outfile:
+        with open(
+            "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
+        ) as outfile:
             json.dump(self.articdata, outfile)
 
     def load_lookup_dict(self):
@@ -316,7 +323,9 @@ class ReportSC2:
         # Magical unpacking into single list
         voc_pos_aa = sum(muts.values.tolist(), [])
 
-        classifications = pandas.read_csv("{0}/standalone/classifications.csv".format(WD), sep=",")
+        classifications = pandas.read_csv(
+            "{0}/standalone/classifications.csv".format(WD), sep=","
+        )
         voc_strains = {"lineage": "", "spike": "", "class": ""}
         voc_strains["lineage"] = classifications["lineage"].tolist()
         voc_strains["spike"] = classifications["spike"].tolist()
@@ -338,7 +347,11 @@ class ReportSC2:
                 if len(hits) == 0:
                     raise Exception("File not found")
                 if len(hits) > 1:
-                    print("Multiple hits for {0}/{1}, picking {2}".format(indir, f, hits[0]))
+                    print(
+                        "Multiple hits for {0}/{1}, picking {2}".format(
+                            indir, f, hits[0]
+                        )
+                    )
                 paths.append(hits[0])
             except Exception as e:
                 print("Unable to find {0} in {1} ({2})".format(f, indir, e))
@@ -408,27 +421,31 @@ class ReportSC2:
             for sample in artic_data.keys():
                 if sample in var_all.keys():
                     if len(var_all[sample]) > 1:
-                        artic_data[sample].update({"variants": ";".join(var_all[sample])})
+                        artic_data[sample].update(
+                            {"variants": ";".join(var_all[sample])}
+                        )
                     else:
                         artic_data[sample].update({"variants": var_all[sample]})
                 else:
                     artic_data[sample].update({"variants": "-"})
 
         # Classification
-        for key, vals in artic_data.items():
+        for sample, vals in artic_data.items():
             # Packing
-            artic_data[key].update({"VOC": "No"})
+            artic_data[sample].update({"VOC": "No"})
 
             # Check for lineage
-            if artic_data[key]["lineage"] == "None":
-                artic_data[key].update({"VOC": "-"})
-            elif artic_data[key]["lineage"] in voc_strains["lineage"]:
-                index = voc_strains["lineage"].index(artic_data[key]["lineage"])
-                if voc_strains["class"][index] == "VOC":
-                    artic_data[key].update({"VOC": "Yes"})
+            if artic_data[sample]["lineage"] == "None":
+                artic_data[sample].update({"VOC": "-"})
+            elif artic_data[sample]["lineage"] in voc_strains["lineage"]:
+                index = voc_strains["lineage"].index(artic_data[sample]["lineage"])
                 # Check for spike
-                # if pandas.isna(voc_strains['spike'][index]) or voc_strains['spike'][index] in artic_data[key]['VOC_aa']:
-                # artic_data[key].update( {"VOC":voc_strains['class'][index]} )
+                if (
+                    pandas.isna(voc_strains["spike"][index])
+                    or voc_strains["spike"][index] in artic_data[sample]["variants"]
+                ):
+                    # Add variant class
+                    artic_data[sample].update({"VOC": voc_strains["class"][index]})
 
         self.articdata.update(artic_data)
 
@@ -620,7 +637,9 @@ class ReportSC2:
             {
                 "format": "csv",
                 "id": self.case,
-                "path": os.path.join(self.indir, "{}_komplettering.csv".format(self.ticket)),
+                "path": os.path.join(
+                    self.indir, "{}_komplettering.csv".format(self.ticket)
+                ),
                 "path_index": "~",
                 "step": "report",
                 "tag": "SARS-CoV-2-info",
