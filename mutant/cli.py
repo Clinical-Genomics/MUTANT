@@ -51,9 +51,10 @@ def analyse(ctx):
     help="Execution profiles, comma-separated",
     default="singularity,slurm",
 )
+@click.option("-n", "--nanopore", is_flag=True)
 @click.pass_context
 def sarscov2(
-    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles
+    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles, nanopore
 ):
 
     # Set base for output files (Move this section)
@@ -76,7 +77,7 @@ def sarscov2(
     )
 
     resdir = run.get_results_dir(config_mutant, outdir)
-    run.run_case(resdir)
+    run.run_case(resdir, nanopore)
 
     # Report
     if config_case != "":
