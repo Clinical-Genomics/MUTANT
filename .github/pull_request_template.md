@@ -4,7 +4,7 @@
 ### Preparations:
 
 **How to prepare mutant for test**:
-* `bash mutant/standalone/deploy_hasta_update.sh stage <MUTANT_branch>`
+* `bash /home/proj/stage/mutant/MUTANT/mutant/standalone/deploy_hasta_update.sh stage <MUTANT_branch>`
 
 **How to prepare cg for test**:
 - `us`
