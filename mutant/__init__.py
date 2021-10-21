@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import datetime
 
-version = "4.8.1"
+version = "4.9.1"
 
 # File work directory
 WD = os.path.dirname(os.path.realpath(__file__))
