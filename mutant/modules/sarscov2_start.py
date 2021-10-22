@@ -55,7 +55,7 @@ class RunSC2:
         nanopore = True # THIS LINE HAS TO BE REMOVED LATER, ONLY FOR TESTING
 
         if nanopore:
-            cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile singularity --nanopolish --prefix 211021_nanopore --basecalled_fastq /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass -fast5_pass /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fast5_pass --sequencing_summary /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/sequencing_summary_FAQ57606_71c83ae0.txt".format(
+            cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile singularity --nanopolish --prefix 211021_nanopore --basecalled_fastq /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass --fast5_pass /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fast5_pass --sequencing_summary /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/sequencing_summary_FAQ57606_71c83ae0.txt".format(
                 confline,
                 nflog,
                 workline,
