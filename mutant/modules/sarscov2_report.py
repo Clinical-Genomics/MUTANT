@@ -9,6 +9,7 @@ import csv
 import glob
 import re
 import yaml
+import json
 
 
 from datetime import date
@@ -56,6 +57,7 @@ class ReportSC2:
         self.create_fohm_csv()
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
+        self.create_jsonfile()
         self.create_instrument_properties()
 
     def get_finished_slurm_ids(self) -> list:
@@ -333,6 +335,18 @@ class ReportSC2:
             except Exception as e:
                 print("Failed creating file {}\n{}".format(varout, e))
 
+    def create_jsonfile(self):
+        """Output all result data in a json format for easy parsing"""
+
+        if self.articdata == dict():
+            print("No artic results loaded. Quitting create_jsonfile")
+            sys.exit(-1)
+
+        with open(
+            "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
+        ) as outfile:
+            json.dump(self.articdata, outfile)
+
     def create_deliveryfile(self):
         """Create deliverables file"""
 
@@ -435,7 +449,7 @@ class ReportSC2:
             {
                 "format": "json",
                 "id": self.case,
-                "path": self.filepaths[self.case]["vogue-metrics"],
+                "path": "{}/{}_artic.json".format(self.indir, self.ticket),
                 "path_index": "~",
                 "step": "result_aggregation",
                 "tag": "artic-json",
