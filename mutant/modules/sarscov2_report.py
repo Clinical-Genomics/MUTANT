@@ -44,8 +44,6 @@ class ReportSC2:
         self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
         self.articdata = dict()
 
-
-
     def create_all_files(self):
         self.create_trailblazer_config()
         self.load_lookup_dict()
