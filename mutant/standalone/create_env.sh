@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-SCRIPT=$(readlink -f $0)
-scriptdir=`dirname $SCRIPT`
 NAME=$1
 
 echo "INFO - Unloading active environment"
@@ -15,8 +13,8 @@ source activate $NAME
 
 echo "INFO - Installing requirements"
 conda config --add channels bioconda
-pip install -r ${scriptdir}/../../requirements-pip.txt
-conda install --yes --file ${scriptdir}/../../requirements-conda.txt
+pip install -r requirements-pip.txt
+conda install --yes --file requirements-conda.txt
 
 echo "INFO - Installing MUTANT"
 pip install -e .
