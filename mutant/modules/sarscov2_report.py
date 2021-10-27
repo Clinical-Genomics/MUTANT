@@ -3,24 +3,27 @@
 
     By: Isak Sylvin & Tanja Normark
 """
-
-import csv
-import glob
-import json
-import pandas
-import re
 import os
 import sys
+import csv
+import glob
+import re
 import yaml
+
 
 from datetime import date
 from pathlib import Path
 
-from mutant import WD
+
+from mutant.constants.artic import ARTIC_FILES_CASE
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
-    append_dict,
     read_filelines,
+)
+from mutant.modules.sarscov2_parser import (
+    get_vogue_multiqc_data,
+    get_artic_results,
+    get_results_paths,
 )
 
 
@@ -38,7 +41,10 @@ class ReportSC2:
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
+        self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
         self.articdata = dict()
+
+
 
     def create_all_files(self):
         self.create_trailblazer_config()
@@ -48,10 +54,10 @@ class ReportSC2:
         # This works off concat pango and needs to occur after
         self.create_concat_consensus()
         self.create_deliveryfile()
+        self.create_vogue_metrics_file()
         self.create_fohm_csv()
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
-        self.create_jsonfile()
         self.create_instrument_properties()
 
     def get_finished_slurm_ids(self) -> list:
@@ -77,6 +83,58 @@ class ReportSC2:
             return
         with open(trailblazer_config_path, "w") as trailblazer_config_file:
             yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
+
+    def load_lookup_dict(self):
+        """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
+
+        self.load_artic_results()
+        self.load_case_config()
+
+    def load_case_config(self):
+        """Appends additional data to articdata dictionary"""
+
+        casekeys = self.caseinfo[0].keys()
+        packing = dict(zip(casekeys, "-" * len(casekeys)))
+        # Updates existing samples with defaults for case-config
+        for k, v in self.articdata.items():
+            self.articdata[k].update(packing)
+        # Updates existing samples with provided case-config info
+        for entry in self.caseinfo:
+            k = entry["Customer_ID_sample"]
+            if k in self.articdata.keys():
+                self.articdata[k].update(entry)
+            else:
+                self.articdata[k] = entry
+
+    def load_artic_results(self):
+        """Parse artic output directory for analysis results. Returns dictionary data object"""
+        artic_data = get_artic_results(self.indir)
+        self.articdata.update(artic_data)
+
+    def create_vogue_metrics_file(self):
+        """Create file with metrics for vogue"""
+
+        out_yaml = {"metrics": []}
+        # Get multiqc-data
+        out_yaml["metrics"].extend(
+            get_vogue_multiqc_data(
+                self.filepaths[self.case]["multiqc-json"], self.caseinfo
+            )
+        )
+        # Add info about failed/passed QC
+        for record in self.caseinfo:
+            sample_yaml = {
+                "header": "~",
+                "id": record["CG_ID_sample"],
+                "input": os.path.basename(self.filepaths[self.case]["results-file"]),
+                "name": "passed-qc",
+                "step": "QC-threshold",
+                "value": self.articdata[record["Customer_ID_sample"]]["qc"],
+            }
+            out_yaml["metrics"].append(sample_yaml)
+        # Create output file
+        with open(self.filepaths[self.case]["vogue-metrics"], "w") as out:
+            yaml.dump(out_yaml, out)
 
     def create_concat_pangolin(self):
         """Concatenate pangolin results"""
@@ -190,14 +248,11 @@ class ReportSC2:
         """Write summary csv report of Artic and Pangolin results"""
 
         ticket = self.ticket
-        today = self.today
         if self.articdata == dict():
             print("No artic results loaded. Quitting sarscov2_resultfile")
             sys.exit(-1)
-        indir = self.indir
 
-        summaryfile = os.path.join(indir, "sars-cov-2_{}_results.csv".format(ticket))
-        with open(summaryfile, mode="w") as out:
+        with open(self.filepaths[self.case]["results-file"], mode="w") as out:
             summary = csv.writer(out)
             summary.writerow(
                 [
@@ -264,7 +319,6 @@ class ReportSC2:
         indir = self.indir
         ticket = self.ticket
         today = self.today
-
         varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
         varout = os.path.join(indir, "sars-cov-2_{}_variants.csv".format(ticket, today))
         if os.stat(varRep).st_size != 0:
@@ -280,174 +334,6 @@ class ReportSC2:
                 open(varout, "a").close()
             except Exception as e:
                 print("Failed creating file {}\n{}".format(varout, e))
-
-    def create_jsonfile(self):
-        """Output all result data in a json format for easy parsing"""
-
-        if self.articdata == dict():
-            print("No artic results loaded. Quitting create_jsonfile")
-            sys.exit(-1)
-
-        with open(
-            "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
-        ) as outfile:
-            json.dump(self.articdata, outfile)
-
-    def load_lookup_dict(self):
-        """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
-        self.load_artic_results()
-        self.load_case_config()
-
-    def load_case_config(self):
-        """Appends additional data to articdata dictionary"""
-        casekeys = self.caseinfo[0].keys()
-
-        packing = dict(zip(casekeys, "-" * len(casekeys)))
-
-        # Updates existing samples with defaults for case-config
-        for k, v in self.articdata.items():
-            self.articdata[k].update(packing)
-        # Updates existing samples with provided case-config info
-        for entry in self.caseinfo:
-            k = entry["Customer_ID_sample"]
-            if k in self.articdata.keys():
-                self.articdata[k].update(entry)
-            else:
-                self.articdata[k] = entry
-
-    def load_artic_results(self):
-        """Parse artic output directory for analysis results. Returns dictionary data object"""
-        indir = self.indir
-        voc_pos = range(475, 486)
-        muts = pandas.read_csv("{0}/standalone/spike_mutations.csv".format(WD), sep=",")
-        # Magical unpacking into single list
-        voc_pos_aa = sum(muts.values.tolist(), [])
-
-        classifications = pandas.read_csv(
-            "{0}/standalone/classifications.csv".format(WD), sep=","
-        )
-        voc_strains = {"lineage": "", "spike": "", "class": ""}
-        voc_strains["lineage"] = classifications["lineage"].tolist()
-        voc_strains["spike"] = classifications["spike"].tolist()
-        voc_strains["class"] = classifications["class"].tolist()
-
-        artic_data = dict()
-        var_all = dict()
-        var_voc = dict()
-
-        # Files of interest. ONLY ADD TO END OF THIS LIST
-        files = [
-            "*qc.csv",
-            "*variant_summary.csv",
-        ]
-        paths = list()
-        for f in files:
-            try:
-                hits = glob.glob(os.path.join(indir, f))
-                if len(hits) == 0:
-                    raise Exception("File not found")
-                if len(hits) > 1:
-                    print(
-                        "Multiple hits for {0}/{1}, picking {2}".format(
-                            indir, f, hits[0]
-                        )
-                    )
-                paths.append(hits[0])
-            except Exception as e:
-                print("Unable to find {0} in {1} ({2})".format(f, indir, e))
-                sys.exit(-1)
-
-        # Parse qc report data
-        with open(paths[0]) as f:
-            content = csv.reader(f)
-            next(content)
-            for line in content:
-                sample = line[0].split("_")[-1]
-                if float(line[2]) > 95:
-                    qc_flag = "TRUE"
-                else:
-                    qc_flag = "FALSE"
-                artic_data[sample] = {
-                    "pct_n_bases": line[1],
-                    "pct_10X_bases": line[2],
-                    "longest_no_N_run": line[3],
-                    "num_aligned_reads": line[4],
-                    "artic_qc": line[7],
-                    "qc": qc_flag,
-                }
-
-        # Parse Variant report data
-        if os.stat(paths[1]).st_size != 0:
-            with open(paths[1]) as f:
-                content = csv.reader(f)
-                next(content)
-                for line in content:
-                    sample = line[0].split("_")[-1]
-                    variant = line[2]
-                    pos = int(re.findall(r"\d+", variant)[0])
-                    if (pos in voc_pos) or (variant in voc_pos_aa):
-                        append_dict(var_voc, sample, variant)
-                    append_dict(var_all, sample, variant)
-
-        # Parse Pangolin report data
-        pangodir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
-        pangolins = glob.glob("{0}/*.pangolin.csv".format(pangodir))
-        for path in pangolins:
-            with open(path) as f:
-                content = csv.reader(f)
-                next(content)  # Skip header
-                for line in content:
-                    sample = line[0].split(".")[0].split("_")[-1]
-                    artic_data[sample].update(
-                        {
-                            "lineage": line[1],
-                            "pangolin_probability": line[3],
-                            "pangoLEARN_version": line[-4],
-                            "pangolin_qc": line[-2],
-                        }
-                    )
-
-        # Add variant data to results
-        if var_voc:
-            for sample in artic_data.keys():
-                if sample in var_voc.keys():
-                    artic_data[sample].update({"VOC_aa": ";".join(var_voc[sample])})
-                else:
-                    artic_data[sample].update({"VOC_aa": "-"})
-        else:
-            for sample in artic_data.keys():
-                artic_data[sample].update({"VOC_aa": "-"})
-        if var_all:
-            for sample in artic_data.keys():
-                if sample in var_all.keys():
-                    if len(var_all[sample]) > 1:
-                        artic_data[sample].update(
-                            {"variants": ";".join(var_all[sample])}
-                        )
-                    else:
-                        artic_data[sample].update({"variants": var_all[sample]})
-                else:
-                    artic_data[sample].update({"variants": "-"})
-
-        # Classification
-        for sample, vals in artic_data.items():
-            # Packing
-            artic_data[sample].update({"VOC": "No"})
-
-            # Check for lineage
-            if artic_data[sample]["lineage"] == "None":
-                artic_data[sample].update({"VOC": "-"})
-            elif artic_data[sample]["lineage"] in voc_strains["lineage"]:
-                index = voc_strains["lineage"].index(artic_data[sample]["lineage"])
-                # Check for spike
-                if (
-                    pandas.isna(voc_strains["spike"][index])
-                    or voc_strains["spike"][index] in artic_data[sample]["variants"]
-                ):
-                    # Add variant class
-                    artic_data[sample].update({"VOC": voc_strains["class"][index]})
-
-        self.articdata.update(artic_data)
 
     def create_deliveryfile(self):
         """Create deliverables file"""
@@ -467,7 +353,6 @@ class ReportSC2:
                 "tag": "instrument-properties",
             }
         )
-
         # KS Report
         deliv["files"].append(
             {
@@ -479,7 +364,6 @@ class ReportSC2:
                 "tag": "ks-results",
             }
         )
-
         # KS Aux report
         deliv["files"].append(
             {
@@ -491,7 +375,6 @@ class ReportSC2:
                 "tag": "ks-aux-results",
             }
         )
-
         # Pangolin typing
         deliv["files"].append(
             {
@@ -503,7 +386,6 @@ class ReportSC2:
                 "tag": "pangolin-typing",
             }
         )
-
         # Pangolin typing for FOHM (only qcpass files)
         deliv["files"].append(
             {
@@ -517,7 +399,6 @@ class ReportSC2:
                 "tag": "pangolin-typing-fohm",
             }
         )
-
         # Consensus file
         deliv["files"].append(
             {
@@ -529,7 +410,6 @@ class ReportSC2:
                 "tag": "consensus",
             }
         )
-
         # Multiqc report
         deliv["files"].append(
             {
@@ -541,7 +421,7 @@ class ReportSC2:
                 "tag": "multiqc-html",
             }
         )
-        # MultiQC json (vogue)
+        # MultiQC json
         deliv["files"].append(
             {
                 "format": "json",
@@ -552,47 +432,12 @@ class ReportSC2:
                 "tag": "multiqc-json",
             }
         )
-
-        ## Artic Summary report
-        # deliv["files"].append(
-        #    {
-        #        "format": "csv",
-        #        "id": self.case,
-        #        "path": "{}/{}.typing_summary.csv".format(self.indir, self.ticket),
-        #        "path_index": "~",
-        #        "step": "report",
-        #        "tag": "artic-sum",
-        #    }
-        # )
-        ## Artic Variant report
-        # deliv["files"].append(
-        #    {
-        #        "format": "csv",
-        #        "id": self.case,
-        #        "path": "{}/{}.variant_summary.csv".format(self.indir, self.ticket),
-        #        "path_index": "~",
-        #        "step": "report",
-        #        "tag": "artic-var",
-        #    }
-        # )
-        ## Artic QC report
-        # deliv["files"].append(
-        #    {
-        #        "format": "csv",
-        #        "id": self.case,
-        #        "path": "{}/{}.qc.csv".format(self.indir, self.ticket),
-        #        "path_index": "~",
-        #        "step": "result_aggregation",
-        #        "tag": "artic-qc",
-        #    }
-        # )
-
         # Artic Json (Vogue) data
         deliv["files"].append(
             {
                 "format": "json",
                 "id": self.case,
-                "path": "{}/{}_artic.json".format(self.indir, self.ticket),
+                "path": self.filepaths[self.case]["vogue-metrics"],
                 "path_index": "~",
                 "step": "result_aggregation",
                 "tag": "artic-json",
@@ -631,7 +476,6 @@ class ReportSC2:
                 "tag": "logfile",
             }
         )
-
         # FoHM delivery file
         deliv["files"].append(
             {
@@ -677,22 +521,6 @@ class ReportSC2:
                     "tag": "reverse-reads",
                 }
             )
-
-            ## Commenting these to save space in CG. Can be reenabled dynamically
-
-            ## Alignment (bam, sorted)
-            # deliv["files"].append(
-            #    {
-            #        "format": "bam",
-            #        "id": sampleID,
-            #        "path": "{}/ncovIllumina_sequenceAnalysis_readMapping/{}.sorted.bam".format(
-            #            self.indir, base_sample
-            #        ),
-            #        "path_index": "~",
-            #        "step": "alignment",
-            #        "tag": "reference-alignment-sorted",
-            #    }
-            # )
             # Variants (vcf)
             deliv["files"].append(
                 {
@@ -706,7 +534,6 @@ class ReportSC2:
                     "tag": "vcf-covid",
                 }
             )
-
             # Single-file fasta
             deliv["files"].append(
                 {
@@ -720,20 +547,5 @@ class ReportSC2:
                     "tag": "consensus-sample",
                 }
             )
-
-            ## Variants (tsv)
-            # deliv["files"].append(
-            #    {
-            #        "format": "tsv",
-            #        "id": sampleID,
-            #        "path": "{}/ncovIllumina_sequenceAnalysis_callVariants/{}.variants.tsv".format(
-            #            self.indir, base_sample
-            #        ),
-            #        "path_index": "~",
-            #        "step": "variant-calling",
-            #        "tag": "variants",
-            #    }
-            # )
-
         with open(delivfile, "w") as out:
             yaml.dump(deliv, out)
