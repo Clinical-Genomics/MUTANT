@@ -15,7 +15,8 @@ Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
 ### Setup
 * `git clone --recurse-submodules https://github.com/Clinical-Genomics/MUTANT.git`
-* `cd MUTANT && source setup.sh D_mutant`
+* `cd MUTANT`
+* `source setup.sh D_mutant`
 * `source activate D_mutant`
 * Pull the latest image from Dockerhub or build images as described below.
 
