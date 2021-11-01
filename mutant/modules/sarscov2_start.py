@@ -55,7 +55,23 @@ class RunSC2:
         nanopore = True # THIS LINE HAS TO BE REMOVED LATER, ONLY FOR TESTING
 
         if nanopore:
-            cmd = "nextflow run /home/proj/stage/mutant/MUTANT/mutant/externals/gms-artic/main.nf -profile singularity --nanopolish --prefix 211101_nanopore_via_mutant --basecalled_fastq /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass --fast5_pass /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fast5_pass --sequencing_summary /home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/sequencing_summary_FAQ57606_71c83ae0.txt"
+            cmd_nf_script = "/home/proj/stage/mutant/MUTANT/mutant/externals/gms-artic/main.nf"
+            cmd_profile = "singularity"
+            cmd_prefix = "211101_nanopore"
+            cmd_bcfastq = "/home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass"
+            cmd_fast5pass = "/home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fast5_pass"
+            cmd_seqsum = "/home/hiseq.clinical/HO_data_processing/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/sequencing_summary_FAQ57606_71c83ae0.txt"
+            cmd_output_dir = "/home/hiseq.clinical/HO_data_processing/nanopore/test_output_via_mutant"
+
+            cmd = "nextflow run {0} -profile {1} --nanopolish --prefix {2} --basecalled_fastq {3} --fast5_pass {4} --sequencing_summary {5} --outdir {6}".format(
+                cmd_nf_script,
+                cmd_profile,
+                cmd_prefix,
+                cmd_bcfastq,
+                cmd_fast5pass,
+                cmd_seqsum,
+                cmd_output_dir,
+            )
         else:
             cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} --directory {6} {7}".format(
                 confline,
