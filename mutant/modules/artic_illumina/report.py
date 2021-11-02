@@ -10,21 +10,16 @@ import glob
 import re
 import yaml
 import json
-
-
 from datetime import date
 from pathlib import Path
-
-
-from mutant.constants.artic import ARTIC_FILES_CASE
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
     read_filelines,
 )
-from mutant.modules.sarscov2_parser import (
+from mutant.modules.artic_illumina.parser import (
     get_vogue_multiqc_data,
     get_artic_results,
-    get_results_paths,
+    get_results_paths
 )
 
 
