@@ -439,15 +439,15 @@ class ReportSC2:
                 "tag": "multiqc-json",
             }
         )
-        # Artic Json (Vogue) data
+        # Artic yaml (Vogue) data
         deliv["files"].append(
             {
-                "format": "json",
+                "format": "yaml",
                 "id": self.case,
-                "path": "{}/{}_artic.json".format(self.indir, self.ticket),
+                "path": self.filepaths[self.case]["vogue-metrics"],
                 "path_index": "~",
                 "step": "result_aggregation",
-                "tag": "artic-json",
+                "tag": "artic-yaml",
             }
         )
         # Provided CG CASE info from StatusDB
@@ -455,7 +455,7 @@ class ReportSC2:
             {
                 "format": "json",
                 "id": self.case,
-                "path": "{}".format(self.casefile),
+                "path": os.path.abspath(self.casefile),
                 "path_index": "~",
                 "step": "runinfo",
                 "tag": "sampleinfo",
@@ -466,7 +466,7 @@ class ReportSC2:
             {
                 "format": "txt",
                 "id": self.case,
-                "path": self.config_artic,
+                "path": os.path.abspath(self.config_artic),
                 "path_index": "~",
                 "step": "runinfo",
                 "tag": "runtime-settings",
