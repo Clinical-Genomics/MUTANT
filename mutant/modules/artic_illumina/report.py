@@ -19,7 +19,7 @@ from mutant.modules.generic_parser import (
 from mutant.modules.artic_illumina.parser import (
     get_vogue_multiqc_data,
     get_artic_results,
-    get_results_paths
+    get_results_paths,
 )
 
 
