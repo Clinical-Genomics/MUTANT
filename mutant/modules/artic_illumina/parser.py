@@ -104,6 +104,7 @@ def get_vogue_multiqc_data(multiqc, caseinfo) -> list:
                             field_data["value"] = get_multiqc_metric_value(
                                 data, sample_keys, step, field
                             )
+                        case_data.append(field_data)
                     else:
                         for direction in [1, 2]:
                             # Get template data
@@ -115,7 +116,7 @@ def get_vogue_multiqc_data(multiqc, caseinfo) -> list:
                                 field_data["value"] = get_multiqc_metric_value(
                                     data, sample_keys, step, field, str(direction)
                                 )
-                    case_data.append(field_data)
+                            case_data.append(field_data)
     return case_data
 
 
