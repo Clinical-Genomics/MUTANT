@@ -27,7 +27,7 @@ params {
     help = false
     tracedir = "${params.outdir}/pipeline_info"
     // cache option makes it a bit easier to set conda or singularity cacheDir
-    cache = "/home/proj/development/microbial/sars-cov-2/nf-cache/"
+    cache = "/home/proj/stage/mutant/nf-cache/"
     // Scheme name
     scheme = 'nCoV-2019'
     // Scheme version
@@ -93,7 +93,7 @@ if ( params.illumina ) {
         // Options for picard CollectWgsMetrics
         wgsMetricsOptions = "--COVERAGE_CAP 1000000 --LOCUS_ACCUMULATION_CAP 1000000"
         // Customization of multiQC report
-        multiqcOptions = '--cl_config "picard_config: { general_stats_target_coverage: [10,30,50,100] }"'
+        multiqcOptions = '--cl_config "picard_config: { general_stats_target_coverage: [10,30,50,100] }" --module cutadapt --module fastqc --module ivar --module picard'
     }
 }
 
