@@ -10,10 +10,10 @@ from datetime import datetime
 import click
 
 from mutant import version, log, WD, TIMESTAMP
-from mutant.modules.sarscov2_start import RunSC2
+from mutant.modules.artic_illumina.start import RunSC2
 from mutant.modules.generic_parser import get_json
-from mutant.modules.sarscov2_report import ReportSC2
-from mutant.modules.sarscov2_delivery import DeliverySC2
+from mutant.modules.artic_illumina.report import ReportSC2
+from mutant.modules.artic_illumina.delivery import DeliverySC2
 
 
 @click.group()
