@@ -3,16 +3,16 @@ profiles {
     local {
         process.executor = 'local'
         process.time = '1h'
-        process.memory = '8 GB'
+        process.memory = '2 GB'
         process.cpus = 1
     }
 }
 process {
     withLabel: largecpu {
-        cpus = 2
+        cpus = 1
     }
     withLabel: largemem {
-        memory = '12 GB'
+        memory = '8 GB'
     }
 }
 

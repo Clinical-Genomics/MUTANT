@@ -4,7 +4,7 @@ import json
 import click
 
 
-def append_dict(dictionary, key, item):
+def append_dict(dictionary, key, item) -> dict:
     if key in dictionary.keys():
         dictionary[key].append(item)
     else:
@@ -12,7 +12,7 @@ def append_dict(dictionary, key, item):
     return dictionary
 
 
-def get_json(config):
+def get_json(config) -> dict:
     """Read json file"""
     if os.path.exists(config):
         try:
@@ -30,7 +30,7 @@ def get_json(config):
     return data
 
 
-def get_sarscov2_config(config):
+def get_sarscov2_config(config) -> dict:
     """Parse SARS-CoV-2 sample config"""
     caseinfo = get_json(config)
     for i in range(len(caseinfo)):
@@ -42,7 +42,7 @@ def get_sarscov2_config(config):
     return caseinfo
 
 
-def read_filelines(infile):
+def read_filelines(infile) -> list:
     try:
         with open(infile, "r") as f:
             contents = f.readlines()
