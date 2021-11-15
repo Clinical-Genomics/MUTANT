@@ -118,14 +118,29 @@ class ReportSC2:
         )
         # Add info about failed/passed QC
         for record in self.caseinfo:
-            sample_yaml = {
-                "header": "~",
-                "id": record["CG_ID_sample"],
-                "input": os.path.basename(self.filepaths[self.case]["results-file"]),
-                "name": "passed-qc",
-                "step": "QC-threshold",
-                "value": self.articdata[record["Customer_ID_sample"]]["qc"],
-            }
+            if record["sequencing_qc_pass"]:
+                sample_yaml = {
+                    "header": "~",
+                    "id": record["CG_ID_sample"],
+                    "input": os.path.basename(
+                        self.filepaths[self.case]["results-file"]
+                    ),
+                    "name": "passed-qc",
+                    "step": "QC-threshold",
+                    "value": self.articdata[record["Customer_ID_sample"]]["qc"],
+                }
+            # Sample failed QC and has not been analyzed
+            else:
+                sample_yaml = {
+                    "header": "~",
+                    "id": record["CG_ID_sample"],
+                    "input": os.path.basename(
+                        self.filepaths[self.case]["results-file"]
+                    ),
+                    "name": "passed-qc",
+                    "step": "QC-threshold",
+                    "value": "FALSE",
+                }
             out_yaml["metrics"].append(sample_yaml)
         # Create output file
         with open(self.filepaths[self.case]["vogue-metrics"], "w") as out:
