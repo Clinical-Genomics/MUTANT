@@ -4,6 +4,7 @@ P.1,,VOC
 B.1.617.2,,VOC
 B.1.621,,VOI
 C.37,,VOI
+AY.4.2,,VOI
 C.36,L452R,VUM
 B.1.1.318,,VUM
 P.1,P681H,VUM
@@ -12,7 +13,7 @@ C.1.2,,VUM
 B.1.617.2,E484X,VUM
 B.1.617.2,Q613H,VUM
 B.1.617.2,Q677H,VUM
-AY.4.2,,VUM
+B.1.640,,VUM
 B.1.1.7,,De-escalated
 B.1.1.7,E484K,De-escalated
 B.1.427,,De-escalated
