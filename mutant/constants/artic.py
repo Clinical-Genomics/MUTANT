@@ -1,10 +1,18 @@
 """Constants for GMS-Artic and MUTANT"""
 
-# GMS-Artic and MUTANT output files
-ARTIC_FILES_CASE = {
+# GMS-Artic and MUTANT output files for Illumina
+ILLUMINA_FILES_CASE = {
     "multiqc-json": "{resdir}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json",
     "multiqc-html": "{resdir}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html",
     "vogue-metrics": "{resdir}/{case}_metrics_deliverables.yaml",
+    "results-file": "{resdir}/sars-cov-2_{ticket}_results.csv",
+}
+
+# GMS-Artic and MUTANT output files for Nanopore
+NANOPORE_FILES_CASE = {
+    "multiqc-json": None,
+    "multiqc-html": None,
+    "vogue-metrics": None,
     "results-file": "{resdir}/sars-cov-2_{ticket}_results.csv",
 }
 

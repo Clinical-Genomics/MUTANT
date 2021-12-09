@@ -87,6 +87,7 @@ def sarscov2(
             fastq_dir=os.path.abspath(input_folder),
             config_artic=config_artic,
             timestamp=TIMESTAMP,
+            nanopore=nanopore
         )
         report.create_all_files()
 

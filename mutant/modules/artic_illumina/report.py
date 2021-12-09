@@ -24,7 +24,7 @@ from mutant.modules.artic_illumina.parser import (
 
 
 class ReportSC2:
-    def __init__(self, caseinfo, indir, config_artic, fastq_dir, timestamp):
+    def __init__(self, caseinfo, indir, config_artic, fastq_dir, timestamp, nanopore):
         self.casefile = caseinfo
         caseinfo = get_sarscov2_config(caseinfo)
         self.caseinfo = caseinfo
@@ -37,7 +37,8 @@ class ReportSC2:
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
-        self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
+        self.nanopore = nanopore
+        self.filepaths = get_results_paths(self.indir, self.case, self.ticket, self.nanopore)
         self.articdata = dict()
 
     def create_all_files(self):
