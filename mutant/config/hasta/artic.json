@@ -43,9 +43,11 @@ if ( params.medaka || params.nanopolish ) {
     // Clinical genomics override
     params {
         // Minimum read length for artic guppyplex
-        min_length = 400
+        // min_length = 400
+        min_length = 150
         // Maximum read length for artic guppyplex
-        max_length = 700
+        // max_length = 700
+        max_length = 1200
         // Set to an integer to enable normalising in artic minion
         // IF SET TO false THIS WILL USE artic minion DEFAULT (100)
         normalise = 500
