@@ -46,6 +46,7 @@ def analyse(ctx):
 @click.option(
     "--outdir", help="Output folder to override general configutations", default=""
 )
+@click.option("-n", "--nanopore", is_flag=True)
 @click.option(
     "--profiles",
     help="Execution profiles, comma-separated",
@@ -53,7 +54,7 @@ def analyse(ctx):
 )
 @click.pass_context
 def sarscov2(
-    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles
+    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles, nanopore
 ):
 
     # Set base for output files (Move this section)
@@ -76,7 +77,7 @@ def sarscov2(
     )
 
     resdir = run.get_results_dir(config_mutant, outdir)
-    run.run_case(resdir)
+    run.run_case(resdir, nanopore)
 
     # Report
     if config_case != "":
