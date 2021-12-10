@@ -11,6 +11,8 @@ import click
 
 from mutant import version, log, WD, TIMESTAMP
 from mutant.modules.artic_illumina.start import RunSC2
+from mutant.modules.artic_nanopore.parser import ParserNanopore
+from mutant.modules.artic_nanopore.report import ReportPrinterNanopore
 from mutant.modules.generic_parser import get_json
 from mutant.modules.artic_illumina.report import ReportSC2
 from mutant.modules.artic_illumina.delivery import DeliverySC2
