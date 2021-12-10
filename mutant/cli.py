@@ -79,26 +79,57 @@ def sarscov2(
     resdir = run.get_results_dir(config_mutant, outdir)
     run.run_case(resdir, nanopore)
 
-    # Report
-    if config_case != "":
-        report = ReportSC2(
-            caseinfo=config_case,
-            indir=os.path.abspath(resdir),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
-            nanopore=nanopore
-        )
-        report.create_all_files()
+    if nanopore:
+        if config_case != "":
+            parser = ParserNanopore(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+            )
+            result: dict = parser.collect_results()
+            report_printer = ReportPrinterNanopore(
+                indir=os.path.abspath(resdir),
+            )
+            report_printer.print_report(result=result)
 
-    # Deliverables
-    if config_case != "":
-        delivery = DeliverySC2(
-            caseinfo=config_case,
-            indir=os.path.abspath(resdir),
-        )
+        if config_case != "":
+            report = ReportSC2ont(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+                fastq_dir=os.path.abspath(input_folder),
+                config_artic=config_artic,
+                timestamp=TIMESTAMP,
+            )
+            report.create_all_files()
 
-        delivery.rename_deliverables()
+        # Deliverables
+        if config_case != "":
+            delivery = DeliverySC2ont(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+            )
+
+            delivery.rename_deliverables()
+
+    else:
+        # Report
+        if config_case != "":
+            report = ReportSC2(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+                fastq_dir=os.path.abspath(input_folder),
+                config_artic=config_artic,
+                timestamp=TIMESTAMP,
+            )
+            report.create_all_files()
+
+        # Deliverables
+        if config_case != "":
+            delivery = DeliverySC2(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+            )
+
+            delivery.rename_deliverables()
 
 
 @analyse.command()
