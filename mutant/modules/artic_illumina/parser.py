@@ -8,21 +8,17 @@ import glob
 import csv
 import re
 from mutant import WD
-from mutant.constants.artic import MULTIQC_TO_VOGUE, ILLUMINA_FILES_CASE, NANOPORE_FILES_CASE
+from mutant.constants.artic import MULTIQC_TO_VOGUE, ILLUMINA_FILES_CASE
 from mutant.modules.generic_parser import append_dict
 
 
-def get_results_paths(indir, case, ticket, nanopore) -> dict:
+def get_results_paths(indir, case, ticket) -> dict:
     """Get paths for all reports and output files from GMS-Artic and MUTANT"""
 
     # Case paths
     path_dict = dict()
     case_paths = dict()
-    if nanopore:
-        case_files_dict = NANOPORE_FILES_CASE
-    else:
-        case_files_dict = ILLUMINA_FILES_CASE
-    for stepname, filepath in case_files_dict.items():
+    for stepname, filepath in ILLUMINA_FILES_CASE.items():
         fullpath = filepath.format(resdir=indir, case=case, ticket=ticket)
         if "*" in fullpath:
             fullpath = glob.glob(fullpath)[0]
