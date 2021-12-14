@@ -462,7 +462,7 @@ class ReportSC2:
                 "path": self.filepaths[self.case]["vogue-metrics"],
                 "path_index": "~",
                 "step": "result_aggregation",
-                "tag": "artic-yaml",
+                "tag": "metrics",
             }
         )
         # Provided CG CASE info from StatusDB
