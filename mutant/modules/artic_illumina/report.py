@@ -487,6 +487,17 @@ class ReportSC2:
                 "tag": "runtime-settings",
             }
         )
+        # Software versions
+        deliv["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": self.filepaths[self.case]["versions-file"],
+                "path_index": "~",
+                "step": "runinfo",
+                "tag": "versions",
+            }
+        )
         # Execution log
         deliv["files"].append(
             {
