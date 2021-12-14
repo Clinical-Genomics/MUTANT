@@ -495,7 +495,7 @@ class ReportSC2:
                 "path": self.filepaths[self.case]["versions-file"],
                 "path_index": "~",
                 "step": "runinfo",
-                "tag": "versions",
+                "tag": "software-versions",
             }
         )
         # Execution log
