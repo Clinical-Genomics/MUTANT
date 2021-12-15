@@ -41,14 +41,17 @@ class ParserNanopore:
                 second_line = line
         return second_line
 
-    def get_cust_sample_id(self, raw_pangolin_result: str) -> str:
+    def get_cust_sample_id(self, raw_pangolin_result: str, barcode_translation: dict) -> str:
+        """Return the customer ID of a sample"""
         split_on_slash = raw_pangolin_result.split("/")
         sample_folder = split_on_slash[0]
         split_on_underscore = sample_folder.split("_")
-        cust_sample_id = split_on_underscore[-1]
+        barcode = split_on_underscore[-1]
+        cust_sample_id = barcode_translation[barcode]
         return cust_sample_id
 
     def get_pangolin_type(self, raw_pangolin_result: str) -> str:
+        """Return the pangolin type of a sample"""
         split_on_comma = raw_pangolin_result.split(",")
         lineage = split_on_comma[1]
         return lineage
@@ -57,7 +60,7 @@ class ParserNanopore:
         """Collect data for pangolin types"""
         for filename in os.listdir("/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_14/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/"):
             second_line: str = self.get_second_line(filename=filename)
-            cust_sample_id: str = self.get_cust_sample_id(raw_pangolin_result=second_line)
+            cust_sample_id: str = self.get_cust_sample_id(raw_pangolin_result=second_line, barcode_translation=barcode_to_sample)
             pangolin_type: str = self.get_pangolin_type(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolin_type"] = pangolin_type
         return results
@@ -69,6 +72,7 @@ class ParserNanopore:
 #        pass
 
     def collect_results(self) -> dict:
+        """Build a dictionary with data for the report"""
         parsed_config: dict = get_sarscov2_config(config=self.caseinfo)
         barcode_to_sample: dict = self.translate_barcodes(parsed_config=parsed_config)
         results: dict = self.get_data_from_config(parsed_config=parsed_config)

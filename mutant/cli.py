@@ -89,28 +89,10 @@ def sarscov2(
             )
             result: dict = parser.collect_results()
             report_printer = ReportPrinterNanopore(
+                caseinfo=config_case,
                 indir=os.path.abspath(resdir),
             )
             report_printer.print_report(result=result)
-
-        if config_case != "":
-            report = ReportSC2ont(
-                caseinfo=config_case,
-                indir=os.path.abspath(resdir),
-                fastq_dir=os.path.abspath(input_folder),
-                config_artic=config_artic,
-                timestamp=TIMESTAMP,
-            )
-            report.create_all_files()
-
-        # Deliverables
-        if config_case != "":
-            delivery = DeliverySC2ont(
-                caseinfo=config_case,
-                indir=os.path.abspath(resdir),
-            )
-
-            delivery.rename_deliverables()
 
     else:
         # Report

@@ -60,7 +60,7 @@ class RunSC2:
             cmd_prefix = "211209_via_mutant"
             cmd_bcfastq = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass"
             cmd_scheme_dir = "/home/proj/production/mutant/MUTANT/mutant/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1"
-            cmd_output_dir = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_14"
+            cmd_output_dir = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_15"
 
             cmd = "nextflow run {0} -c {1} -profile singularity,slurm --medaka --prefix {2} --basecalled_fastq {3} --scheme-directory {4} --outdir {5}".format(
                 cmd_nf_script,
