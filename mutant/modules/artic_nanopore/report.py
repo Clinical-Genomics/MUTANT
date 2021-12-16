@@ -14,9 +14,6 @@ class ReportPrinterNanopore:
         self.indir = indir
 
     def print_report(self, result: dict) -> None:
-        print(result["custtest1"]["pangolin_type"])
-
-        #for sample in result:
-        #    for key in sample:
-        #        message = "Sample {0} with key {1} has value {2}".format(sample, key, result[sample][key])
-        #        print(message)
+        for sample, key in result.items():
+            message = "Sample {0} with key {1} has value {2}".format(sample, key, result[sample][key])
+            print(message)
