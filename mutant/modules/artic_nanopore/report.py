@@ -16,5 +16,5 @@ class ReportPrinterNanopore:
     def print_report(self, result: dict) -> None:
         for sample in result:
             for key in sample:
-                message = "Sample {0} with key {1} has value {2}".format(sample["Customer_ID_sample"], key, result[sample][key])
+                message = "Sample {0} with key {1} has value {2}".format(sample, key, result[sample][key])
                 print(message)
