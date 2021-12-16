@@ -122,42 +122,7 @@ profiles {
         singularity.autoMounts = true
         // Container
         if ( params.medaka || params.nanopolish ) {
-            process {
-                withName:articDownloadScheme {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:articGuppyPlex {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:articMinIONMedaka {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:articRemoveUnmappedReads {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:makeQCCSV {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:makeQCCSV {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:writeQCSummaryCSV {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:collateSamples {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:pangolinTyping {
-                    container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
-                }
-                withName:typeVariants {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-                withName:mergeTypingCSVs {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
-                }
-
-            }
+            process.container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
         }
         else if (params.illumina) {
             process.container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
