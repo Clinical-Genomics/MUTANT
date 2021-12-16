@@ -59,7 +59,7 @@ class RunSC2:
 
             cmd = "nextflow run {0}/externals/gms-artic/main.nf {1} -profile singularity,slurm --medaka --prefix {2} --basecalled_fastq {3} --scheme-directory {4} {5}".format(
                 self.WD,
-                confline,
+                "-c /home/proj/stage/mutant/MUTANT/mutant/config/hasta/artic.json",
                 self.prefix,
                 cmd_bcfastq,
                 "/home/proj/production/mutant/MUTANT/mutant/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1",
