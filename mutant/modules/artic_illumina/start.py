@@ -57,9 +57,10 @@ class RunSC2:
         if nanopore:
             cmd_bcfastq = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass"
 
-            cmd = "nextflow run {0}/externals/gms-artic/main.nf {1} -profile singularity,slurm --medaka --prefix {2} --basecalled_fastq {3} --scheme-directory {4} {5}".format(
+            cmd = "nextflow {0} -log {1} run {2}/externals/gms-artic/main.nf -profile singularity,slurm --medaka --prefix {3} --basecalled_fastq {4} --scheme-directory {5} {6}".format(
+                confline,
+                nflog,
                 self.WD,
-                "-c /home/proj/stage/mutant/MUTANT/mutant/config/hasta/artic.json",
                 self.prefix,
                 cmd_bcfastq,
                 "/home/proj/production/mutant/MUTANT/mutant/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1",
