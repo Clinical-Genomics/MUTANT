@@ -55,20 +55,15 @@ class RunSC2:
         nanopore = True  # THIS LINE HAS TO BE REMOVED LATER, ONLY FOR TESTING
 
         if nanopore:
-            cmd_nf_script = "/home/proj/stage/mutant/MUTANT/mutant/externals/gms-artic/main.nf"
-            cmd_nf_config = "/home/proj/stage/mutant/MUTANT/mutant/config/hasta/artic.json"
-            cmd_prefix = "211209_via_mutant"
             cmd_bcfastq = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass"
-            cmd_scheme_dir = "/home/proj/production/mutant/MUTANT/mutant/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1"
-            cmd_output_dir = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_15"
 
-            cmd = "nextflow run {0} -c {1} -profile singularity,slurm --medaka --prefix {2} --basecalled_fastq {3} --scheme-directory {4} --outdir {5}".format(
-                cmd_nf_script,
-                cmd_nf_config,
-                cmd_prefix,
+            cmd = "nextflow run {0}/externals/gms-artic/main.nf {1} -profile singularity,slurm --medaka --prefix {2} --basecalled_fastq {3} --scheme-directory {4} {5}".format(
+                self.WD,
+                confline,
+                self.prefix,
                 cmd_bcfastq,
-                cmd_scheme_dir,
-                cmd_output_dir,
+                "/home/proj/production/mutant/MUTANT/mutant/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1",
+                resultsline,
             )
         else:
             cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} --directory {6} {7}".format(
