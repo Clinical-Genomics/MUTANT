@@ -59,8 +59,10 @@ class ParserNanopore:
 
     def parse_pangolin(self, results: dict, barcode_to_sample: dict) -> dict:
         """Collect data for pangolin types"""
-        for filename in os.listdir("/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_14/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/"):
-            second_line: str = self.get_second_line(filename=filename)
+        basepath = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_15/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping/"
+        for filename in os.listdir("/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_15/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping/"):
+            abs_path = os.path.join(basepath, filename)
+            second_line: str = self.get_second_line(filename=abs_path)
             cust_sample_id: str = self.get_cust_sample_id(raw_pangolin_result=second_line, barcode_translation=barcode_to_sample)
             pangolin_type: str = self.get_pangolin_type(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolin_type"] = pangolin_type
