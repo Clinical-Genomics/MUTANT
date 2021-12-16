@@ -148,7 +148,7 @@ profiles {
                     container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
                 withName:pangolinTyping {
-                    container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                    container="docker://genomicmedicinesweden/gms-artic-nanopore:latest"
                 }
                 withName:typeVariants {
                     container="file:///${baseDir}/artic-ncov2019-nanopore.sif"
