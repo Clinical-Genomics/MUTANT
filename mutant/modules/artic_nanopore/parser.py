@@ -22,6 +22,7 @@ class ParserNanopore:
         data_to_report = {}
         for sample in parsed_config:
             cust_sample_id = sample["Customer_ID_sample"]
+            data_to_report[cust_sample_id] = {}
             data_to_report[cust_sample_id]["selection_criteria"] = sample["selection_criteria"]
             data_to_report[cust_sample_id]["region_code"] = sample["region_code"]
         return data_to_report
