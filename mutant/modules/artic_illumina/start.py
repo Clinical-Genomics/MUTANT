@@ -55,15 +55,13 @@ class RunSC2:
         nanopore = True  # THIS LINE HAS TO BE REMOVED LATER, ONLY FOR TESTING
 
         if nanopore:
-            cmd_bcfastq = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/210811_47CoV_SABasecalled/CS5/20210811_1157_MC-111732_0_FAQ57606_c89872a3/fastq_pass"
-
-            cmd = "nextflow {0} -log {1} run {2}/externals/gms-artic/main.nf -profile singularity,slurm --medaka --prefix {3} --basecalled_fastq {4} --scheme-directory {5} {6}".format(
+            cmd = "nextflow {0} -log {1} run {2}/externals/gms-artic/main.nf -profile singularity,slurm --medaka --prefix {3} --basecalled_fastq {4} --scheme-directory {5}/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1 {6}".format(
                 confline,
                 nflog,
                 self.WD,
                 self.prefix,
-                cmd_bcfastq,
-                "/home/proj/production/mutant/MUTANT/mutant/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1",
+                self.fastq,
+                self.WD,
                 resultsline,
             )
         else:
