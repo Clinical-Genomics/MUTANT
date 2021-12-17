@@ -57,11 +57,11 @@ class ParserNanopore:
         lineage = split_on_comma[1]
         return lineage
 
-    def parse_pangolin(self, results: dict, barcode_to_sample: dict) -> dict:
+    def parse_pangolin(self, results: dict, barcode_to_sample: dict, resdir: str) -> dict:
         """Collect data for pangolin types"""
-        basepath = "/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_15/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping/"
-        for filename in os.listdir("/home/hiseq.clinical/HO_data_processing/projects/nanopore/outputs/output_15/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping/"):
-            abs_path = os.path.join(basepath, filename)
+        base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping"])
+        for filename in os.listdir(base_path):
+            abs_path = os.path.join(base_path, filename)
             second_line: str = self.get_second_line(filename=abs_path)
             cust_sample_id: str = self.get_cust_sample_id(raw_pangolin_result=second_line, barcode_translation=barcode_to_sample)
             pangolin_type: str = self.get_pangolin_type(raw_pangolin_result=second_line)
@@ -74,14 +74,14 @@ class ParserNanopore:
 #    def parse_mutations(self, results: dict) -> dict:
 #        pass
 
-    def collect_results(self) -> dict:
+    def collect_results(self, resdir: str) -> dict:
         """Build a dictionary with data for the report"""
         parsed_config: dict = get_sarscov2_config(config=self.caseinfo)
         barcode_to_sample: dict = self.translate_barcodes(parsed_config=parsed_config)
         results: dict = self.get_data_from_config(parsed_config=parsed_config)
         #results: dict = self.parse_assembly(results=results)
         #results: dict = self.calculate_coverage(results=results)
-        results: dict = self.parse_pangolin(results=results, barcode_to_sample=barcode_to_sample)
+        results: dict = self.parse_pangolin(results=results, barcode_to_sample=barcode_to_sample, resdir=resdir)
         #results: dict = self.parse_classifications(results=results)
         #results: dict = self.parse_mutations(results=results)
         return results

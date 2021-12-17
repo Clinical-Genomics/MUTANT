@@ -52,8 +52,6 @@ class RunSC2:
         if self.config_artic != "":
             confline = "-C {0}".format(self.config_artic)
 
-        nanopore = True  # THIS LINE HAS TO BE REMOVED LATER, ONLY FOR TESTING
-
         if nanopore:
             cmd = "nextflow {0} -log {1} run {2}/externals/gms-artic/main.nf -profile singularity,slurm --medaka --prefix {3} --basecalled_fastq {4} --scheme-directory {5}/externals/gms-artic/primer-schemes/midnight/nCoV-2019/V1 {6}".format(
                 confline,
