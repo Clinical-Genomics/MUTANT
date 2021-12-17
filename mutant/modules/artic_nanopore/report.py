@@ -15,8 +15,8 @@ class ReportPrinterNanopore:
     def print_report(self, result: dict) -> None:
         result_file = "/".join([self.indir, "sars-cov-2_results.csv"])
         with open(result_file, "a") as file_to_append:
-            file_to_append.write("Sample,Lineage")
+            file_to_append.write("Sample,Lineage\n")
             samples = result.keys()
             for sample in samples:
-                line_to_append = "{0},{1}".format(sample, result[sample]["pangolin_type"])
+                line_to_append = "{0},{1}{2}".format(sample, result[sample]["pangolin_type"], "\n")
                 file_to_append.write(line_to_append)
