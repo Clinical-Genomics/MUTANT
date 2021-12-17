@@ -87,7 +87,7 @@ def sarscov2(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
             )
-            result: dict = parser.collect_results(resdir=resdir)
+            result: dict = parser.collect_results(resdir=os.path.abspath(resdir))
             report_printer = ReportPrinterNanopore(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
