@@ -142,8 +142,8 @@ class ParserNanopore:
             pangoLEARN_version: str = self.get_pangoLEARN_version(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolearn_version"] = pangoLEARN_version
             voc_strains: dict = self.identify_classifications()
-            if pangolin_type in voc_strains["class"]:
-                index = voc_strains["class"].index()
+            if pangolin_type in voc_strains["lineage"]:
+                index = voc_strains["lineage"].index(pangolin_type)
                 if voc_strains["class"][index] == "VOC":
                     results[cust_sample_id]["voc"] = "YES"
                 else:
