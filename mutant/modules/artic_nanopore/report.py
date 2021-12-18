@@ -25,6 +25,7 @@ class ReportPrinterNanopore:
                     result[sample]["selection_criteria"],
                     result[sample]["region_code"],
                     self.ticket,
+                    result[sample]["fraction_n_bases"],
                     result[sample]["pangolin_type"],
                     "\n"
                 )
