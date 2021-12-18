@@ -75,7 +75,7 @@ class ParserNanopore:
         """Collects data by parsing the assembly"""
         base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka"])
         for filename in os.listdir(base_path):
-            if filename.endswith(".consensus.fasta")
+            if filename.endswith(".consensus.fasta"):
                 abs_path = os.path.join(base_path, filename)
                 first_line: str = self.get_first_line(filename=abs_path)
                 cust_sample_id: str = self.get_cust_sample_id(line_to_parse=first_line, barcode_translation=barcode_to_sample)
