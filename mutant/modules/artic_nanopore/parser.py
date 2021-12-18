@@ -66,8 +66,8 @@ class ParserNanopore:
             total_N = 0
             for line in fasta:
                 stripped_line = line.strip()
-                total_bases =+ len(stripped_line)
-                total_N =+ stripped_line.count('N')
+                total_bases += len(stripped_line)
+                total_N += stripped_line.count('N')
             fraction_N_two_decimals = float("{:.2f}".format(total_N/total_bases))
             return fraction_N_two_decimals
 

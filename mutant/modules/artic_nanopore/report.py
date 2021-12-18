@@ -20,7 +20,7 @@ class ReportPrinterNanopore:
             file_to_append.write("Sample,Selection,Region Code,Ticket,Lineage\n")
             samples = result.keys()
             for sample in samples:
-                line_to_append = "{0},{1},{2},{3},{4}{5}".format(
+                line_to_append = "{0},{1},{2},{3},{4},{5}{6}".format(
                     sample,
                     result[sample]["selection_criteria"],
                     result[sample]["region_code"],
