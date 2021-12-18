@@ -7,13 +7,15 @@ from mutant.modules.generic_parser import get_sarscov2_config
 class ReportPrinterNanopore:
     def __init__(self, caseinfo: str, indir: str):
         self.casefile = caseinfo
-        caseinfo = get_sarscov2_config(caseinfo)
-        self.case = caseinfo[0]["case_ID"]
-        self.ticket = caseinfo[0]["Customer_ID_project"]
+        self.caseinfo = get_sarscov2_config(caseinfo)
+        self.case = self.caseinfo[0]["case_ID"]
+        self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
 
     def print_report(self, result: dict) -> None:
-        result_file = "/".join([self.indir, "sars-cov-2_results.csv"])
+        """Append results from the analysis to a report"""
+        file_name_report = "_".join(["sars-cov-2", self.ticket, "results.csv"])
+        result_file = "/".join([self.indir, file_name_report])
         with open(result_file, "a") as file_to_append:
             file_to_append.write("Sample,Lineage\n")
             samples = result.keys()
