@@ -9,7 +9,7 @@ import csv
 import re
 from mutant import WD
 from mutant.constants.artic import MULTIQC_TO_VOGUE, ILLUMINA_FILES_CASE
-from mutant.modules.generic_parser import append_dict
+from mutant.modules.generic_parser import append_dict, parse_classifications
 
 
 def get_results_paths(indir, case, ticket) -> dict:
@@ -128,13 +128,8 @@ def get_artic_results(indir) -> dict:
     # Magical unpacking into single list
     voc_pos_aa = sum(muts.values.tolist(), [])
 
-    classifications = pandas.read_csv(
-        "{0}/standalone/classifications.csv".format(WD), sep=","
-    )
-    voc_strains = {"lineage": "", "spike": "", "class": ""}
-    voc_strains["lineage"] = classifications["lineage"].tolist()
-    voc_strains["spike"] = classifications["spike"].tolist()
-    voc_strains["class"] = classifications["class"].tolist()
+    classifications_path = "{0}/standalone/classifications.csv".format(WD)
+    voc_strains: dict = parse_classifications(csv_path=classifications_path)
 
     artic_data = dict()
     var_all = dict()

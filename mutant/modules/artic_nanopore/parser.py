@@ -2,7 +2,8 @@
 import glob
 import os
 
-from mutant.modules.generic_parser import get_sarscov2_config
+from mutant import WD
+from mutant.modules.generic_parser import get_sarscov2_config, parse_classifications
 
 QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER = 95
 
@@ -124,6 +125,11 @@ class ParserNanopore:
         pango_learn_version = split_on_comma[9]
         return pango_learn_version
 
+    def identify_classifications(self) -> dict:
+        classifications_path = "{0}/standalone/classifications.csv".format(WD)
+        voc_strains: dict = parse_classifications(csv_path=classifications_path)
+        return voc_strains
+
     def parse_pangolin(self, results: dict, barcode_to_sample: dict, resdir: str) -> dict:
         """Collect data for pangolin types"""
         base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping"])
@@ -135,10 +141,12 @@ class ParserNanopore:
             results[cust_sample_id]["pangolin_type"] = pangolin_type
             pangoLEARN_version: str = self.get_pangoLEARN_version(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolearn_version"] = pangoLEARN_version
+            voc_strains: dict = self.identify_classifications()
+            if voc_strains[pangolin_type] == "VOC":
+                results[cust_sample_id]["voc"] = "YES"
+            else:
+                results[cust_sample_id]["voc"] = "NO"
         return results
-
-#    def parse_classifications(self, results: dict) -> dict:
-#        pass
 
 #    def parse_mutations(self, results: dict) -> dict:
 #        pass
@@ -151,6 +159,5 @@ class ParserNanopore:
         results: dict = self.parse_assembly(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
         results: dict = self.calculate_coverage(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
         results: dict = self.parse_pangolin(results=results, barcode_to_sample=barcode_to_sample, resdir=resdir)
-        #results: dict = self.parse_classifications(results=results)
         #results: dict = self.parse_mutations(results=results)
         return results
