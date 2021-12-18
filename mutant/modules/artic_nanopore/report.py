@@ -17,7 +17,7 @@ class ReportPrinterNanopore:
         file_name_report = "_".join(["sars-cov-2", str(self.ticket), "results.csv"])
         result_file = "/".join([self.indir, file_name_report])
         with open(result_file, "a") as file_to_append:
-            file_to_append.write("Sample,Selection,Region Code,Ticket,Lineage\n")
+            file_to_append.write("Sample,Selection,Region Code,Ticket,%N_bases,Lineage\n")
             samples = result.keys()
             for sample in samples:
                 line_to_append = "{0},{1},{2},{3},{4},{5}{6}".format(

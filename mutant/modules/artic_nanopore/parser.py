@@ -68,8 +68,8 @@ class ParserNanopore:
                 stripped_line = line.strip()
                 total_bases += len(stripped_line)
                 total_N += stripped_line.count('N')
-            fraction_N_two_decimals = float("{:.2f}".format(total_N/total_bases))
-            return fraction_N_two_decimals
+            percentage_N_two_decimals = round((total_N/total_bases)*100, 2)
+            return percentage_N_two_decimals
 
     def parse_assembly(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
         """Collects data by parsing the assembly"""
