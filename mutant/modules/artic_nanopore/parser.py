@@ -4,6 +4,7 @@ import os
 
 from mutant.modules.generic_parser import get_sarscov2_config
 
+QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER = 95
 
 class ParserNanopore:
     def __init__(self, caseinfo: str):
@@ -105,6 +106,10 @@ class ParserNanopore:
             bases_w_10x_cov_or_more: int = self.count_bases_w_10x_cov_or_more(coverage_stats=coverage_stats)
             fraction_equal_or_greater_than_10 = bases_w_10x_cov_or_more / len(coverage_stats)
             results[barcode_to_sample[barcode]]["pct_10x_coverage"] = round(fraction_equal_or_greater_than_10 * 100, 2)
+            if fraction_equal_or_greater_than_10 >= QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER:
+                results[barcode_to_sample[barcode]]["qc_pass"] = "TRUE"
+            else:
+                results[barcode_to_sample[barcode]]["qc_pass"] = "FALSE"
         return results
 
     def get_pangolin_type(self, raw_pangolin_result: str) -> str:
@@ -112,6 +117,12 @@ class ParserNanopore:
         split_on_comma = raw_pangolin_result.split(",")
         lineage = split_on_comma[1]
         return lineage
+
+    def get_pangoLEARN_version(self, raw_pangolin_result: str) -> str:
+        """Return the pangoLEARN_version of a sample"""
+        split_on_comma = raw_pangolin_result.split(",")
+        pango_learn_version = split_on_comma[9]
+        return pango_learn_version
 
     def parse_pangolin(self, results: dict, barcode_to_sample: dict, resdir: str) -> dict:
         """Collect data for pangolin types"""
@@ -122,6 +133,8 @@ class ParserNanopore:
             cust_sample_id: str = self.get_cust_sample_id(line_to_parse=second_line, barcode_translation=barcode_to_sample)
             pangolin_type: str = self.get_pangolin_type(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolin_type"] = pangolin_type
+            pangoLEARN_version: str = self.get_pangoLEARN_version(raw_pangolin_result=second_line)
+            results[cust_sample_id]["pangolearn_version"] = pangoLEARN_version
         return results
 
 #    def parse_classifications(self, results: dict) -> dict:
