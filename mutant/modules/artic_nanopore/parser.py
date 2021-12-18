@@ -1,4 +1,5 @@
 """Parse SARS-CoV-2 nanopore results"""
+import glob
 import os
 
 from mutant.modules.generic_parser import get_sarscov2_config
@@ -65,8 +66,46 @@ class ParserNanopore:
                 results[cust_sample_id]["fraction_n_bases"] = fraction_N
         return results
 
-#    def calculate_coverage(self, results: dict) -> dict:
-#        pass
+    def get_depth_files_paths(self, barcode: str, base_path: str) -> list:
+        """Returns the paths to coverage statistics for a certain barcode"""
+        wild_card_path = "*".join([base_path, barcode, "depths"])
+        depth_files = glob.glob(wild_card_path)
+        return depth_files
+
+    def count_bases_w_10x_cov_or_more(self, coverage_stats: list) -> int:
+        """Counts how many times a number is higher than 10 in a list"""
+        numbers_higher_than_10 = 0
+        for number in coverage_stats:
+            if number >= 10:
+                numbers_higher_than_10 += 1
+        return numbers_higher_than_10
+
+    def initiate_coverage_stats_list(self, file_path: str) -> list:
+        coverage_stats = []
+        with open(file_path, "r") as file1:
+            for line in file1:
+                stripped_line = line.strip()
+                columns: list = stripped_line.split("\t")
+                coverage_stats.append(columns[3])
+        file1.close()
+        return coverage_stats
+
+    def calculate_coverage(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
+        """Collects data for the fraction of each assembly that got 10x coverage or more"""
+        base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/"])
+        for barcode in barcode_to_sample:
+            coverage_files_paths: list = self.get_depth_files_paths(barcode=barcode, base_path=base_path)
+            coverage_stats: list = self.initiate_coverage_stats_list(file_path=coverage_files_paths[0])
+            with open(coverage_files_paths[1], "r") as file2:
+                for line in file2:
+                    stripped_line = line.strip()
+                    columns: list = stripped_line.split("\t")
+                    coverage_stats[columns[2]] += columns[3]
+            file2.close()
+            bases_w_10x_cov_or_more: int = self.count_bases_w_10x_cov_or_more(coverage_stats=coverage_stats)
+            fraction_equal_or_greater_than_10 = bases_w_10x_cov_or_more / len(coverage_stats)
+            results[barcode_to_sample[barcode]]["pct_10x_coverage"] = round(fraction_equal_or_greater_than_10 * 100, 2)
+        return results
 
     def get_pangolin_type(self, raw_pangolin_result: str) -> str:
         """Return the pangolin type of a sample"""
@@ -97,7 +136,7 @@ class ParserNanopore:
         barcode_to_sample: dict = self.translate_barcodes(parsed_config=parsed_config)
         results: dict = self.get_data_from_config(parsed_config=parsed_config)
         results: dict = self.parse_assembly(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
-        #results: dict = self.calculate_coverage(results=results)
+        results: dict = self.calculate_coverage(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
         results: dict = self.parse_pangolin(results=results, barcode_to_sample=barcode_to_sample, resdir=resdir)
         #results: dict = self.parse_classifications(results=results)
         #results: dict = self.parse_mutations(results=results)
