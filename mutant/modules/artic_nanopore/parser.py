@@ -104,9 +104,9 @@ class ParserNanopore:
                     coverage_stats[int(columns[2])] += int(columns[3])
             file2.close()
             bases_w_10x_cov_or_more: int = self.count_bases_w_10x_cov_or_more(coverage_stats=coverage_stats)
-            fraction_equal_or_greater_than_10 = bases_w_10x_cov_or_more / len(coverage_stats)
-            results[barcode_to_sample[barcode]]["pct_10x_coverage"] = round(fraction_equal_or_greater_than_10 * 100, 2)
-            if fraction_equal_or_greater_than_10 >= QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER:
+            percentage_equal_or_greater_than_10 = round((bases_w_10x_cov_or_more / len(coverage_stats)) * 100, 2)
+            results[barcode_to_sample[barcode]]["pct_10x_coverage"] = percentage_equal_or_greater_than_10
+            if percentage_equal_or_greater_than_10 >= QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER:
                 results[barcode_to_sample[barcode]]["qc_pass"] = "TRUE"
             else:
                 results[barcode_to_sample[barcode]]["qc_pass"] = "FALSE"
