@@ -100,7 +100,7 @@ class ParserNanopore:
                 for line in file2:
                     stripped_line = line.strip()
                     columns: list = stripped_line.split("\t")
-                    coverage_stats[columns[2]] += int(columns[3])
+                    coverage_stats[int(columns[2])] += int(columns[3])
             file2.close()
             bases_w_10x_cov_or_more: int = self.count_bases_w_10x_cov_or_more(coverage_stats=coverage_stats)
             fraction_equal_or_greater_than_10 = bases_w_10x_cov_or_more / len(coverage_stats)
