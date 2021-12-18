@@ -14,7 +14,7 @@ class ReportPrinterNanopore:
 
     def print_report(self, result: dict) -> None:
         """Append results from the analysis to a report"""
-        file_name_report = "_".join(["sars-cov-2", self.ticket, "results.csv"])
+        file_name_report = "_".join(["sars-cov-2", str(self.ticket), "results.csv"])
         result_file = "/".join([self.indir, file_name_report])
         with open(result_file, "a") as file_to_append:
             file_to_append.write("Sample,Lineage\n")
