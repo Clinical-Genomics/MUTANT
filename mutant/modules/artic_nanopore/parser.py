@@ -142,7 +142,9 @@ class ParserNanopore:
             pangoLEARN_version: str = self.get_pangoLEARN_version(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolearn_version"] = pangoLEARN_version
             voc_strains: dict = self.identify_classifications()
-            if voc_strains[pangolin_type] == "VOC":
+            if pangolin_type not in voc_strains.keys():
+                results[cust_sample_id]["voc"] = "NO"
+            elif voc_strains[pangolin_type] == "VOC":
                 results[cust_sample_id]["voc"] = "YES"
             else:
                 results[cust_sample_id]["voc"] = "NO"
