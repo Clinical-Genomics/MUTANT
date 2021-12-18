@@ -1,21 +1,37 @@
 """Parse SARS-CoV-2 nanopore results"""
 import os
 
-from pathlib import Path
 from mutant.modules.generic_parser import get_sarscov2_config
 
 
 class ParserNanopore:
-    def __init__(self, caseinfo: str, indir: Path):
+    def __init__(self, caseinfo: str):
         self.caseinfo = caseinfo
-        self.indir = indir
 
-    def get_line(self, filename: str, line_index_of_interest: int) -> str:
-        """Return a certain line of a given file"""
+#    def get_line(self, filename: str, line_index_of_interest: int) -> str:
+#        """Return a certain line of a given file"""
+#        opened_file = open(filename)
+#        for i, line in enumerate(opened_file):
+#            if i == line_index_of_interest:
+#                return line
+
+    def get_second_line(self, filename: str) -> str:
+        """Return the second line of the file"""
         opened_file = open(filename)
+        second_line = ""
         for i, line in enumerate(opened_file):
-            if i == line_index_of_interest:
-                return line
+            if i == 1:
+                second_line = line
+        return second_line
+
+    def get_first_line(self, filename: str) -> str:
+        """Return the first line of the file"""
+        opened_file = open(filename)
+        first_line = ""
+        for i, line in enumerate(opened_file):
+            if i == 0:
+                first_line = line
+        return first_line
 
     def get_cust_sample_id(self, line_to_parse: str, barcode_translation: dict) -> str:
         """Return the customer ID of a sample"""
@@ -60,7 +76,7 @@ class ParserNanopore:
         base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka"])
         for filename in os.listdir(base_path):
             abs_path = os.path.join(base_path, filename)
-            first_line: str = self.get_line(filename=abs_path, line_index_of_interest=0)
+            first_line: str = self.get_first_line(filename=abs_path)
             cust_sample_id: str = self.get_cust_sample_id(line_to_parse=first_line, barcode_translation=barcode_to_sample)
             fraction_N: float = self.get_fraction_n(input_file=abs_path)
             results[cust_sample_id]["fraction_n_bases"] = fraction_N
@@ -80,7 +96,7 @@ class ParserNanopore:
         base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping"])
         for filename in os.listdir(base_path):
             abs_path = os.path.join(base_path, filename)
-            second_line: str = self.get_line(filename=abs_path, line_index_of_interest=1)
+            second_line: str = self.get_second_line(filename=abs_path)
             cust_sample_id: str = self.get_cust_sample_id(line_to_parse=second_line, barcode_translation=barcode_to_sample)
             pangolin_type: str = self.get_pangolin_type(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolin_type"] = pangolin_type
