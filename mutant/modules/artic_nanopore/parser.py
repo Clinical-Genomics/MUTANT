@@ -171,6 +171,7 @@ class ParserNanopore:
         return cust_sample_id
 
     def initiate_mutations_dict(self, results: dict) -> dict:
+        """There wont be variant files for all samples, this give all keys in the dict a value"""
         samples = results.keys()
         for sample in samples:
             results[sample]["mutations"] = "-"
