@@ -27,12 +27,13 @@ class ReportPrinterNanopore:
                 "QC_pass",
                 "Lineage",
                 "PangoLEARN_version",
-                "VOC\n"
+                "VOC",
+                "Mutations\n"
             ])
             file_to_append.write(header_results)
             samples = result.keys()
             for sample in samples:
-                line_to_append = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}{10}".format(
+                line_to_append = "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10}{11}".format(
                     sample,
                     result[sample]["selection_criteria"],
                     result[sample]["region_code"],
@@ -43,6 +44,7 @@ class ReportPrinterNanopore:
                     result[sample]["pangolin_type"],
                     result[sample]["pangolearn_version"],
                     result[sample]["voc"],
+                    result[sample]["mutations"],
                     "\n"
                 )
                 file_to_append.write(line_to_append)

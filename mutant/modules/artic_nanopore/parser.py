@@ -144,16 +144,51 @@ class ParserNanopore:
             voc_strains: dict = self.identify_classifications()
             if pangolin_type in voc_strains["lineage"]:
                 index = voc_strains["lineage"].index(pangolin_type)
-                if voc_strains["class"][index] == "VOC":
-                    results[cust_sample_id]["voc"] = "YES"
-                else:
-                    results[cust_sample_id]["voc"] = "NO"
+                results[cust_sample_id]["voc"] = voc_strains["class"][index]
             else:
                 results[cust_sample_id]["voc"] = "NO"
         return results
 
-#    def parse_mutations(self, results: dict) -> dict:
-#        pass
+    def get_mutations_of_interest(self) -> list:
+        """Collects data for mutations of interest into a list"""
+        mutations_of_interest = "{0}/standalone/spike_mutations.csv".format(WD)
+        mutations_list = []
+        with open(mutations_of_interest, "r") as csv:
+            next(csv)
+            for line in csv:
+                stripped_line = line.strip()
+                mutations_list.append(stripped_line)
+        csv.close()
+        return mutations_list
+
+    def get_sample_id_from_filename(self, filename: str, barcode_to_sample: dict) -> str:
+        """Returns sample ID that correspond to a specific file"""
+        split_on_dot = filename.split(".")
+        prefix = split_on_dot[0]
+        split_on_underscore = prefix.split("_")
+        barcode = split_on_underscore[-1]
+        cust_sample_id = barcode_to_sample[barcode]
+        return cust_sample_id
+
+    def parse_mutations(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
+        """If a mutation of interest is present in a sample it will be added to a dict"""
+        mutations_of_interest: list = self.get_mutations_of_interest()
+        base_path = "/".join([resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"])
+        for filename in os.listdir(base_path):
+            abs_path = os.path.join(base_path, filename)
+            cust_sample_id: str = self.get_sample_id_from_filename(filename=filename, barcode_to_sample=barcode_to_sample)
+            results[cust_sample_id]["mutations"] = "-"
+            with open(abs_path, "r") as variant_file:
+                next(variant_file)
+                for line in variant_file:
+                    split_on_comma = line.split(",")
+                    if split_on_comma[2] in mutations_of_interest:
+                        if results[cust_sample_id]["mutations"] == "-":
+                            results[cust_sample_id]["mutations"] = split_on_comma[2]
+                        else:
+                            results[cust_sample_id]["mutations"] += split_on_comma[2]
+            variant_file.close()
+        return results
 
     def collect_results(self, resdir: str) -> dict:
         """Build a dictionary with data for the report"""
@@ -163,5 +198,5 @@ class ParserNanopore:
         results: dict = self.parse_assembly(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
         results: dict = self.calculate_coverage(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
         results: dict = self.parse_pangolin(results=results, barcode_to_sample=barcode_to_sample, resdir=resdir)
-        #results: dict = self.parse_mutations(results=results)
+        results: dict = self.parse_mutations(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
         return results
