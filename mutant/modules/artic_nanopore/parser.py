@@ -170,14 +170,20 @@ class ParserNanopore:
         cust_sample_id = barcode_to_sample[barcode]
         return cust_sample_id
 
+    def initiate_mutations_dict(self, results: dict) -> dict:
+        samples = results.keys()
+        for sample in samples:
+            results[sample]["mutations"] = "-"
+        return results
+
     def parse_mutations(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
         """If a mutation of interest is present in a sample it will be added to a dict"""
         mutations_of_interest: list = self.get_mutations_of_interest()
         base_path = "/".join([resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"])
+        results: dict = self.initiate_mutations_dict(results=results)
         for filename in os.listdir(base_path):
             abs_path = os.path.join(base_path, filename)
             cust_sample_id: str = self.get_sample_id_from_filename(filename=filename, barcode_to_sample=barcode_to_sample)
-            results[cust_sample_id]["mutations"] = "-"
             with open(abs_path, "r") as variant_file:
                 next(variant_file)
                 for line in variant_file:
@@ -186,7 +192,7 @@ class ParserNanopore:
                         if results[cust_sample_id]["mutations"] == "-":
                             results[cust_sample_id]["mutations"] = split_on_comma[2]
                         else:
-                            results[cust_sample_id]["mutations"] += split_on_comma[2]
+                            results[cust_sample_id]["mutations"] = ";".join([results[cust_sample_id]["mutations"], split_on_comma[2]])
             variant_file.close()
         return results
 
