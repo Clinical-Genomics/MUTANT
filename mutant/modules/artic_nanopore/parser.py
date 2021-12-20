@@ -83,6 +83,7 @@ class ParserNanopore:
         return numbers_higher_than_10
 
     def initiate_coverage_stats_list(self, file_path: str) -> list:
+        """Collect coverage statistics"""
         coverage_stats = []
         with open(file_path, "r") as file1:
             for line in file1:
@@ -126,6 +127,7 @@ class ParserNanopore:
         return pango_learn_version
 
     def identify_classifications(self) -> dict:
+        """Parse which lineages are classified as VOC/VOI etc"""
         classifications_path = "{0}/standalone/classifications.csv".format(WD)
         voc_strains: dict = parse_classifications(csv_path=classifications_path)
         return voc_strains
