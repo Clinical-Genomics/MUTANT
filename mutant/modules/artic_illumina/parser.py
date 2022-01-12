@@ -166,7 +166,7 @@ def get_artic_results(indir) -> dict:
         next(content)
         for line in content:
             sample = line[0].split("_")[-1]
-            if float(line[2]) > 95:
+            if float(line[2]) >= 90:
                 qc_flag = "TRUE"
             else:
                 qc_flag = "FALSE"
