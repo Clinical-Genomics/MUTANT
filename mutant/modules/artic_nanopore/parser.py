@@ -5,7 +5,7 @@ import os
 from mutant import WD
 from mutant.modules.generic_parser import get_sarscov2_config, parse_classifications
 
-QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER = 95
+QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER = 90
 
 class ParserNanopore:
     def __init__(self, caseinfo: str):
