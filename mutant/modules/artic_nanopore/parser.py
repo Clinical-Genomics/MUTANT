@@ -158,7 +158,6 @@ class ParserNanopore:
             for line in csv:
                 stripped_line = line.strip()
                 mutations_list.append(stripped_line)
-        csv.close()
         return mutations_list
 
     def get_sample_id_from_filename(self, filename: str, barcode_to_sample: dict) -> str:
