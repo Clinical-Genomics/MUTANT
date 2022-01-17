@@ -146,7 +146,7 @@ class ParserNanopore:
                 index = voc_strains["lineage"].index(pangolin_type)
                 results[cust_sample_id]["voc"] = voc_strains["class"][index]
             else:
-                results[cust_sample_id]["voc"] = "NO"
+                results[cust_sample_id]["voc"] = "No"
         return results
 
     def get_mutations_of_interest(self) -> list:
