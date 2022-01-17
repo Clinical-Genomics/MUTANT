@@ -193,7 +193,6 @@ class ParserNanopore:
                             results[cust_sample_id]["mutations"] = split_on_comma[2]
                         else:
                             results[cust_sample_id]["mutations"] = ";".join([results[cust_sample_id]["mutations"], split_on_comma[2]])
-            variant_file.close()
         return results
 
     def collect_results(self, resdir: str) -> dict:
