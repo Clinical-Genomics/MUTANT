@@ -13,10 +13,10 @@ class ParserNanopore:
 
     def get_line(self, filename: str, line_index_of_interest: int) -> str:
         """Return a certain line of a given file"""
-        opened_file = open(filename)
-        for i, line in enumerate(opened_file):
-            if i == line_index_of_interest:
-                return line
+        with open(filename) as opened_file:
+            for i, line in enumerate(opened_file):
+                if i == line_index_of_interest:
+                    return line
 
     def get_cust_sample_id(self, line_to_parse: str, barcode_translation: dict) -> str:
         """Return the customer ID of a sample"""
