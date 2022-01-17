@@ -90,7 +90,6 @@ class ParserNanopore:
                 stripped_line = line.strip()
                 columns: list = stripped_line.split("\t")
                 coverage_stats.append(int(columns[3]))
-        file1.close()
         return coverage_stats
 
     def calculate_coverage(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
