@@ -28,10 +28,14 @@ params {
     tracedir = "${params.outdir}/pipeline_info"
     // cache option makes it a bit easier to set conda or singularity cacheDir
     cache = "/home/proj/production/mutant/nf-cache/"
+    // Repo to download your primer scheme from
+    schemeRepoURL = 'https://github.com/artic-network/primer-schemes.git'
+    // Directory within schemeRepoURL that contains primer schemes
+    schemeDir = 'primer-schemes/midnight'
     // Scheme name
     scheme = 'nCoV-2019'
     // Scheme version
-    schemeVersion = 'V3'
+    schemeVersion = 'V1'
     // gff file
     gff = "$baseDir/typing/MN908947.3.gff"
     // SARS-CoV-2 VOC
@@ -199,4 +203,3 @@ manifest {
     nextflowVersion = '>=20.01.0'
     version = '1.0.0'
 }
-
