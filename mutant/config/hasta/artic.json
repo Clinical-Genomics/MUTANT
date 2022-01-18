@@ -33,7 +33,7 @@ params {
     // Directory within schemeRepoURL that contains primer schemes
     schemeDir = 'primer-schemes'
     // Scheme name
-    scheme = 'midnight/nCoV-2019'
+    scheme = 'primer-schemes/midnight/nCoV-2019'
     // Scheme version
     schemeVersion = 'V1'
     // gff file
