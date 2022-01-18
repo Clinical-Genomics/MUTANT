@@ -29,7 +29,7 @@ params {
     // cache option makes it a bit easier to set conda or singularity cacheDir
     cache = "/home/proj/production/mutant/nf-cache/"
     // Repo to download your primer scheme from
-    schemeRepoURL = 'https://github.com/artic-network/primer-schemes.git'
+    schemeRepoURL = 'https://github.com/genomic-medicine-sweden/gms-artic.git'
     // Directory within schemeRepoURL that contains primer schemes
     schemeDir = 'primer-schemes/midnight'
     // Scheme name
