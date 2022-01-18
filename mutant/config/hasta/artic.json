@@ -31,9 +31,9 @@ params {
     // Repo to download your primer scheme from
     schemeRepoURL = 'https://github.com/genomic-medicine-sweden/gms-artic.git'
     // Directory within schemeRepoURL that contains primer schemes
-    schemeDir = ''
+    schemeDir = 'primer-schemes'
     // Scheme name
-    scheme = 'primer-schemes/midnight/nCoV-2019'
+    scheme = 'midnight/nCoV-2019'
     // Scheme version
     schemeVersion = 'V1'
     // gff file
