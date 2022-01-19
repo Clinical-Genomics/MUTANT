@@ -29,11 +29,11 @@ params {
     // cache option makes it a bit easier to set conda or singularity cacheDir
     cache = "/home/proj/production/mutant/nf-cache/"
     // Repo to download your primer scheme from
-    schemeRepoURL = 'https://github.com/genomic-medicine-sweden/gms-artic.git'
+    schemeRepoURL = 'https://github.com/Clinical-Genomics/primer-schemes.git'
     // Directory within schemeRepoURL that contains primer schemes
-    schemeDir = 'primer-schemes/midnight'
+    schemeDir = 'nCoV-2019-midnight'
     // Scheme name
-    scheme = 'nCoV-2019'
+    scheme = 'nCoV-2019-midnight'
     // Scheme version
     schemeVersion = 'V1'
     // gff file
