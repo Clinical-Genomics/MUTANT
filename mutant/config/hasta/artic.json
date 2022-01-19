@@ -31,7 +31,7 @@ params {
     // Repo to download your primer scheme from
     schemeRepoURL = 'https://github.com/Clinical-Genomics/primer-schemes.git'
     // Directory within schemeRepoURL that contains primer schemes
-    schemeDir = 'nCoV-2019'
+    schemeDir = 'primer-schemes'
     // Scheme name
     scheme = 'nCoV-2019'
     // Scheme version
