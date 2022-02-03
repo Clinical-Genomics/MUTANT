@@ -4,15 +4,14 @@
 ### Preparations:
 
 **How to prepare mutant for test**:
-* `bash /home/proj/stage/mutant/MUTANT/mutant/standalone/deploy_hasta_update.sh stage <MUTANT_branch>`
+* `cd MUTANT`
+* `bash mutant/standalone/deploy_hasta_update.sh stage <MUTANT_branch>`
 
 **How to prepare cg for test**:
 - `us`
 - Paxa and update cg or other tools needed for the test:
   - `paxa -u <user> -s hasta -r cg-stage`
-  - `paxa -u <user> -s hasta -r servers-stage`
   - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-cg-stage.sh master`
-  - `bash /home/proj/production/servers/resources/hasta.scilifelab.se/update-servers-stage.sh master`
   
 
 ### How to test:
