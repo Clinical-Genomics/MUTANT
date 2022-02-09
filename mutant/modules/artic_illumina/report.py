@@ -296,7 +296,10 @@ class ReportSC2:
                 if "pct_10X_bases" in data:
                     tenx_bases = data["pct_10X_bases"]
                 if "qc" in data:
-                    qc_status = data["qc"]
+                    if data["lineage"] == "None":
+                        qc_status = "FALSE"
+                    else:
+                        qc_status = data["qc"]
                 if "lineage" in data:
                     lineage = data["lineage"]
                 if "pangoLEARN_version" in data and data["pangoLEARN_version"] != "":
