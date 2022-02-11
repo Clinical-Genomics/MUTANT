@@ -53,7 +53,7 @@ class RunSC2:
             confline = "-C {0}".format(self.config_artic)
 
         if nanopore:
-            cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --medaka --prefix {5} --basecalled_fastq {6} --scheme-directory {7}/crap/megacrap/crap_part_deaux/morecrap/crap/omg {8}".format(
+            cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --medaka --prefix {5} --basecalled_fastq {6} {7}".format(
                 confline,
                 nflog,
                 workline,
@@ -61,7 +61,6 @@ class RunSC2:
                 self.profiles,
                 self.prefix,
                 self.fastq,
-                self.WD,
                 resultsline,
             )
         else:
