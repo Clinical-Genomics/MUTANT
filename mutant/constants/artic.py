@@ -6,6 +6,7 @@ ILLUMINA_FILES_CASE = {
     "multiqc-html": "{resdir}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html",
     "vogue-metrics": "{resdir}/{case}_metrics_deliverables.yaml",
     "results-file": "{resdir}/sars-cov-2_{ticket}_results.csv",
+    "versions-file": "{resdir}/ncovIllumina_sequenceAnalysis_versions/*_versions.csv"
 }
 
 # GMS-Artic and MUTANT output files for Nanopore

@@ -462,7 +462,7 @@ class ReportSC2:
                 "path": self.filepaths[self.case]["vogue-metrics"],
                 "path_index": "~",
                 "step": "result_aggregation",
-                "tag": "artic-yaml",
+                "tag": "metrics",
             }
         )
         # Provided CG CASE info from StatusDB
@@ -485,6 +485,17 @@ class ReportSC2:
                 "path_index": "~",
                 "step": "runinfo",
                 "tag": "runtime-settings",
+            }
+        )
+        # Software versions
+        deliv["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": self.filepaths[self.case]["versions-file"],
+                "path_index": "~",
+                "step": "runinfo",
+                "tag": "software-versions",
             }
         )
         # Execution log
