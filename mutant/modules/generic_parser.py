@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import click
+import pandas
 
 
 def append_dict(dictionary, key, item) -> dict:
@@ -51,3 +52,13 @@ def read_filelines(infile) -> list:
         click.echo(e)
         sys.exit(-1)
     return contents
+
+
+def parse_classifications(csv_path: str) -> dict:
+    """Parse classifications.csv, which contains info about VOC/VOI"""
+    classifications = pandas.read_csv(csv_path, sep=",")
+    voc_strains = {"lineage": "", "spike": "", "class": ""}
+    voc_strains["lineage"] = classifications["lineage"].tolist()
+    voc_strains["spike"] = classifications["spike"].tolist()
+    voc_strains["class"] = classifications["class"].tolist()
+    return voc_strains

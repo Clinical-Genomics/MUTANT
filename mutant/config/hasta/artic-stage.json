@@ -122,13 +122,14 @@ profiles {
         singularity.enabled = true
         singularity.autoMounts = true
         // Container
-        if ( params.medaka || params.nanopolish ){
+        if ( params.medaka || params.nanopolish ) {
             process.container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
-        } else if (params.illumina) {
+        }
+        else if (params.illumina) {
             process.container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
         }
         // Temporary directories
-        if (params.cache){
+        if (params.cache) {
             singularity.cacheDir = params.cache
             env.NXF_TEMP="${params.cache}"
             env.NXF_SINGULARITY_LOCALCACHEDIR="${params.cache}"

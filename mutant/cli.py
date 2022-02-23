@@ -11,6 +11,8 @@ import click
 
 from mutant import version, log, WD, TIMESTAMP
 from mutant.modules.artic_illumina.start import RunSC2
+from mutant.modules.artic_nanopore.parser import ParserNanopore
+from mutant.modules.artic_nanopore.report import ReportPrinterNanopore
 from mutant.modules.generic_parser import get_json
 from mutant.modules.artic_illumina.report import ReportSC2
 from mutant.modules.artic_illumina.delivery import DeliverySC2
@@ -46,6 +48,7 @@ def analyse(ctx):
 @click.option(
     "--outdir", help="Output folder to override general configutations", default=""
 )
+@click.option("-n", "--nanopore", is_flag=True)
 @click.option(
     "--profiles",
     help="Execution profiles, comma-separated",
@@ -53,7 +56,7 @@ def analyse(ctx):
 )
 @click.pass_context
 def sarscov2(
-    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles
+    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles, nanopore
 ):
 
     # Set base for output files (Move this section)
@@ -76,27 +79,40 @@ def sarscov2(
     )
 
     resdir = run.get_results_dir(config_mutant, outdir)
-    run.run_case(resdir)
+    run.run_case(resdir, nanopore)
 
-    # Report
-    if config_case != "":
-        report = ReportSC2(
-            caseinfo=config_case,
-            indir=os.path.abspath(resdir),
-            fastq_dir=os.path.abspath(input_folder),
-            config_artic=config_artic,
-            timestamp=TIMESTAMP,
-        )
-        report.create_all_files()
+    if nanopore:
+        if config_case != "":
+            parser = ParserNanopore(
+                caseinfo=config_case,
+            )
+            result: dict = parser.collect_results(resdir=os.path.abspath(resdir))
+            report_printer = ReportPrinterNanopore(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+            )
+            report_printer.print_report(result=result)
 
-    # Deliverables
-    if config_case != "":
-        delivery = DeliverySC2(
-            caseinfo=config_case,
-            indir=os.path.abspath(resdir),
-        )
+    else:
+        # Report
+        if config_case != "":
+            report = ReportSC2(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+                fastq_dir=os.path.abspath(input_folder),
+                config_artic=config_artic,
+                timestamp=TIMESTAMP,
+            )
+            report.create_all_files()
 
-        delivery.rename_deliverables()
+        # Deliverables
+        if config_case != "":
+            delivery = DeliverySC2(
+                caseinfo=config_case,
+                indir=os.path.abspath(resdir),
+            )
+
+            delivery.rename_deliverables()
 
 
 @analyse.command()
