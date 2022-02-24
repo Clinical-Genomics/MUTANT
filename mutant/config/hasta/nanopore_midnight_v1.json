@@ -2,7 +2,7 @@
 profiles {
     slurm {
         process.executor = 'slurm'
-        process.clusterOptions = { "-A development --qos low" }
+        process.clusterOptions = { "-A production --qos high" }
         process.time = '1h'
         process.memory = '16 GB'
         process.cpus = 4
@@ -29,11 +29,7 @@ params {
     help = false
     tracedir = "${params.outdir}/pipeline_info"
     // cache option makes it a bit easier to set conda or singularity cacheDir
-    cache = "/home/proj/stage/mutant/nf-cache/"
-    // Scheme name
-    scheme = 'nCoV-2019'
-    // Scheme version
-    schemeVersion = 'V3'
+    cache = "/home/proj/production/mutant/nf-cache/"
     // gff file
     gff = "$baseDir/typing/MN908947.3.gff"
     // SARS-CoV-2 VOC
@@ -45,9 +41,9 @@ if ( params.medaka || params.nanopolish ) {
     // Clinical genomics override
     params {
         // Minimum read length for artic guppyplex
-        min_length = 400
+        min_length = 150
         // Maximum read length for artic guppyplex
-        max_length = 700
+        max_length = 1200
         // Set to an integer to enable normalising in artic minion
         // IF SET TO false THIS WILL USE artic minion DEFAULT (100)
         normalise = 500
@@ -63,39 +59,14 @@ if ( params.medaka || params.nanopolish ) {
         csqAfThreshold = 0.75
         // Minimum coverage depth to call aa consequences of variant.
         csqDpThreshold = 20
-    }
-}
-
-if ( params.illumina ) {
-    includeConfig "$baseDir/conf/illumina.config"
-    // Clinical genomics override
-    params {
-        // Allow reads that don't have primer sequence? Ligation prep = false, nextera = true
-        allowNoprimer = true
-        // Length of illumina reads to keep after primer trimming
-        illuminaKeepLen = 30
-        // Sliding window quality threshold for keeping reads after primer trimming (illumina)
-        illuminaQualThreshold = 20
-        // Mpileup depth for ivar (although undocumented in mpileup, setting to zero removes limit)
-        mpileupDepth = 100000
-        // iVar frequency threshold for consensus variant (ivar consensus: -t)
-        ivarFreqThreshold = 0.75
-        // Minimum coverage depth to call variant (ivar consensus: -m; ivar variants -m)
-        ivarMinDepth = 10
-        // iVar frequency threshold to call variant (ivar variants: -t )
-        ivarMinFreqThreshold = 0.25
-        // iVar minimum mapQ to call variant (ivar variants: -q)
-        ivarMinVariantQuality = 20
-        // Typing frequency threshold to call aa consequences of variant. Set to ivarFreqThreshold for consistency with consensus
-        csqAfThreshold = 0.75
-        // Minimum coverage depth to call aa consequences of variant. Set to ivarMinDepth for consistency with consensus
-        csqDpThreshold = 10
-        // Java settings for picard tools. The "-Xmx" setting is useful if running into java memory issues
-        picardJavaSettings = "-Xmx10g"
-        // Options for picard CollectWgsMetrics
-        wgsMetricsOptions = "--COVERAGE_CAP 1000000 --LOCUS_ACCUMULATION_CAP 1000000"
-        // Customization of multiQC report
-        multiqcOptions = '--cl_config "picard_config: { general_stats_target_coverage: [10,30,50,100] }" --module cutadapt --module fastqc --module ivar --module picard'
+        // Repo to download your primer scheme from
+        schemeRepoURL = 'https://github.com/Clinical-Genomics/primer-schemes.git'
+        // Directory within schemeRepoURL that contains primer schemes
+        schemeDir = 'primer-schemes'
+        // Scheme name
+        scheme = 'midnight_nanopore'
+        // Scheme version
+        schemeVersion = 'V1'
     }
 }
 
@@ -104,12 +75,13 @@ if ( params.illumina ) {
 profiles {
     conda {
         if ( params.medaka || params.nanopolish ) {
-        process.conda = "$baseDir/environments/nanopore/environment.yml"
-        } else if (params.illumina) {
-        process.conda = "$baseDir/environments/illumina/environment.yml"
+            process.conda = "$baseDir/environments/nanopore/environment.yml"
+        }
+        else if (params.illumina) {
+            process.conda = "$baseDir/environments/illumina/environment.yml"
         }
         if (params.cache){
-        conda.cacheDir = params.cache
+            conda.cacheDir = params.cache
         }
         includeConfig "$baseDir/conf/conda.config"
     }
@@ -123,7 +95,38 @@ profiles {
         singularity.autoMounts = true
         // Container
         if ( params.medaka || params.nanopolish ) {
-            process.container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+            process {
+                withName:articDownloadScheme {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:articGuppyPlex {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:articMinIONMedaka {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:articRemoveUnmappedReads {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:makeQCCSV {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:writeQCSummaryCSV {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:collateSamples {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:pangolinTyping {
+                    container = "file:///${baseDir}/artic-ncov2019-pangolin.sif"
+                }
+                withName:typeVariants {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:mergeTypingCSVs {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+            }
         }
         else if (params.illumina) {
             process.container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
@@ -169,4 +172,3 @@ manifest {
     nextflowVersion = '>=20.01.0'
     version = '1.0.0'
 }
-
