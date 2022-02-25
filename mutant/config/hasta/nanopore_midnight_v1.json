@@ -1,7 +1,6 @@
 includeConfig "$baseDir/../../config/hasta/default_config.json"
 
 if ( params.medaka || params.nanopolish ) {
-    includeConfig "$baseDir/conf/nanopore.config"
     // Clinical genomics override
     params {
         // Minimum read length for artic guppyplex

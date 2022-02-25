@@ -1,7 +1,6 @@
 includeConfig "$baseDir/../../config/hasta/default_config.json"
 
 if ( params.illumina ) {
-    includeConfig "$baseDir/conf/illumina.config"
     // Clinical genomics override
     params {
         // Repo to download your primer scheme from
