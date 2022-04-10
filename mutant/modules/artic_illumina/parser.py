@@ -200,8 +200,8 @@ def get_artic_results(indir) -> dict:
                     {
                         "lineage": line[1],
                         "pangolin_probability": line[3],
-                        "pangoLEARN_version": line[-4],
-                        "pangolin_qc": line[-2],
+                        "pangoLEARN_version": line[-7],
+                        "pangolin_qc": line[-3],
                     }
                 )
 
