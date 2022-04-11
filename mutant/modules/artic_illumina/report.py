@@ -274,7 +274,7 @@ class ReportSC2:
                     "%10X_coverage",
                     "QC_pass",
                     "Lineage",
-                    "Pangolin_version",
+                    "Pangolin_data_version",
                     "VOC",
                     "Mutations",
                 ]
@@ -302,8 +302,8 @@ class ReportSC2:
                         qc_status = data["qc"]
                 if "lineage" in data:
                     lineage = data["lineage"]
-                if "pangolin_version" in data and data["pangolin_version"] != "":
-                    verzion = data["pangolin_version"]
+                if "pangolin_data_version" in data and data["pangolin_data_version"] != "":
+                    verzion = data["pangolin_data_version"]
                 if "VOC" in data:
                     vocs = data["VOC"]
                 if "VOC_aa" in data:
