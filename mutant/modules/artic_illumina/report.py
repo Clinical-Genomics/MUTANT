@@ -175,7 +175,7 @@ class ReportSC2:
         """Concatenate pangolin results and format for fohm"""
 
         indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
-        concatfile = "{0}/{1}_{2}_pangolin_classification_format3.txt".format(
+        concatfile = "{0}/{1}_{2}_pangolin_classification_format4.txt".format(
             self.indir, self.ticket, str(date.today())
         )
         pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
@@ -274,7 +274,7 @@ class ReportSC2:
                     "%10X_coverage",
                     "QC_pass",
                     "Lineage",
-                    "PangoLEARN_version",
+                    "Pangolin_data_version",
                     "VOC",
                     "Mutations",
                 ]
@@ -302,8 +302,8 @@ class ReportSC2:
                         qc_status = data["qc"]
                 if "lineage" in data:
                     lineage = data["lineage"]
-                if "pangoLEARN_version" in data and data["pangoLEARN_version"] != "":
-                    verzion = data["pangoLEARN_version"]
+                if "pangolin_data_version" in data and data["pangolin_data_version"] != "":
+                    verzion = data["pangolin_data_version"]
                 if "VOC" in data:
                     vocs = data["VOC"]
                 if "VOC_aa" in data:
@@ -416,7 +416,7 @@ class ReportSC2:
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/{}_{}_pangolin_classification_format3.txt".format(
+                "path": "{}/{}_{}_pangolin_classification_format4.txt".format(
                     self.indir, self.ticket, str(date.today())
                 ),
                 "path_index": "~",
