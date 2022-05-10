@@ -39,7 +39,7 @@ def get_sarscov2_config(config) -> dict:
         caseinfo[i]["lab_code"] = caseinfo[i]["lab_code"].replace(" ", "_")
         selection_criteria = caseinfo[i]["selection_criteria"]
         first_character = selection_criteria[:1]
-        if isinstance(first_character, int):
+        if first_character.isnumeric():
             caseinfo[i]["selection_criteria"] = (
                 caseinfo[i]["selection_criteria"].split(".")[1].strip()
             )
