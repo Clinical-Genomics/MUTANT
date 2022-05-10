@@ -37,6 +37,11 @@ def get_sarscov2_config(config) -> dict:
     for i in range(len(caseinfo)):
         caseinfo[i]["region_code"] = caseinfo[i]["region_code"].replace(" ", "_")
         caseinfo[i]["lab_code"] = caseinfo[i]["lab_code"].replace(" ", "_")
+        first_character = caseinfo[i]["selection_criteria"][:1]
+        if isinstance(first_character, int):
+            caseinfo[i]["selection_criteria"] = (
+                caseinfo[i]["selection_criteria"].split(".")[1].strip()
+            )
     return caseinfo
 
 
