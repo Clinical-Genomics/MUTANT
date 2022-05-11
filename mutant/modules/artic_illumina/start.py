@@ -14,7 +14,6 @@ class RunSC2:
     def __init__(
         self, input_folder, caseID, prefix, profiles, timestamp, WD, config_artic=""
     ):
-
         self.fastq = input_folder
         self.timestamp = timestamp
         self.WD = WD

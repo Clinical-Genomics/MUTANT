@@ -37,7 +37,7 @@ def analyse(ctx):
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
-    default="{}/config/hasta/artic.json".format(WD),
+    default="{}/config/hasta/default_config.json".format(WD),
 )
 @click.option("--config_case", help="Provided config for the case", default="")
 @click.option(
@@ -138,7 +138,7 @@ def sarscov2(ctx):
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
-    default="{}/config/hasta/artic.json".format(WD),
+    default="{}/config/hasta/default_config.json".format(WD),
 )
 @click.option("--fastq_folder", help="Sequence data folder for the case", required=True)
 @click.option("--config_case", help="Provided config for the case", required=True)
@@ -173,7 +173,7 @@ def postproc(ctx, input_folder, config_artic, fastq_folder, config_case):
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
-    default="{}/config/hasta/artic.json".format(WD),
+    default="{}/config/hasta/default_config.json".format(WD),
 )
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context

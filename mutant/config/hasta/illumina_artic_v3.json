@@ -1,0 +1,15 @@
+includeConfig "$baseDir/../../config/hasta/default_config.json"
+
+if ( params.illumina ) {
+    // Clinical genomics override
+    params {
+        // Repo to download your primer scheme from
+        schemeRepoURL = 'https://github.com/artic-network/primer-schemes.git'
+        // Directory within schemeRepoURL that contains primer schemes
+        schemeDir = 'primer-schemes'
+        // Scheme name
+        scheme = 'nCoV-2019'
+        // Scheme version
+        schemeVersion = 'V3'
+    }
+}
