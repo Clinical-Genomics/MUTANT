@@ -19,7 +19,6 @@ process {
     }
     withName: fastqc {
         cpus = 2
-        ext.args = "--dir ~/tmp"
     }
 }
 
