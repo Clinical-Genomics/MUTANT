@@ -17,6 +17,9 @@ process {
     withLabel: largemem {
         memory = '48 GB'
     }
+    withName: fastqc {
+        cpus = 2
+    }
 }
 
 // Load base.config by default for all pipelines
