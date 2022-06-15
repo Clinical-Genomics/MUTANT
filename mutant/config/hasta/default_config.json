@@ -90,7 +90,8 @@ if ( params.illumina ) {
         // Minimum coverage depth to call variant (ivar consensus: -m; ivar variants -m)
         ivarMinDepth = 10
         // iVar frequency threshold to call variant (ivar variants: -t )
-        ivarMinFreqThreshold = 0.25
+        //ivarMinFreqThreshold = 0.25
+        ivarMinFreqThreshold = 0.03
         // iVar minimum mapQ to call variant (ivar variants: -q)
         ivarMinVariantQuality = 20
         // Typing frequency threshold to call aa consequences of variant. Set to ivarFreqThreshold for consistency with consensus
