@@ -18,21 +18,21 @@ class ParserNanopore:
                 if i == line_index_of_interest:
                     return line
 
-    def get_cust_sample_id(self, line_to_parse: str, barcode_translation: dict) -> str:
+    def get_cust_sample_id(self, line_to_parse: str, limsid_to_sample: dict) -> str:
         """Return the customer ID of a sample"""
         split_on_slash = line_to_parse.split("/")
         sample_folder = split_on_slash[0]
         split_on_underscore = sample_folder.split("_")
-        barcode = split_on_underscore[-1]
-        cust_sample_id = barcode_translation[barcode]
+        limsid = split_on_underscore[-1]
+        cust_sample_id = limsid_to_sample[limsid]
         return cust_sample_id
 
-    def translate_barcodes(self, parsed_config: dict) -> dict:
-        """Builds a dict where barcodes point at customer sample id"""
-        barcode_to_sample = {}
+    def translate_limsids(self, parsed_config: dict) -> dict:
+        """Builds a dict where limsids point at customer sample id"""
+        limsid_to_sample = {}
         for sample in parsed_config:
-            barcode_to_sample[sample["barcode"]] = sample["Customer_ID_sample"]
-        return barcode_to_sample
+            limsid_to_sample[sample["CG_ID_sample"]] = sample["Customer_ID_sample"]
+        return limsid_to_sample
 
     def get_data_from_config(self, parsed_config: dict) -> dict:
         """Collect data for selection criteria and region"""
@@ -56,21 +56,21 @@ class ParserNanopore:
             percentage_N_two_decimals = round((total_N/total_bases)*100, 2)
             return percentage_N_two_decimals
 
-    def parse_assembly(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
+    def parse_assembly(self, results: dict, resdir: str, limsid_to_sample: dict) -> dict:
         """Collects data by parsing the assembly"""
         base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka"])
         for filename in os.listdir(base_path):
             if filename.endswith(".consensus.fasta"):
                 abs_path = os.path.join(base_path, filename)
                 first_line: str = self.get_line(filename=abs_path, line_index_of_interest=0)
-                cust_sample_id: str = self.get_cust_sample_id(line_to_parse=first_line, barcode_translation=barcode_to_sample)
+                cust_sample_id: str = self.get_cust_sample_id(line_to_parse=first_line, limsid_to_sample=limsid_to_sample)
                 fraction_N: float = self.get_fraction_n(input_file=abs_path)
                 results[cust_sample_id]["fraction_n_bases"] = fraction_N
         return results
 
-    def get_depth_files_paths(self, barcode: str, base_path: str) -> list:
-        """Returns the paths to coverage statistics for a certain barcode"""
-        wild_card_path = "*".join([base_path, barcode, "depths"])
+    def get_depth_files_paths(self, limsid: str, base_path: str) -> list:
+        """Returns the paths to coverage statistics for a certain limsid"""
+        wild_card_path = "*".join([base_path, limsid, "depths"])
         depth_files = glob.glob(wild_card_path)
         return depth_files
 
@@ -92,11 +92,11 @@ class ParserNanopore:
                 coverage_stats.append(int(columns[3]))
         return coverage_stats
 
-    def calculate_coverage(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
+    def calculate_coverage(self, results: dict, resdir: str, limsid_to_sample: dict) -> dict:
         """Collects data for the fraction of each assembly that got 10x coverage or more"""
         base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/"])
-        for barcode in barcode_to_sample:
-            coverage_files_paths: list = self.get_depth_files_paths(barcode=barcode, base_path=base_path)
+        for limsid in limsid_to_sample:
+            coverage_files_paths: list = self.get_depth_files_paths(limsid=limsid, base_path=base_path)
             coverage_stats: list = self.initiate_coverage_stats_list(file_path=coverage_files_paths[0])
             with open(coverage_files_paths[1], "r") as file2:
                 for line in file2:
@@ -105,11 +105,11 @@ class ParserNanopore:
                     coverage_stats[int(columns[2])] += int(columns[3])
             bases_w_10x_cov_or_more: int = self.count_bases_w_10x_cov_or_more(coverage_stats=coverage_stats)
             percentage_equal_or_greater_than_10 = round((bases_w_10x_cov_or_more / len(coverage_stats)) * 100, 2)
-            results[barcode_to_sample[barcode]]["pct_10x_coverage"] = percentage_equal_or_greater_than_10
+            results[limsid_to_sample[limsid]]["pct_10x_coverage"] = percentage_equal_or_greater_than_10
             if percentage_equal_or_greater_than_10 >= QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER:
-                results[barcode_to_sample[barcode]]["qc_pass"] = "TRUE"
+                results[limsid_to_sample[limsid]]["qc_pass"] = "TRUE"
             else:
-                results[barcode_to_sample[barcode]]["qc_pass"] = "FALSE"
+                results[limsid_to_sample[limsid]]["qc_pass"] = "FALSE"
         return results
 
     def get_pangolin_type(self, raw_pangolin_result: str) -> str:
@@ -130,13 +130,13 @@ class ParserNanopore:
         voc_strains: dict = parse_classifications(csv_path=classifications_path)
         return voc_strains
 
-    def parse_pangolin(self, results: dict, barcode_to_sample: dict, resdir: str) -> dict:
+    def parse_pangolin(self, results: dict, limsid_to_sample: dict, resdir: str) -> dict:
         """Collect data for pangolin types"""
         base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping"])
         for filename in os.listdir(base_path):
             abs_path = os.path.join(base_path, filename)
             second_line: str = self.get_line(filename=abs_path, line_index_of_interest=1)
-            cust_sample_id: str = self.get_cust_sample_id(line_to_parse=second_line, barcode_translation=barcode_to_sample)
+            cust_sample_id: str = self.get_cust_sample_id(line_to_parse=second_line, limsid_to_sample=limsid_to_sample)
             pangolin_type: str = self.get_pangolin_type(raw_pangolin_result=second_line)
             results[cust_sample_id]["pangolin_type"] = pangolin_type
             pangoLEARN_version: str = self.get_pangoLEARN_version(raw_pangolin_result=second_line)
@@ -160,13 +160,13 @@ class ParserNanopore:
                 mutations_list.append(stripped_line)
         return mutations_list
 
-    def get_sample_id_from_filename(self, filename: str, barcode_to_sample: dict) -> str:
+    def get_sample_id_from_filename(self, filename: str, limsid_to_sample: dict) -> str:
         """Returns sample ID that correspond to a specific file"""
         split_on_dot = filename.split(".")
         prefix = split_on_dot[0]
         split_on_underscore = prefix.split("_")
-        barcode = split_on_underscore[-1]
-        cust_sample_id = barcode_to_sample[barcode]
+        limsid = split_on_underscore[-1]
+        cust_sample_id = limsid_to_sample[limsid]
         return cust_sample_id
 
     def initiate_mutations_dict(self, results: dict) -> dict:
@@ -176,14 +176,14 @@ class ParserNanopore:
             results[sample]["mutations"] = "-"
         return results
 
-    def parse_mutations(self, results: dict, resdir: str, barcode_to_sample: dict) -> dict:
+    def parse_mutations(self, results: dict, resdir: str, limsid_to_sample: dict) -> dict:
         """If a mutation of interest is present in a sample it will be added to a dict"""
         mutations_of_interest: list = self.get_mutations_of_interest()
         base_path = "/".join([resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"])
         results: dict = self.initiate_mutations_dict(results=results)
         for filename in os.listdir(base_path):
             abs_path = os.path.join(base_path, filename)
-            cust_sample_id: str = self.get_sample_id_from_filename(filename=filename, barcode_to_sample=barcode_to_sample)
+            cust_sample_id: str = self.get_sample_id_from_filename(filename=filename, limsid_to_sample=limsid_to_sample)
             with open(abs_path, "r") as variant_file:
                 next(variant_file)
                 for line in variant_file:
@@ -198,10 +198,10 @@ class ParserNanopore:
     def collect_results(self, resdir: str) -> dict:
         """Build a dictionary with data for the report"""
         parsed_config: dict = get_sarscov2_config(config=self.caseinfo)
-        barcode_to_sample: dict = self.translate_barcodes(parsed_config=parsed_config)
+        limsid_to_sample: dict = self.translate_limsids(parsed_config=parsed_config)
         results: dict = self.get_data_from_config(parsed_config=parsed_config)
-        results: dict = self.parse_assembly(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
-        results: dict = self.calculate_coverage(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
-        results: dict = self.parse_pangolin(results=results, barcode_to_sample=barcode_to_sample, resdir=resdir)
-        results: dict = self.parse_mutations(results=results, resdir=resdir, barcode_to_sample=barcode_to_sample)
+        results: dict = self.parse_assembly(results=results, resdir=resdir, limsid_to_sample=limsid_to_sample)
+        results: dict = self.calculate_coverage(results=results, resdir=resdir, limsid_to_sample=limsid_to_sample)
+        results: dict = self.parse_pangolin(results=results, limsid_to_sample=limsid_to_sample, resdir=resdir)
+        results: dict = self.parse_mutations(results=results, resdir=resdir, limsid_to_sample=limsid_to_sample)
         return results
