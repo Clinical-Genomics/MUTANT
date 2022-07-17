@@ -37,7 +37,6 @@ def analyse(ctx):
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
-    default="",
 )
 @click.option("--config_case", help="Provided config for the case")
 @click.option(
