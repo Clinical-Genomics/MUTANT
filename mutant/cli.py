@@ -67,6 +67,12 @@ def sarscov2(
         caseID = "artic"
     prefix = "{}_{}".format(caseID, TIMESTAMP)
 
+    if not config_artic:
+        caseinfo = get_json(config_case)
+        primer_json = caseinfo[0]["primer"].replace(" ", "_")
+        primer_config = "{}/config/hasta/" + primer_json.lower() + ".json"
+        config_artic = primer_config.format(WD)
+
     # Run
     run = RunSC2(
         input_folder=input_folder,
