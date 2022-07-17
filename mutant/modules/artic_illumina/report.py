@@ -302,7 +302,10 @@ class ReportSC2:
                         qc_status = data["qc"]
                 if "lineage" in data:
                     lineage = data["lineage"]
-                if "pangolin_data_version" in data and data["pangolin_data_version"] != "":
+                if (
+                    "pangolin_data_version" in data
+                    and data["pangolin_data_version"] != ""
+                ):
                     verzion = data["pangolin_data_version"]
                 if "VOC" in data:
                     vocs = data["VOC"]

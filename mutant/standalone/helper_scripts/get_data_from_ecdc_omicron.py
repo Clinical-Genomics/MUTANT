@@ -47,7 +47,7 @@ with open(os.path.join(outdir, "classifications.csv"), "w") as class_outfile:
                 if "(" in mut:
                     mut = mut.split("(")[0]
                 if mut not in all_mutations:
-                  all_mutations.append(mut)
+                    all_mutations.append(mut)
 
             # Get data from variant column
             lineage = row.findAll("td")[1].getText().strip().replace(" ", "")
@@ -62,7 +62,7 @@ with open(os.path.join(outdir, "classifications.csv"), "w") as class_outfile:
                 class_lineage.append(lineage)
 
         # Add omicron data
-        if i==0:
+        if i == 0:
             class_lineage.append("B.1.1.529")
 
         # Output formatted lineages
@@ -74,9 +74,11 @@ with open(os.path.join(outdir, "classifications.csv"), "w") as class_outfile:
             classifications.writerow([lineage, spike, classtype[i]])
 
 # Add omicron mutations
-all_omicron_mutations = "A67V, Δ69-70, T95I, G142D, Δ143-145, Δ211-212, ins214EPE, G339D, S371L, S373P, S375F, K417N," \
-                       "N440K, G446S, S477N, T478K, E484A, Q493R, G496S, Q498R, N501Y, Y505H, T547K, D614G, H655Y," \
-                       "N679K, P681H, N764K, D796Y, N856K, Q954H, N969K, L981F".replace(" ", "").split(",")
+all_omicron_mutations = (
+    "A67V, Δ69-70, T95I, G142D, Δ143-145, Δ211-212, ins214EPE, G339D, S371L, S373P, S375F, K417N,"
+    "N440K, G446S, S477N, T478K, E484A, Q493R, G496S, Q498R, N501Y, Y505H, T547K, D614G, H655Y,"
+    "N679K, P681H, N764K, D796Y, N856K, Q954H, N969K, L981F".replace(" ", "").split(",")
+)
 for mut in all_omicron_mutations:
     if mut not in all_mutations:
         all_mutations.append(mut)

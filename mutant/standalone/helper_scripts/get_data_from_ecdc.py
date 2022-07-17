@@ -39,7 +39,7 @@ with open(os.path.join(outdir, "classifications.csv"), "w") as class_outfile:
                 if "(" in mut:
                     mut = mut.split("(")[0]
                 if mut not in all_mutations:
-                  all_mutations.append(mut)
+                    all_mutations.append(mut)
 
             # Get data from variant column
             lineage = row.findAll("td")[1].getText().strip().replace(" ", "")

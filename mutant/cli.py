@@ -37,9 +37,9 @@ def analyse(ctx):
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
-    default="{}/config/hasta/default_config.json".format(WD),
+    default="",
 )
-@click.option("--config_case", help="Provided config for the case", default="")
+@click.option("--config_case", help="Provided config for the case")
 @click.option(
     "--config_mutant",
     help="General configuration file for MUTANT",
@@ -56,22 +56,30 @@ def analyse(ctx):
 )
 @click.pass_context
 def sarscov2(
-    ctx, input_folder, config_artic, config_case, config_mutant, outdir, profiles, nanopore
+    ctx,
+    input_folder,
+    config_artic,
+    config_case,
+    config_mutant,
+    outdir,
+    profiles,
+    nanopore,
 ):
 
-    # Set base for output files (Move this section)
-    if config_case != "":
-        caseinfo = get_json(config_case)
-        caseID = caseinfo[0]["case_ID"]
-    else:
-        caseID = "artic"
+    if not config_case:
+        log.debug("No case config given, mutant needs a case config to run analysis")
+
+    caseinfo = get_json(config_case)
+    caseID = caseinfo[0]["case_ID"]
     prefix = "{}_{}".format(caseID, TIMESTAMP)
 
+    primer_json = caseinfo[0]["primer"].replace(" ", "_")
     if not config_artic:
-        caseinfo = get_json(config_case)
-        primer_json = caseinfo[0]["primer"].replace(" ", "_")
         primer_config = "{}/config/hasta/" + primer_json.lower() + ".json"
         config_artic = primer_config.format(WD)
+
+    if "nanopore" in primer_json.lower():
+        nanopore = True
 
     # Run
     run = RunSC2(
