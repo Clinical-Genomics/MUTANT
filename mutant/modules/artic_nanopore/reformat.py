@@ -5,11 +5,13 @@ import os
 
 def get_barcode_from_custid(sampleid_abspath: str) -> str:
     fastq_files: list = os.listdir(sampleid_abspath)
-    with gzip.open(fastq_files[0], "rt") as f:
-        for line in f:
-            nanopore_run_info = str(line).split(" ")
-            barcode_info = nanopore_run_info[8].split("=")
-            return barcode_info[1]
+    for fastq in fastq_files:
+        abspath_fastq = sampleid_abspath + "/" + fastq
+        with gzip.open(abspath_fastq, "rt") as f:
+            for line in f:
+                nanopore_run_info = str(line).split(" ")
+                barcode_info = nanopore_run_info[8].split("=")
+                return barcode_info[1]
 
 
 def reformat_fastq_folder(fastq_folder: str) -> dict:
