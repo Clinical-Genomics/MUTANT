@@ -5,13 +5,13 @@
 
 import os
 import subprocess
-from datetime import datetime
 
 import click
 
 from mutant import version, log, WD, TIMESTAMP
 from mutant.modules.artic_illumina.start import RunSC2
 from mutant.modules.artic_nanopore.parser import ParserNanopore
+from mutant.modules.artic_nanopore.reformat import reformat_fastq_folder
 from mutant.modules.artic_nanopore.report import ReportPrinterNanopore
 from mutant.modules.generic_parser import get_json
 from mutant.modules.artic_illumina.report import ReportSC2
@@ -92,6 +92,10 @@ def sarscov2(
     )
 
     resdir = run.get_results_dir(config_mutant, outdir)
+    if nanopore:
+        barcode_to_sampleid: dict = reformat_fastq_folder(
+            fastq_folder=os.path.abspath(input_folder)
+        )
     run.run_case(resdir, nanopore)
 
     if nanopore:
@@ -99,7 +103,9 @@ def sarscov2(
             parser = ParserNanopore(
                 caseinfo=config_case,
             )
-            result: dict = parser.collect_results(resdir=os.path.abspath(resdir))
+            result: dict = parser.collect_results(
+                resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid
+            )
             report_printer = ReportPrinterNanopore(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
