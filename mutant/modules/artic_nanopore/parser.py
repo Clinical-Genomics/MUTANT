@@ -191,7 +191,9 @@ class ParserNanopore:
                 mutations_list.append(stripped_line)
         return mutations_list
 
-    def get_sample_id_from_filename(self, filename: str, barcode_to_sampleid: dict) -> str:
+    def get_sample_id_from_filename(
+        self, filename: str, barcode_to_sampleid: dict
+    ) -> str:
         """Returns sample ID that correspond to a specific file"""
         split_on_dot = filename.split(".")
         prefix = split_on_dot[0]

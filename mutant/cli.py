@@ -93,7 +93,9 @@ def sarscov2(
 
     resdir = run.get_results_dir(config_mutant, outdir)
     if nanopore:
-        barcode_to_sampleid: dict = reformat_fastq_folder(fastq_folder=os.path.abspath(input_folder))
+        barcode_to_sampleid: dict = reformat_fastq_folder(
+            fastq_folder=os.path.abspath(input_folder)
+        )
     run.run_case(resdir, nanopore)
 
     if nanopore:
@@ -101,7 +103,9 @@ def sarscov2(
             parser = ParserNanopore(
                 caseinfo=config_case,
             )
-            result: dict = parser.collect_results(resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid)
+            result: dict = parser.collect_results(
+                resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid
+            )
             report_printer = ReportPrinterNanopore(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
