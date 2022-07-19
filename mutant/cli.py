@@ -5,7 +5,6 @@
 
 import os
 import subprocess
-from datetime import datetime
 
 import click
 
@@ -102,7 +101,7 @@ def sarscov2(
             parser = ParserNanopore(
                 caseinfo=config_case,
             )
-            result: dict = parser.collect_results(resdir=os.path.abspath(resdir))
+            result: dict = parser.collect_results(resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid)
             report_printer = ReportPrinterNanopore(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
