@@ -106,11 +106,14 @@ def sarscov2(
             result: dict = parser.collect_results(
                 resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid
             )
+            variants: list = parser.collect_variants(
+                resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid
+            )
             report_printer = ReportPrinterNanopore(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
             )
-            report_printer.print_report(result=result)
+            report_printer.create_all_nanopore_files(result=result, variants=variants)
 
     else:
         # Report
