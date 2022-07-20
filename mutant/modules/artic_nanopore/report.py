@@ -27,12 +27,12 @@ class ReportPrinterNanopore:
                     "sampleID",
                     "gene",
                     "aa_var",
-                    "dna_var",
+                    "dna_var\n",
                 ]
             )
             file_to_append.write(header_results)
             for line in variants:
-                file_to_append.write(line)
+                file_to_append.write(line + "\n")
         file_to_append.close()
 
     def print_report(self, result: dict) -> None:
