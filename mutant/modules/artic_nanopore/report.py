@@ -13,6 +13,28 @@ class ReportPrinterNanopore:
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
 
+    def create_all_nanopore_files(self, result: dict, variants: list):
+        self.print_report(result=result)
+        self.print_variants(variants=variants)
+
+    def print_variants(self, variants: list) -> None:
+        """Append data to the variant report"""
+        file_name_report = "_".join(["sars-cov-2", str(self.ticket), "variants.csv"])
+        variants_file = "/".join([self.indir, file_name_report])
+        with open(variants_file, "a") as file_to_append:
+            header_results = ",".join(
+                [
+                    "sampleID",
+                    "gene",
+                    "aa_var",
+                    "dna_var\n",
+                ]
+            )
+            file_to_append.write(header_results)
+            for line in variants:
+                file_to_append.write(line + "\n")
+        file_to_append.close()
+
     def print_report(self, result: dict) -> None:
         """Append results from the analysis to a report"""
         file_name_report = "_".join(["sars-cov-2", str(self.ticket), "results.csv"])

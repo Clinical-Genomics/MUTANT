@@ -256,3 +256,26 @@ class ParserNanopore:
             results=results, resdir=resdir, barcode_to_sampleid=barcode_to_sampleid
         )
         return results
+
+    def extract_barcode_from_variant_file(self, filename: str) -> str:
+        prefix = filename.split("_")[2]
+        barcode = prefix.split(".")[0]
+        return barcode
+
+    def collect_variants(self, resdir: str, barcode_to_sampleid: dict) -> list:
+        variants_list = []
+        base_path = "/".join(
+            [resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"]
+        )
+        for filename in os.listdir(base_path):
+            abs_path = os.path.join(base_path, filename)
+            with open(abs_path, "r") as variant_file:
+                next(variant_file)
+                for line in variant_file:
+                    barcode = self.extract_barcode_from_variant_file(filename=filename)
+                    line_except_sampleid = line.split(",")[1] + "," + line.split(",")[2]
+                    modified_line = (
+                        barcode_to_sampleid[barcode] + "," + line_except_sampleid
+                    )
+                    variants_list.append(modified_line)
+        return variants_list
