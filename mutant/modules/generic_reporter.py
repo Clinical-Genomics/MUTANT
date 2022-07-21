@@ -100,7 +100,7 @@ class ReportSC2:
     def load_lookup_dict(self):
         """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
 
-        self.load_artic_results()
+        self.load_artic_results(nanopore=self.nanopore)
         self.load_case_config()
 
     def load_case_config(self):
