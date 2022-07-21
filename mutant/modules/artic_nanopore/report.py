@@ -1,8 +1,10 @@
 """ Using a dict as input, this class will print a report covering the
     information requested by the sarscov2-customers at Clinical Genomics
 """
+import glob
+
 from mutant.modules.artic_nanopore.parser import collect_results, collect_variants
-from mutant.modules.generic_parser import get_sarscov2_config
+from mutant.modules.generic_parser import get_sarscov2_config, read_filelines
 from mutant.modules.generic_reporter import GenericReporter
 
 
@@ -31,6 +33,7 @@ class ReportPrinterNanopore:
                 nanopore=True,
             )
         generic_reporter.create_trailblazer_config()
+        self.create_concat_pangolin()
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""
@@ -91,3 +94,32 @@ class ReportPrinterNanopore:
                 )
                 file_to_append.write(line_to_append)
         file_to_append.close()
+
+    def extract_barcode_from_pangolin_csv(self, line: str) -> str:
+        """ line in format noblecat_220721-191417_barcode01/ARTIC/medaka_MN908947.3 """
+        split_on_slash = line.split("/")
+        splid_on_underscore = split_on_slash[0].split("_")
+        return splid_on_underscore[2]
+
+    def create_concat_pangolin(self):
+        """Concatenate nanopore pangolin results"""
+
+        indir = "{0}/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping".format(self.indir)
+        concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
+        pango_csvs = glob.glob("{0}/*.pangolin.csv".format(indir))
+
+        header = read_filelines(pango_csvs[0])[0]
+        with open(concatfile, "w") as concat:
+            concat.write(header)
+            # Parse sample pangolin data
+            for csv in pango_csvs:
+                data: list = read_filelines(csv)[1:]
+                for line in data:
+                    split_on_comma = line.split(",")
+                    barcode = self.extract_barcode_from_pangolin_csv(line=split_on_comma[0])
+                    split_on_comma[0] = self.barcode_to_sampleid[barcode]
+                    concatenated_line = ""
+                    for section in split_on_comma:
+                        concatenated_line = ",".join([formatted_line, section])
+                    formatted_line = concatenated_line[1:]
+                    concat.write(formatted_line)
