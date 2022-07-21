@@ -27,7 +27,7 @@ class IlluminaReporter:
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
-        self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
+        self.filepaths = get_results_paths(self.indir, self.case, self.ticket, False)
         self.articdata = dict()
 
     def create_reports(self):

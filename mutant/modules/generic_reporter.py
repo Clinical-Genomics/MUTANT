@@ -24,13 +24,13 @@ from mutant.modules.artic_illumina.parser import (
 )
 
 
-def get_results_paths(self, indir, case, ticket) -> dict:
+def get_results_paths(indir, case, ticket, nanopore) -> dict:
     """Get paths for all reports and output files from GMS-Artic and MUTANT"""
 
     # Case paths
     path_dict = dict()
     case_paths = dict()
-    if self.nanopore:
+    if nanopore:
         casefiles = NANOPORE_FILES_CASE
     else:
         casefiles = ILLUMINA_FILES_CASE
@@ -57,7 +57,7 @@ class ReportSC2:
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
-        self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
+        self.filepaths = get_results_paths(self.indir, self.case, self.ticket, nanopore)
         self.articdata = dict()
         self.nanopore = nanopore
 
@@ -73,6 +73,7 @@ class ReportSC2:
         self.create_fohm_csv()
         self.create_jsonfile()
         self.create_instrument_properties(nanopore=nanopore)
+
 
     def get_finished_slurm_ids(self) -> list:
         """Get slurm IDs"""
