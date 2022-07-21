@@ -17,11 +17,9 @@ from mutant.constants.artic import ILLUMINA_FILES_CASE, NANOPORE_FILES_CASE
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
     read_filelines,
-)
-from mutant.modules.artic_illumina.parser import (
-    get_vogue_multiqc_data,
     get_artic_results,
 )
+from mutant.modules.artic_illumina.parser import get_vogue_multiqc_data
 
 
 def get_results_paths(indir, case, ticket, nanopore) -> dict:
@@ -121,9 +119,9 @@ class ReportSC2:
             else:
                 self.articdata[k] = entry
 
-    def load_artic_results(self):
+    def load_artic_results(self, nanopore: bool):
         """Parse artic output directory for analysis results. Returns dictionary data object"""
-        artic_data = get_artic_results(self.indir)
+        artic_data = get_artic_results(self.indir, nanopore)
         self.articdata.update(artic_data)
 
     def create_vogue_metrics_file(self):
