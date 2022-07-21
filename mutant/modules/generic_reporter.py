@@ -69,11 +69,11 @@ class ReportSC2:
         # This works off concat pango and needs to occur after
         self.create_concat_consensus(nanopore=nanopore)
         self.create_deliveryfile(nanopore=nanopore)
-        self.create_vogue_metrics_file()
+        if not nanopore:
+            self.create_vogue_metrics_file()
         self.create_fohm_csv()
         self.create_jsonfile()
         self.create_instrument_properties(nanopore=nanopore)
-
 
     def get_finished_slurm_ids(self) -> list:
         """Get slurm IDs"""
@@ -391,17 +391,18 @@ class ReportSC2:
                 "tag": "consensus",
             }
         )
-        # Multiqc report
-        deliv["files"].append(
-            {
-                "format": "html",
-                "id": self.case,
-                "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
-                "path_index": "~",
-                "step": "report",
-                "tag": "multiqc-html",
-            }
-        )
+        if not nanopore:
+            # Multiqc report
+            deliv["files"].append(
+                {
+                    "format": "html",
+                    "id": self.case,
+                    "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
+                    "path_index": "~",
+                    "step": "report",
+                    "tag": "multiqc-html",
+                }
+            )
         # MultiQC json
         deliv["files"].append(
             {
@@ -413,17 +414,18 @@ class ReportSC2:
                 "tag": "multiqc-json",
             }
         )
-        # Artic yaml (Vogue) data
-        deliv["files"].append(
-            {
-                "format": "yaml",
-                "id": self.case,
-                "path": self.filepaths[self.case]["vogue-metrics"],
-                "path_index": "~",
-                "step": "result_aggregation",
-                "tag": "metrics",
-            }
-        )
+        if not nanopore:
+            # Artic yaml (Vogue) data
+            deliv["files"].append(
+                {
+                    "format": "yaml",
+                    "id": self.case,
+                    "path": self.filepaths[self.case]["vogue-metrics"],
+                    "path_index": "~",
+                    "step": "result_aggregation",
+                    "tag": "metrics",
+                }
+            )
         # Provided CG CASE info from StatusDB
         deliv["files"].append(
             {
@@ -446,17 +448,18 @@ class ReportSC2:
                 "tag": "runtime-settings",
             }
         )
-        # Software versions
-        deliv["files"].append(
-            {
-                "format": "csv",
-                "id": self.case,
-                "path": self.filepaths[self.case]["versions-file"],
-                "path_index": "~",
-                "step": "runinfo",
-                "tag": "software-versions",
-            }
-        )
+        if not nanopore:
+            # Software versions
+            deliv["files"].append(
+                {
+                    "format": "csv",
+                    "id": self.case,
+                    "path": self.filepaths[self.case]["versions-file"],
+                    "path_index": "~",
+                    "step": "runinfo",
+                    "tag": "software-versions",
+                }
+            )
         # Execution log
         deliv["files"].append(
             {
