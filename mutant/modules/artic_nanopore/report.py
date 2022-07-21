@@ -3,6 +3,7 @@
 """
 from mutant.modules.artic_nanopore.parser import collect_results, collect_variants
 from mutant.modules.generic_parser import get_sarscov2_config
+from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportPrinterNanopore:
@@ -25,6 +26,11 @@ class ReportPrinterNanopore:
         )
         self.print_report(result=result)
         self.print_variants(variants=variants)
+        generic_reporter = GenericReporter(
+                indir=self.indir,
+                nanopore=True,
+            )
+        generic_reporter.create_trailblazer_config()
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""
