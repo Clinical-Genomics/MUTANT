@@ -33,27 +33,3 @@ class GenericReporter:
         with open(trailblazer_config_path, "w") as trailblazer_config_file:
             yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
 
-    def create_concat_pangolin(self):
-        """Concatenate pangolin results"""
-
-        indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
-        concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
-        pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
-        # Copy header
-        header = read_filelines(pangolins[0])[0]
-        with open(concatfile, "w") as concat:
-            concat.write(header)
-            # Parse sample pangolin data
-            for pango in pangolins:
-                data = read_filelines(pango)[1:]
-                for line in data:
-                    # Use sample name at taxon field
-                    taxon_regex = "(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
-                    sample, subs = re.subn(taxon_regex, r"\g<name>", line.split(",")[0])
-                    if subs == 0:
-                        print(
-                            "Unable to rename taxon - using original: {}".format(pango)
-                        )
-                    else:
-                        line = sample + line[line.find(","):]
-                    concat.write(line)

@@ -120,6 +120,6 @@ class ReportPrinterNanopore:
                     split_on_comma[0] = self.barcode_to_sampleid[barcode]
                     concatenated_line = ""
                     for section in split_on_comma:
-                        concatenated_line = ",".join([formatted_line, section])
+                        concatenated_line = ",".join([concatenated_line, section])
                     formatted_line = concatenated_line[1:]
                     concat.write(formatted_line)
