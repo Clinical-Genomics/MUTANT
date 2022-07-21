@@ -14,8 +14,9 @@ from mutant.modules.artic_nanopore.parser import ParserNanopore
 from mutant.modules.artic_nanopore.reformat import reformat_fastq_folder
 from mutant.modules.artic_nanopore.report import ReportPrinterNanopore
 from mutant.modules.generic_parser import get_json
-from mutant.modules.artic_illumina.report import ReportSC2
+from mutant.modules.artic_illumina.report import IlluminaReporter
 from mutant.modules.artic_illumina.delivery import DeliverySC2
+from mutant.modules.generic_reporter import ReportSC2
 
 
 @click.group()
@@ -118,23 +119,33 @@ def sarscov2(
     else:
         # Report
         if config_case != "":
-            report = ReportSC2(
+            report = IlluminaReporter(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
                 fastq_dir=os.path.abspath(input_folder),
                 config_artic=config_artic,
                 timestamp=TIMESTAMP,
             )
-            report.create_all_files()
+            report.create_reports()
 
-        # Deliverables
-        if config_case != "":
-            delivery = DeliverySC2(
-                caseinfo=config_case,
-                indir=os.path.abspath(resdir),
-            )
+    generic_reporter = ReportSC2(
+        caseinfo=config_case,
+        indir=os.path.abspath(resdir),
+        fastq_dir=os.path.abspath(input_folder),
+        config_artic=config_artic,
+        timestamp=TIMESTAMP,
+        nanopore=nanopore,
+    )
 
-            delivery.rename_deliverables()
+    generic_reporter.create_all_files(nanopore=nanopore)
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverySC2(
+            caseinfo=config_case,
+            indir=os.path.abspath(resdir),
+        )
+
+        delivery.rename_deliverables()
 
 
 @analyse.command()
