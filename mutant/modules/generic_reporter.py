@@ -24,6 +24,25 @@ from mutant.modules.artic_illumina.parser import (
 )
 
 
+def get_results_paths(self, indir, case, ticket) -> dict:
+    """Get paths for all reports and output files from GMS-Artic and MUTANT"""
+
+    # Case paths
+    path_dict = dict()
+    case_paths = dict()
+    if self.nanopore:
+        casefiles = NANOPORE_FILES_CASE
+    else:
+        casefiles = ILLUMINA_FILES_CASE
+    for stepname, filepath in casefiles.items():
+        fullpath = filepath.format(resdir=indir, case=case, ticket=ticket)
+        if "*" in fullpath:
+            fullpath = glob.glob(fullpath)[0]
+        case_paths[stepname] = fullpath
+    path_dict[case] = case_paths
+    return path_dict
+
+
 class ReportSC2:
     def __init__(self, caseinfo, indir, config_artic, fastq_dir, timestamp, nanopore):
         self.casefile = caseinfo
@@ -38,7 +57,7 @@ class ReportSC2:
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
-        self.filepaths = self.get_results_paths(self.indir, self.case, self.ticket)
+        self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
         self.articdata = dict()
         self.nanopore = nanopore
 
@@ -54,24 +73,6 @@ class ReportSC2:
         self.create_fohm_csv()
         self.create_jsonfile()
         self.create_instrument_properties(nanopore=nanopore)
-
-    def get_results_paths(self, indir, case, ticket) -> dict:
-        """Get paths for all reports and output files from GMS-Artic and MUTANT"""
-
-        # Case paths
-        path_dict = dict()
-        case_paths = dict()
-        if self.nanopore:
-            casefiles = NANOPORE_FILES_CASE
-        else:
-            casefiles = ILLUMINA_FILES_CASE
-        for stepname, filepath in casefiles.items():
-            fullpath = filepath.format(resdir=indir, case=case, ticket=ticket)
-            if "*" in fullpath:
-                fullpath = glob.glob(fullpath)[0]
-            case_paths[stepname] = fullpath
-        path_dict[case] = case_paths
-        return path_dict
 
     def get_finished_slurm_ids(self) -> list:
         """Get slurm IDs"""

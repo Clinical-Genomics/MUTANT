@@ -9,12 +9,8 @@ import csv
 import glob
 import json
 from datetime import date
-from mutant.modules.generic_parser import (
-    get_sarscov2_config,
-)
-from mutant.modules.artic_illumina.parser import (
-    get_results_paths,
-)
+from mutant.modules.generic_parser import get_sarscov2_config
+from mutant.modules.generic_reporter import get_results_paths
 
 
 class IlluminaReporter:
