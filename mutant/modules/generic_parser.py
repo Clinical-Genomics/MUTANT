@@ -90,6 +90,7 @@ def get_artic_results(indir, nanopore) -> dict:
             content = csv.reader(f)
             next(content)  # Skip header
             for line in content:
+
                 sample = line[0].split(".")[0].split("_")[-1]
                 artic_data[sample].update(
                     {
