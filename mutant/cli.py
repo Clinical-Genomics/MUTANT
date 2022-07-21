@@ -10,7 +10,6 @@ import click
 
 from mutant import version, log, WD, TIMESTAMP
 from mutant.modules.artic_illumina.start import RunSC2
-from mutant.modules.artic_nanopore.parser import ParserNanopore
 from mutant.modules.artic_nanopore.reformat import reformat_fastq_folder
 from mutant.modules.artic_nanopore.report import ReportPrinterNanopore
 from mutant.modules.generic_parser import get_json
@@ -100,20 +99,12 @@ def sarscov2(
 
     if nanopore:
         if config_case != "":
-            parser = ParserNanopore(
-                caseinfo=config_case,
-            )
-            result: dict = parser.collect_results(
-                resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid
-            )
-            variants: list = parser.collect_variants(
-                resdir=os.path.abspath(resdir), barcode_to_sampleid=barcode_to_sampleid
-            )
-            report_printer = ReportPrinterNanopore(
+            nanopore_report = ReportPrinterNanopore(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
+                barcode_to_sampleid=barcode_to_sampleid,
             )
-            report_printer.create_all_nanopore_files(result=result, variants=variants)
+            nanopore_report.create_all_nanopore_files()
 
     else:
         # Report

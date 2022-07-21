@@ -1,19 +1,28 @@
 """ Using a dict as input, this class will print a report covering the
     information requested by the sarscov2-customers at Clinical Genomics
 """
-
+from mutant.modules.artic_nanopore.parser import collect_results, collect_variants
 from mutant.modules.generic_parser import get_sarscov2_config
 
 
 class ReportPrinterNanopore:
-    def __init__(self, caseinfo: str, indir: str):
+    def __init__(self, caseinfo: str, indir: str, barcode_to_sampleid: dict):
         self.casefile = caseinfo
         self.caseinfo = get_sarscov2_config(caseinfo)
         self.case = self.caseinfo[0]["case_ID"]
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
+        self.barcode_to_sampleid = barcode_to_sampleid
 
-    def create_all_nanopore_files(self, result: dict, variants: list):
+    def create_all_nanopore_files(self):
+        result: dict = collect_results(
+            resdir=self.indir,
+            barcode_to_sampleid=self.barcode_to_sampleid,
+            caseinfo=self.casefile,
+        )
+        variants: list = collect_variants(
+            resdir=self.indir, barcode_to_sampleid=self.barcode_to_sampleid
+        )
         self.print_report(result=result)
         self.print_variants(variants=variants)
 
