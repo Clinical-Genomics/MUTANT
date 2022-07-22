@@ -37,8 +37,11 @@ class GenericReporter:
 
     def create_concat_consensus(self, target_files: str):
         """Concatenate consensus files"""
-
-        concat = open("{0}/{1}.consensus.fa".format(self.indir, self.ticket), "w+")
+        if self.nanopore:
+            concat_consensus = "{0}/{1}.consensus.fasta".format(self.indir, self.ticket)
+        else:
+            concat_consensus = "{0}/{1}.consensus.fa".format(self.indir, self.ticket)
+        concat = open(concat_consensus, "w+")
         for item in glob.glob(target_files):
             single = open(item, "r")
             concat.write(single.read())
