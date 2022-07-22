@@ -2,6 +2,7 @@
     information requested by the sarscov2-customers at Clinical Genomics
 """
 import glob
+from datetime import date
 
 from mutant.modules.artic_nanopore.parser import collect_results, collect_variants
 from mutant.modules.generic_parser import get_sarscov2_config, read_filelines
@@ -34,6 +35,7 @@ class ReportPrinterNanopore:
             )
         generic_reporter.create_trailblazer_config()
         self.create_concat_pangolin()
+        self.create_concat_pangolin_fohm(result=result)
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""
@@ -101,9 +103,8 @@ class ReportPrinterNanopore:
         splid_on_underscore = split_on_slash[0].split("_")
         return splid_on_underscore[2]
 
-    def create_concat_pangolin(self):
+    def create_concat_pangolin(self) -> None:
         """Concatenate nanopore pangolin results"""
-
         indir = "{0}/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping".format(self.indir)
         concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
         pango_csvs = glob.glob("{0}/*.pangolin.csv".format(indir))
@@ -123,3 +124,17 @@ class ReportPrinterNanopore:
                         concatenated_line = ",".join([concatenated_line, section])
                     formatted_line = concatenated_line[1:]
                     concat.write(formatted_line)
+
+    def create_concat_pangolin_fohm(self, result: dict) -> None:
+        """Prints concatenated pangolin csv for samples passing QC"""
+        concatenated_pangolin = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
+        pango_fohm = "{0}/{1}_{2}_pangolin_classification_format4.txt".format(
+            self.indir, self.ticket, str(date.today())
+        )
+        with open(concatenated_pangolin) as f:
+            lines = f.readlines()
+
+        with open(pango_fohm, "w") as passed_qc:
+            passed_qc.write(lines[0])
+            for line in lines[1:]:
+                passed_qc.write(line)
