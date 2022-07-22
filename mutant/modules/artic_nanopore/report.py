@@ -12,7 +12,7 @@ from mutant.modules.generic_reporter import GenericReporter
 class ReportPrinterNanopore:
     def __init__(self, caseinfo: str, indir: str, barcode_to_sampleid: dict, config_artic: str):
         self.casefile = caseinfo
-        self.caseinfo = get_sarscov2_config(caseinfo)
+        self.caseinfo = get_sarscov2_config(self.casefile)
         self.case = self.caseinfo[0]["case_ID"]
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir

@@ -10,10 +10,8 @@ from mutant.modules.generic_parser import get_sarscov2_config, get_results_paths
 
 class GenericReporter:
     def __init__(self, caseinfo: dict, casefile: str, indir: str, nanopore: bool, config_artic: str):
-        self.casefile = caseinfo
         self.casefile = casefile
-        caseinfo = get_sarscov2_config(caseinfo)
-        self.caseinfo = caseinfo
+        self.caseinfo = get_sarscov2_config(self.casefile)
         self.indir = indir
         self.config_artic = config_artic
         self.nanopore = nanopore
