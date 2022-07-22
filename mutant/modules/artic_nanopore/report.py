@@ -22,7 +22,7 @@ class ReportPrinterNanopore:
                 self.indir
             )
         )
-        self.consensus_target_files = "{0}/*.consensus.fa".format(self.consensus_path)
+        self.consensus_target_files = "{0}/*.consensus.fasta".format(self.consensus_path)
 
     def create_all_nanopore_files(self):
         result: dict = collect_results(
