@@ -17,6 +17,8 @@ class ReportPrinterNanopore:
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
         self.barcode_to_sampleid = barcode_to_sampleid
+        self.consensus_path = "{0}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka".format(self.indir)
+        self.consensus_target_files = "{0}/*.consensus.fa".format(self.consensus_path)
 
     def create_all_nanopore_files(self):
         result: dict = collect_results(
@@ -30,12 +32,15 @@ class ReportPrinterNanopore:
         self.print_report(result=result)
         self.print_variants(variants=variants)
         generic_reporter = GenericReporter(
+                caseinfo=self.caseinfo,
                 indir=self.indir,
                 nanopore=True,
             )
         generic_reporter.create_trailblazer_config()
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm(result=result)
+        generic_reporter.create_concat_consensus(target_files=self.consensus_target_files)
+
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""

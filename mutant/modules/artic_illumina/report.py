@@ -39,9 +39,12 @@ class ReportSC2:
         self.fastq_dir = fastq_dir
         self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
         self.articdata = dict()
+        self.consensus_path = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+        self.consensus_target_files = "{0}/*.consensus.fa".format(self.consensus_path)
 
     def create_all_files(self):
         generic_reporter = GenericReporter(
+                caseinfo=self.caseinfo,
                 indir=self.indir,
                 nanopore=False,
             )
@@ -50,7 +53,7 @@ class ReportSC2:
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm()
         # This works off concat pango and needs to occur after
-        self.create_concat_consensus()
+        generic_reporter.create_concat_consensus(target_files=self.consensus_target_files)
         self.create_deliveryfile()
         self.create_vogue_metrics_file()
         self.create_fohm_csv()
@@ -175,17 +178,6 @@ class ReportSC2:
                                 continue
                             csv_items[0] = sample
                             concat.write(",".join(csv_items))
-
-    def create_concat_consensus(self):
-        """Concatenate consensus files"""
-
-        indir = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
-        concat = open("{0}/{1}.consensus.fa".format(self.indir, self.ticket), "w+")
-        for item in glob.glob("{0}/*.consensus.fa".format(indir)):
-            single = open(item, "r")
-            concat.write(single.read())
-            concat.write("\n")
-        concat.close()
 
     def create_fohm_csv(self):
         """Creates a summary file for FoHMs additional info"""

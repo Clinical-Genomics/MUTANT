@@ -1,12 +1,15 @@
+import glob
 from pathlib import Path
 
 import yaml
 
 
 class GenericReporter:
-    def __init__(self, indir: str, nanopore: bool):
+    def __init__(self, caseinfo: dict, indir: str, nanopore: bool):
+        self.casefile = caseinfo
         self.indir = indir
         self.nanopore = nanopore
+        self.ticket = caseinfo[0]["Customer_ID_project"]
 
 
     def get_finished_slurm_ids(self) -> list:
@@ -33,3 +36,12 @@ class GenericReporter:
         with open(trailblazer_config_path, "w") as trailblazer_config_file:
             yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
 
+    def create_concat_consensus(self, target_files: str):
+        """Concatenate consensus files"""
+
+        concat = open("{0}/{1}.consensus.fa".format(self.indir, self.ticket), "w+")
+        for item in glob.glob(target_files):
+            single = open(item, "r")
+            concat.write(single.read())
+            concat.write("\n")
+        concat.close()
