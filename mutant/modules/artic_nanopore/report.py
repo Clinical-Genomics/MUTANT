@@ -137,4 +137,7 @@ class ReportPrinterNanopore:
         with open(pango_fohm, "w") as passed_qc:
             passed_qc.write(lines[0])
             for line in lines[1:]:
-                passed_qc.write(line)
+                split_on_comma = line.split(",")
+                sample_id = split_on_comma[0]
+                if result[sample_id]["qc_pass"] == "TRUE":
+                    passed_qc.write(line)
