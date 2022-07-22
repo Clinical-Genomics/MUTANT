@@ -11,7 +11,6 @@ import re
 import yaml
 import json
 from datetime import date
-from pathlib import Path
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
     read_filelines,
@@ -21,6 +20,7 @@ from mutant.modules.artic_illumina.parser import (
     get_artic_results,
     get_results_paths,
 )
+from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportSC2:
@@ -41,7 +41,11 @@ class ReportSC2:
         self.articdata = dict()
 
     def create_all_files(self):
-        self.create_trailblazer_config()
+        generic_reporter = GenericReporter(
+                indir=self.indir,
+                nanopore=False,
+            )
+        generic_reporter.create_trailblazer_config()
         self.load_lookup_dict()
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm()
@@ -55,29 +59,6 @@ class ReportSC2:
         self.create_jsonfile()
         self.create_instrument_properties()
 
-    def get_finished_slurm_ids(self) -> list:
-        """Get slurm IDs"""
-
-        trace_file_path = Path(self.indir, "pipeline_info", "execution_trace.txt")
-        slurm_id_list = []
-        with open(trace_file_path, "r") as trace_file_contents:
-            for line in trace_file_contents:
-                slurm_id = line.split()[2]
-                try:
-                    slurm_id_list.append(int(slurm_id))
-                except Exception:
-                    continue
-        return slurm_id_list
-
-    def create_trailblazer_config(self) -> None:
-        """Create Trailblazer config file"""
-
-        trailblazer_config_path = Path(self.indir, "trailblazer_config.yaml")
-        finished_slurm_ids = self.get_finished_slurm_ids()
-        if not finished_slurm_ids:
-            return
-        with open(trailblazer_config_path, "w") as trailblazer_config_file:
-            yaml.dump(data={"jobs": finished_slurm_ids}, stream=trailblazer_config_file)
 
     def load_lookup_dict(self):
         """Loads articdata with data from various sources. Atm, artic output and the case config input file"""

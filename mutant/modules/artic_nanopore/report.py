@@ -1,21 +1,39 @@
 """ Using a dict as input, this class will print a report covering the
     information requested by the sarscov2-customers at Clinical Genomics
 """
+import glob
 
-from mutant.modules.generic_parser import get_sarscov2_config
+from mutant.modules.artic_nanopore.parser import collect_results, collect_variants
+from mutant.modules.generic_parser import get_sarscov2_config, read_filelines
+from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportPrinterNanopore:
-    def __init__(self, caseinfo: str, indir: str):
+    def __init__(self, caseinfo: str, indir: str, barcode_to_sampleid: dict):
         self.casefile = caseinfo
         self.caseinfo = get_sarscov2_config(caseinfo)
         self.case = self.caseinfo[0]["case_ID"]
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
+        self.barcode_to_sampleid = barcode_to_sampleid
 
-    def create_all_nanopore_files(self, result: dict, variants: list):
+    def create_all_nanopore_files(self):
+        result: dict = collect_results(
+            resdir=self.indir,
+            barcode_to_sampleid=self.barcode_to_sampleid,
+            caseinfo=self.casefile,
+        )
+        variants: list = collect_variants(
+            resdir=self.indir, barcode_to_sampleid=self.barcode_to_sampleid
+        )
         self.print_report(result=result)
         self.print_variants(variants=variants)
+        generic_reporter = GenericReporter(
+                indir=self.indir,
+                nanopore=True,
+            )
+        generic_reporter.create_trailblazer_config()
+        self.create_concat_pangolin()
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""
@@ -76,3 +94,32 @@ class ReportPrinterNanopore:
                 )
                 file_to_append.write(line_to_append)
         file_to_append.close()
+
+    def extract_barcode_from_pangolin_csv(self, line: str) -> str:
+        """ line in format noblecat_220721-191417_barcode01/ARTIC/medaka_MN908947.3 """
+        split_on_slash = line.split("/")
+        splid_on_underscore = split_on_slash[0].split("_")
+        return splid_on_underscore[2]
+
+    def create_concat_pangolin(self):
+        """Concatenate nanopore pangolin results"""
+
+        indir = "{0}/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping".format(self.indir)
+        concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
+        pango_csvs = glob.glob("{0}/*.pangolin.csv".format(indir))
+
+        header = read_filelines(pango_csvs[0])[0]
+        with open(concatfile, "w") as concat:
+            concat.write(header)
+            # Parse sample pangolin data
+            for csv in pango_csvs:
+                data: list = read_filelines(csv)[1:]
+                for line in data:
+                    split_on_comma = line.split(",")
+                    barcode = self.extract_barcode_from_pangolin_csv(line=split_on_comma[0])
+                    split_on_comma[0] = self.barcode_to_sampleid[barcode]
+                    concatenated_line = ""
+                    for section in split_on_comma:
+                        concatenated_line = ",".join([concatenated_line, section])
+                    formatted_line = concatenated_line[1:]
+                    concat.write(formatted_line)
