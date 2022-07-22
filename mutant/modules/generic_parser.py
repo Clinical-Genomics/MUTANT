@@ -4,6 +4,27 @@ import json
 import click
 import pandas
 
+from mutant.constants.artic import ILLUMINA_FILES_CASE, NANOPORE_FILES_CASE
+
+
+def get_results_paths(indir, case, ticket, nanopore) -> dict:
+    """Get paths for all reports and output files from GMS-Artic and MUTANT"""
+
+    # Case paths
+    path_dict = dict()
+    case_paths = dict()
+    if nanopore:
+        files_to_iterate = NANOPORE_FILES_CASE
+    else:
+        files_to_iterate = ILLUMINA_FILES_CASE
+    for stepname, filepath in files_to_iterate.items():
+        fullpath = filepath.format(resdir=indir, case=case, ticket=ticket)
+        if "*" in fullpath:
+            fullpath = glob.glob(fullpath)[0]
+        case_paths[stepname] = fullpath
+    path_dict[case] = case_paths
+    return path_dict
+
 
 def append_dict(dictionary, key, item) -> dict:
     if key in dictionary.keys():

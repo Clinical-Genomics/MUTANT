@@ -8,23 +8,8 @@ import glob
 import csv
 import re
 from mutant import WD
-from mutant.constants.artic import MULTIQC_TO_VOGUE, ILLUMINA_FILES_CASE
+from mutant.constants.artic import MULTIQC_TO_VOGUE
 from mutant.modules.generic_parser import append_dict, parse_classifications
-
-
-def get_results_paths(indir, case, ticket) -> dict:
-    """Get paths for all reports and output files from GMS-Artic and MUTANT"""
-
-    # Case paths
-    path_dict = dict()
-    case_paths = dict()
-    for stepname, filepath in ILLUMINA_FILES_CASE.items():
-        fullpath = filepath.format(resdir=indir, case=case, ticket=ticket)
-        if "*" in fullpath:
-            fullpath = glob.glob(fullpath)[0]
-        case_paths[stepname] = fullpath
-    path_dict[case] = case_paths
-    return path_dict
 
 
 def get_multiqc_template_data(record, field, step, direction="") -> dict:

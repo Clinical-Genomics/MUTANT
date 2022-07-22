@@ -103,6 +103,7 @@ def sarscov2(
                 caseinfo=config_case,
                 indir=os.path.abspath(resdir),
                 barcode_to_sampleid=barcode_to_sampleid,
+                config_artic=config_artic,
             )
             nanopore_report.create_all_nanopore_files()
 

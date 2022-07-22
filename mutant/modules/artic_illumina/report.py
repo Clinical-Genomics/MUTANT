@@ -13,31 +13,29 @@ import json
 from datetime import date
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
-    read_filelines,
+    read_filelines, get_results_paths,
 )
 from mutant.modules.artic_illumina.parser import (
     get_vogue_multiqc_data,
     get_artic_results,
-    get_results_paths,
 )
 from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportSC2:
-    def __init__(self, caseinfo, indir, config_artic, fastq_dir, timestamp):
+    def __init__(self, caseinfo: str, indir: str, config_artic: str, fastq_dir: str, timestamp: str):
         self.casefile = caseinfo
-        caseinfo = get_sarscov2_config(caseinfo)
-        self.caseinfo = caseinfo
-        self.case = caseinfo[0]["case_ID"]
-        self.ticket = caseinfo[0]["Customer_ID_project"]
-        self.project = caseinfo[0]["Customer_ID_project"]
+        self.caseinfo = get_sarscov2_config(caseinfo)
+        self.case = self.caseinfo[0]["case_ID"]
+        self.ticket = self.caseinfo[0]["Customer_ID_project"]
+        self.project = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
         self.config_artic = config_artic
         self.time = timestamp
         today = date.today().strftime("%Y%m%d")
         self.today = today
         self.fastq_dir = fastq_dir
-        self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
+        self.filepaths = get_results_paths(self.indir, self.case, self.ticket, False)
         self.articdata = dict()
         self.consensus_path = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(
             self.indir
@@ -47,8 +45,10 @@ class ReportSC2:
     def create_all_files(self):
         generic_reporter = GenericReporter(
             caseinfo=self.caseinfo,
+            casefile=self.casefile,
             indir=self.indir,
             nanopore=False,
+            config_artic=self.config_artic,
         )
         generic_reporter.create_trailblazer_config()
         self.load_lookup_dict()
@@ -58,7 +58,7 @@ class ReportSC2:
         generic_reporter.create_concat_consensus(
             target_files=self.consensus_target_files
         )
-        self.create_deliveryfile()
+        generic_reporter.create_deliveryfile(fastq_dir=fastq_dir)
         self.create_vogue_metrics_file()
         self.create_fohm_csv()
         self.create_sarscov2_resultfile()
@@ -338,229 +338,3 @@ class ReportSC2:
             "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
         ) as outfile:
             json.dump(self.articdata, outfile)
-
-    def create_deliveryfile(self):
-        """Create deliverables file"""
-
-        deliv = {"files": []}
-        delivfile = "{}/{}_deliverables.yaml".format(self.indir, self.case)
-
-        ## Per Case
-        # Instrument properties
-        deliv["files"].append(
-            {
-                "format": "txt",
-                "id": self.case,
-                "path": "{}/instrument.properties".format(self.indir),
-                "path_index": "~",
-                "step": "report",
-                "tag": "instrument-properties",
-            }
-        )
-        # KS Report
-        deliv["files"].append(
-            {
-                "format": "csv",
-                "id": self.case,
-                "path": "{}/sars-cov-2_{}_results.csv".format(self.indir, self.ticket),
-                "path_index": "~",
-                "step": "report",
-                "tag": "ks-results",
-            }
-        )
-        # KS Aux report
-        deliv["files"].append(
-            {
-                "format": "csv",
-                "id": self.case,
-                "path": "{}/sars-cov-2_{}_variants.csv".format(self.indir, self.ticket),
-                "path_index": "~",
-                "step": "report",
-                "tag": "ks-aux-results",
-            }
-        )
-        # Pangolin typing
-        deliv["files"].append(
-            {
-                "format": "csv",
-                "id": self.case,
-                "path": "{}/{}.pangolin.csv".format(self.indir, self.ticket),
-                "path_index": "~",
-                "step": "report",
-                "tag": "pangolin-typing",
-            }
-        )
-        # Pangolin typing for FOHM (only qcpass files)
-        deliv["files"].append(
-            {
-                "format": "csv",
-                "id": self.case,
-                "path": "{}/{}_{}_pangolin_classification_format4.txt".format(
-                    self.indir, self.ticket, str(date.today())
-                ),
-                "path_index": "~",
-                "step": "report",
-                "tag": "pangolin-typing-fohm",
-            }
-        )
-        # Consensus file
-        deliv["files"].append(
-            {
-                "format": "fasta",
-                "id": self.case,
-                "path": "{}/{}.consensus.fa".format(self.indir, self.ticket),
-                "path_index": "~",
-                "step": "analysis",
-                "tag": "consensus",
-            }
-        )
-        # Multiqc report
-        deliv["files"].append(
-            {
-                "format": "html",
-                "id": self.case,
-                "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
-                "path_index": "~",
-                "step": "report",
-                "tag": "multiqc-html",
-            }
-        )
-        # MultiQC json
-        deliv["files"].append(
-            {
-                "format": "json",
-                "id": self.case,
-                "path": "{}/{}_multiqc.json".format(self.indir, self.ticket),
-                "path_index": "~",
-                "step": "report",
-                "tag": "multiqc-json",
-            }
-        )
-        # Artic yaml (Vogue) data
-        deliv["files"].append(
-            {
-                "format": "yaml",
-                "id": self.case,
-                "path": self.filepaths[self.case]["vogue-metrics"],
-                "path_index": "~",
-                "step": "result_aggregation",
-                "tag": "metrics",
-            }
-        )
-        # Provided CG CASE info from StatusDB
-        deliv["files"].append(
-            {
-                "format": "json",
-                "id": self.case,
-                "path": os.path.abspath(self.casefile),
-                "path_index": "~",
-                "step": "runinfo",
-                "tag": "sampleinfo",
-            }
-        )
-        # Input settings dump
-        deliv["files"].append(
-            {
-                "format": "txt",
-                "id": self.case,
-                "path": os.path.abspath(self.config_artic),
-                "path_index": "~",
-                "step": "runinfo",
-                "tag": "runtime-settings",
-            }
-        )
-        # Software versions
-        deliv["files"].append(
-            {
-                "format": "csv",
-                "id": self.case,
-                "path": self.filepaths[self.case]["versions-file"],
-                "path_index": "~",
-                "step": "runinfo",
-                "tag": "software-versions",
-            }
-        )
-        # Execution log
-        deliv["files"].append(
-            {
-                "format": "txt",
-                "id": self.case,
-                "path": "{}/nextflow.log".format(self.indir),
-                "path_index": "~",
-                "step": "runinfo",
-                "tag": "logfile",
-            }
-        )
-        # FoHM delivery file
-        deliv["files"].append(
-            {
-                "format": "csv",
-                "id": self.case,
-                "path": os.path.join(
-                    self.indir, "{}_komplettering.csv".format(self.ticket)
-                ),
-                "path_index": "~",
-                "step": "report",
-                "tag": "SARS-CoV-2-info",
-            }
-        )
-
-        # Per sample
-        for record in self.caseinfo:
-            sampleID = record["CG_ID_sample"]
-            sample = record["Customer_ID_sample"]
-            region = record["region_code"]
-            lab = record["lab_code"]
-            base_sample = "{0}_{1}_{2}".format(region, lab, sample)
-            if not record["sequencing_qc_pass"]:
-                continue
-            # Concat reads forwards
-            deliv["files"].append(
-                {
-                    "format": "fastq",
-                    "id": sampleID,
-                    "path": "{0}/{1}_1.fastq.gz".format(self.fastq_dir, base_sample),
-                    "path_index": "~",
-                    "step": "concatination",
-                    "tag": "forward-reads",
-                }
-            )
-            # Concat reads reverse
-            deliv["files"].append(
-                {
-                    "format": "fastq",
-                    "id": sampleID,
-                    "path": "{0}/{1}_2.fastq.gz".format(self.fastq_dir, base_sample),
-                    "path_index": "~",
-                    "step": "concatination",
-                    "tag": "reverse-reads",
-                }
-            )
-            # Variants (vcf)
-            deliv["files"].append(
-                {
-                    "format": "vcf",
-                    "id": sampleID,
-                    "path": "{}/ncovIllumina_Genotyping_typeVariants/vcf/{}.vcf".format(
-                        self.indir, base_sample
-                    ),
-                    "path_index": "~",
-                    "step": "genotyping",
-                    "tag": "vcf-covid",
-                }
-            )
-            # Single-file fasta
-            deliv["files"].append(
-                {
-                    "format": "fasta",
-                    "id": sampleID,
-                    "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/{}.consensus.fasta".format(
-                        self.indir, base_sample
-                    ),
-                    "path_index": "~",
-                    "step": "consensus",
-                    "tag": "consensus-sample",
-                }
-            )
-        with open(delivfile, "w") as out:
-            yaml.dump(deliv, out)

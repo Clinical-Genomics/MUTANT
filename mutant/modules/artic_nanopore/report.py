@@ -10,12 +10,14 @@ from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportPrinterNanopore:
-    def __init__(self, caseinfo: str, indir: str, barcode_to_sampleid: dict):
+    def __init__(self, caseinfo: str, indir: str, barcode_to_sampleid: dict, config_artic: str):
         self.casefile = caseinfo
         self.caseinfo = get_sarscov2_config(caseinfo)
         self.case = self.caseinfo[0]["case_ID"]
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
+        self.fastq_dir = "{0}/../fastq".format(self.indir)
+        self.config_artic = config_artic
         self.barcode_to_sampleid = barcode_to_sampleid
         self.consensus_path = (
             "{0}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka".format(
@@ -37,8 +39,10 @@ class ReportPrinterNanopore:
         self.print_variants(variants=variants)
         generic_reporter = GenericReporter(
             caseinfo=self.caseinfo,
+            casefile=self.casefile,
             indir=self.indir,
             nanopore=True,
+            config_artic=self.config_artic,
         )
         generic_reporter.create_trailblazer_config()
         self.create_concat_pangolin()
@@ -46,6 +50,9 @@ class ReportPrinterNanopore:
         generic_reporter.create_concat_consensus(
             target_files=self.consensus_target_files
         )
+        generic_reporter.create_deliveryfile(fastq_dir=self.fastq_dir)
+        # TODO rename_vcfs
+        # TODO handle consensus files
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""
