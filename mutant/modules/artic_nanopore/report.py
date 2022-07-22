@@ -17,7 +17,11 @@ class ReportPrinterNanopore:
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
         self.barcode_to_sampleid = barcode_to_sampleid
-        self.consensus_path = "{0}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka".format(self.indir)
+        self.consensus_path = (
+            "{0}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka".format(
+                self.indir
+            )
+        )
         self.consensus_target_files = "{0}/*.consensus.fa".format(self.consensus_path)
 
     def create_all_nanopore_files(self):
@@ -32,15 +36,16 @@ class ReportPrinterNanopore:
         self.print_report(result=result)
         self.print_variants(variants=variants)
         generic_reporter = GenericReporter(
-                caseinfo=self.caseinfo,
-                indir=self.indir,
-                nanopore=True,
-            )
+            caseinfo=self.caseinfo,
+            indir=self.indir,
+            nanopore=True,
+        )
         generic_reporter.create_trailblazer_config()
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm(result=result)
-        generic_reporter.create_concat_consensus(target_files=self.consensus_target_files)
-
+        generic_reporter.create_concat_consensus(
+            target_files=self.consensus_target_files
+        )
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""
@@ -103,14 +108,16 @@ class ReportPrinterNanopore:
         file_to_append.close()
 
     def extract_barcode_from_pangolin_csv(self, line: str) -> str:
-        """ line in format noblecat_220721-191417_barcode01/ARTIC/medaka_MN908947.3 """
+        """line in format noblecat_220721-191417_barcode01/ARTIC/medaka_MN908947.3"""
         split_on_slash = line.split("/")
         splid_on_underscore = split_on_slash[0].split("_")
         return splid_on_underscore[2]
 
     def create_concat_pangolin(self) -> None:
         """Concatenate nanopore pangolin results"""
-        indir = "{0}/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping".format(self.indir)
+        indir = "{0}/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping".format(
+            self.indir
+        )
         concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
         pango_csvs = glob.glob("{0}/*.pangolin.csv".format(indir))
 
@@ -122,7 +129,9 @@ class ReportPrinterNanopore:
                 data: list = read_filelines(csv)[1:]
                 for line in data:
                     split_on_comma = line.split(",")
-                    barcode = self.extract_barcode_from_pangolin_csv(line=split_on_comma[0])
+                    barcode = self.extract_barcode_from_pangolin_csv(
+                        line=split_on_comma[0]
+                    )
                     split_on_comma[0] = self.barcode_to_sampleid[barcode]
                     concatenated_line = ""
                     for section in split_on_comma:

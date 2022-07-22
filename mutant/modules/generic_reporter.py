@@ -11,7 +11,6 @@ class GenericReporter:
         self.nanopore = nanopore
         self.ticket = caseinfo[0]["Customer_ID_project"]
 
-
     def get_finished_slurm_ids(self) -> list:
         """Get slurm IDs"""
 

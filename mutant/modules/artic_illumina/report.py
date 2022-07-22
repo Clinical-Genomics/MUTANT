@@ -39,21 +39,25 @@ class ReportSC2:
         self.fastq_dir = fastq_dir
         self.filepaths = get_results_paths(self.indir, self.case, self.ticket)
         self.articdata = dict()
-        self.consensus_path = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+        self.consensus_path = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(
+            self.indir
+        )
         self.consensus_target_files = "{0}/*.consensus.fa".format(self.consensus_path)
 
     def create_all_files(self):
         generic_reporter = GenericReporter(
-                caseinfo=self.caseinfo,
-                indir=self.indir,
-                nanopore=False,
-            )
+            caseinfo=self.caseinfo,
+            indir=self.indir,
+            nanopore=False,
+        )
         generic_reporter.create_trailblazer_config()
         self.load_lookup_dict()
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm()
         # This works off concat pango and needs to occur after
-        generic_reporter.create_concat_consensus(target_files=self.consensus_target_files)
+        generic_reporter.create_concat_consensus(
+            target_files=self.consensus_target_files
+        )
         self.create_deliveryfile()
         self.create_vogue_metrics_file()
         self.create_fohm_csv()
@@ -61,7 +65,6 @@ class ReportSC2:
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
         self.create_instrument_properties()
-
 
     def load_lookup_dict(self):
         """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
