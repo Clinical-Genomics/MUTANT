@@ -140,6 +140,9 @@ profiles {
         // Container
         if ( params.medaka || params.nanopolish ) {
             process {
+                withName:versions {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
                 withName:articDownloadScheme {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
