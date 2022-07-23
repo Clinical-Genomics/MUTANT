@@ -58,7 +58,7 @@ class ReportSC2:
         generic_reporter.create_concat_consensus(
             target_files=self.consensus_target_files
         )
-        generic_reporter.create_deliveryfile(fastq_dir=fastq_dir)
+        generic_reporter.create_deliveryfile(fastq_dir=self.fastq_dir)
         self.create_vogue_metrics_file()
         self.create_fohm_csv()
         self.create_sarscov2_resultfile()
