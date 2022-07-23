@@ -185,18 +185,17 @@ class GenericReporter:
                 "tag": "runtime-settings",
             }
         )
-        if not self.nanopore:
-            # Software versions
-            deliv["files"].append(
-                {
-                    "format": "csv",
-                    "id": self.case,
-                    "path": self.filepaths[self.case]["versions-file"],
-                    "path_index": "~",
-                    "step": "runinfo",
-                    "tag": "software-versions",
-                }
-            )
+        # Software versions
+        deliv["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": self.filepaths[self.case]["versions-file"],
+                "path_index": "~",
+                "step": "runinfo",
+                "tag": "software-versions",
+            }
+        )
         # Execution log
         deliv["files"].append(
             {
