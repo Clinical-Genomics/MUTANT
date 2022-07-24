@@ -20,6 +20,9 @@ process {
     withName: fastqc {
         cpus = 2
     }
+    withName: fastqcNanopore {
+        cpus = 2
+    }
 }
 
 // Load base.config by default for all pipelines
@@ -37,6 +40,8 @@ params {
     gff = "$baseDir/typing/MN908947.3.gff"
     // SARS-CoV-2 VOC
     yaml = "$baseDir/typing/SARS-CoV-2.types.yaml"
+    // Fastq files
+    fastqPath = "${params.outdir}/../fastq/*/*fastq.gz"
 }
 
 if ( params.medaka || params.nanopolish ) {
