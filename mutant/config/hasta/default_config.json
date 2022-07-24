@@ -43,7 +43,7 @@ params {
     // Fastq files
     fastqPath = "${params.outdir}/../fastq/*/*fastq.gz"
     // Fastqc output folder
-    fastqPath = "${params.outdir}/fastqc_output/"
+    fastqcOut = "${params.outdir}/fastqc_output/"
 }
 
 if ( params.medaka || params.nanopolish ) {
