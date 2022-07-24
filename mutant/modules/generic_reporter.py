@@ -9,7 +9,14 @@ from mutant.modules.generic_parser import get_sarscov2_config, get_results_paths
 
 
 class GenericReporter:
-    def __init__(self, caseinfo: dict, casefile: str, indir: str, nanopore: bool, config_artic: str):
+    def __init__(
+        self,
+        caseinfo: dict,
+        casefile: str,
+        indir: str,
+        nanopore: bool,
+        config_artic: str,
+    ):
         self.casefile = casefile
         self.caseinfo = get_sarscov2_config(self.casefile)
         self.indir = indir
@@ -234,7 +241,9 @@ class GenericReporter:
                     {
                         "format": "fastq",
                         "id": sampleID,
-                        "path": "{0}/{1}/{2}_1.fastq.gz".format(fastq_dir, sample, base_sample),
+                        "path": "{0}/{1}/{2}_1.fastq.gz".format(
+                            fastq_dir, sample, base_sample
+                        ),
                         "path_index": "~",
                         "step": "concatination",
                         "tag": "forward-reads",

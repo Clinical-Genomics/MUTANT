@@ -13,7 +13,8 @@ import json
 from datetime import date
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
-    read_filelines, get_results_paths,
+    read_filelines,
+    get_results_paths,
 )
 from mutant.modules.artic_illumina.parser import (
     get_vogue_multiqc_data,
@@ -23,7 +24,14 @@ from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportSC2:
-    def __init__(self, caseinfo: str, indir: str, config_artic: str, fastq_dir: str, timestamp: str):
+    def __init__(
+        self,
+        caseinfo: str,
+        indir: str,
+        config_artic: str,
+        fastq_dir: str,
+        timestamp: str,
+    ):
         self.casefile = caseinfo
         self.caseinfo = get_sarscov2_config(caseinfo)
         self.case = self.caseinfo[0]["case_ID"]

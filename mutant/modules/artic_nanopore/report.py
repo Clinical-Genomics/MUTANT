@@ -10,7 +10,9 @@ from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportPrinterNanopore:
-    def __init__(self, caseinfo: str, indir: str, barcode_to_sampleid: dict, config_artic: str):
+    def __init__(
+        self, caseinfo: str, indir: str, barcode_to_sampleid: dict, config_artic: str
+    ):
         self.casefile = caseinfo
         self.caseinfo = get_sarscov2_config(self.casefile)
         self.case = self.caseinfo[0]["case_ID"]
@@ -24,7 +26,9 @@ class ReportPrinterNanopore:
                 self.indir
             )
         )
-        self.consensus_target_files = "{0}/*.consensus.fasta".format(self.consensus_path)
+        self.consensus_target_files = "{0}/*.consensus.fasta".format(
+            self.consensus_path
+        )
 
     def create_all_nanopore_files(self):
         result: dict = collect_results(
