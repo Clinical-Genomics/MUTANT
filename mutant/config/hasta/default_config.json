@@ -176,7 +176,7 @@ profiles {
                 withName:fastqc {
                     container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
                 }
-                withName:multiqc_nanopore {
+                withName:multiqcNanopore {
                     container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
                 }
             }
