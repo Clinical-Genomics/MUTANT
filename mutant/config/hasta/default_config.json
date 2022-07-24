@@ -173,7 +173,7 @@ profiles {
                 withName:mergeTypingCSVs {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
-                withName:fastqc {
+                withName:fastqcNanopore {
                     container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
                 }
                 withName:multiqcNanopore {
