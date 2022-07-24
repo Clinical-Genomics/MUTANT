@@ -42,6 +42,8 @@ params {
     yaml = "$baseDir/typing/SARS-CoV-2.types.yaml"
     // Fastq files
     fastqPath = "${params.outdir}/../fastq/*/*fastq.gz"
+    // Fastqc output folder
+    fastqPath = "${params.outdir}/fastqc_output/"
 }
 
 if ( params.medaka || params.nanopolish ) {
