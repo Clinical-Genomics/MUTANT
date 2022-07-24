@@ -173,6 +173,12 @@ profiles {
                 withName:mergeTypingCSVs {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
+                withName:fastqc {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:multiqc_nanopore {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
             }
         }
         else if (params.illumina) {
