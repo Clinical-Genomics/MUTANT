@@ -136,29 +136,29 @@ class GenericReporter:
                 "tag": "consensus",
             }
         )
+        # Multiqc report
+        deliv["files"].append(
+            {
+                "format": "html",
+                "id": self.case,
+                "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
+                "path_index": "~",
+                "step": "report",
+                "tag": "multiqc-html",
+            }
+        )
+        # MultiQC json
+        deliv["files"].append(
+            {
+                "format": "json",
+                "id": self.case,
+                "path": "{}/{}_multiqc.json".format(self.indir, self.ticket),
+                "path_index": "~",
+                "step": "report",
+                "tag": "multiqc-json",
+            }
+        )
         if not self.nanopore:
-            # Multiqc report
-            deliv["files"].append(
-                {
-                    "format": "html",
-                    "id": self.case,
-                    "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
-                    "path_index": "~",
-                    "step": "report",
-                    "tag": "multiqc-html",
-                }
-            )
-            # MultiQC json
-            deliv["files"].append(
-                {
-                    "format": "json",
-                    "id": self.case,
-                    "path": "{}/{}_multiqc.json".format(self.indir, self.ticket),
-                    "path_index": "~",
-                    "step": "report",
-                    "tag": "multiqc-json",
-                }
-            )
             # Artic yaml (Vogue) data
             deliv["files"].append(
                 {
