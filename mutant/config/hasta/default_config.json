@@ -181,10 +181,10 @@ profiles {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
                 withName:fastqcNanopore {
-                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
                 withName:multiqcNanopore {
-                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
             }
         }
