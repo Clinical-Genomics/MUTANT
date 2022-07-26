@@ -20,6 +20,9 @@ process {
     withName: fastqc {
         cpus = 2
     }
+    withName: fastqcNanopore {
+        cpus = 2
+    }
 }
 
 // Load base.config by default for all pipelines
@@ -37,6 +40,10 @@ params {
     gff = "$baseDir/typing/MN908947.3.gff"
     // SARS-CoV-2 VOC
     yaml = "$baseDir/typing/SARS-CoV-2.types.yaml"
+    // Fastq files
+    fastqPath = "${params.outdir}/../fastq/*/*fastq.gz"
+    // Fastqc output folder
+    fastqcOut = "${params.outdir}/fastqc_output/"
 }
 
 if ( params.medaka || params.nanopolish ) {
@@ -140,6 +147,9 @@ profiles {
         // Container
         if ( params.medaka || params.nanopolish ) {
             process {
+                withName:versions {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
                 withName:articDownloadScheme {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
@@ -168,6 +178,12 @@ profiles {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
                 withName:mergeTypingCSVs {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:fastqcNanopore {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:multiqcNanopore {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
             }

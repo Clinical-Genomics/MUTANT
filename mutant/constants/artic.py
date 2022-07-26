@@ -11,10 +11,10 @@ ILLUMINA_FILES_CASE = {
 
 # GMS-Artic and MUTANT output files for Nanopore
 NANOPORE_FILES_CASE = {
-    "multiqc-json": None,
-    "multiqc-html": None,
-    "vogue-metrics": None,
+    "multiqc-json": "{resdir}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc_data/multiqc_data.json",
+    "multiqc-html": "{resdir}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc.html",
     "results-file": "{resdir}/sars-cov-2_{ticket}_results.csv",
+    "versions-file": "{resdir}/articNcovNanopore_sequenceAnalysisMedaka_versions/*_versions.csv",
 }
 
 # Multiqc metrics to report to Vogue
