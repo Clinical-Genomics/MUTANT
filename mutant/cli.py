@@ -12,9 +12,9 @@ from mutant import version, log, WD, TIMESTAMP
 from mutant.modules.artic_illumina.start import RunSC2
 from mutant.modules.artic_nanopore.reformat import reformat_fastq_folder
 from mutant.modules.artic_nanopore.report import ReportPrinterNanopore
+from mutant.modules.delivery import DeliverySC2
 from mutant.modules.generic_parser import get_json
 from mutant.modules.artic_illumina.report import ReportSC2
-from mutant.modules.artic_illumina.delivery import DeliverySC2
 
 
 @click.group()
@@ -119,14 +119,14 @@ def sarscov2(
             )
             report.create_all_files()
 
-        # Deliverables
-        if config_case != "":
-            delivery = DeliverySC2(
-                caseinfo=config_case,
-                indir=os.path.abspath(resdir),
-            )
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverySC2(
+            caseinfo=config_case,
+            indir=os.path.abspath(resdir),
+        )
 
-            delivery.rename_deliverables()
+        delivery.rename_deliverables()
 
 
 @analyse.command()
