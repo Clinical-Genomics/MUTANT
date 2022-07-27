@@ -90,6 +90,7 @@ def sarscov2(
         WD=WD,
     )
 
+    barcode_to_sampleid = {}
     resdir = run.get_results_dir(config_mutant, outdir)
     if nanopore:
         barcode_to_sampleid: dict = reformat_fastq_folder(
@@ -124,6 +125,9 @@ def sarscov2(
         delivery = DeliverySC2(
             caseinfo=config_case,
             indir=os.path.abspath(resdir),
+            nanopore=nanopore,
+            timestamp=TIMESTAMP,
+            barcode_to_sampleid=barcode_to_sampleid,
         )
 
         delivery.rename_deliverables()
