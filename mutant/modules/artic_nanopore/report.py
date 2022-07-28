@@ -117,7 +117,7 @@ class ReportPrinterNanopore:
                     "%10X_coverage",
                     "QC_pass",
                     "Lineage",
-                    "PangoLEARN_version",
+                    "Pangolin_data_version",
                     "VOC",
                     "Mutations\n",
                 ]
@@ -135,7 +135,7 @@ class ReportPrinterNanopore:
                         result[sample]["pct_10x_coverage"],
                         result[sample]["qc_pass"],
                         result[sample]["pangolin_type"],
-                        result[sample]["pangolearn_version"],
+                        result[sample]["pangolin_data_version"],
                         result[sample]["voc"],
                         result[sample]["mutations"],
                         "\n",
