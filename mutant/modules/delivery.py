@@ -66,8 +66,17 @@ class DeliverySC2:
                 )
             )
 
-        # Rename sample files
+        # Rename sample folders
+        if self.nanopore:
+            fastq_folder = "{0}/../fastq".format(self.indir)
+            for barcode in os.listdir(fastq_folder):
+                barcode_abspath = fastq_folder + "/" + barcode
+                sampleid_abspath = (
+                    fastq_folder + "/" + self.barcode_to_sampleid[barcode]
+                )
+                os.rename(barcode_abspath, sampleid_abspath)
 
+        # Rename sample files
         for sampleinfo in self.caseinfo:
             region = sampleinfo["region_code"]
             lab = sampleinfo["lab_code"]
