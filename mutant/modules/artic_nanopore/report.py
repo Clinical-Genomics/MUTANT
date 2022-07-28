@@ -1,7 +1,9 @@
 """ Using a dict as input, this class will print a report covering the
     information requested by the sarscov2-customers at Clinical Genomics
 """
+import csv
 import glob
+import os
 from datetime import date
 
 from mutant.modules.artic_nanopore.parser import collect_results, collect_variants
@@ -55,8 +57,32 @@ class ReportPrinterNanopore:
             target_files=self.consensus_target_files
         )
         generic_reporter.create_deliveryfile(fastq_dir=self.fastq_dir)
-        # TODO rename_vcfs
-        # TODO handle consensus files
+        self.create_fohm_csv(result=result)
+        self.create_instrument_properties()
+
+    def create_instrument_properties(self) -> None:
+        """Creates a properties file with instrument information"""
+        propfile = os.path.join(self.indir, "instrument.properties")
+        with open(propfile, "w") as prop:
+            prop.write("instrument=MinION\n")
+            prop.write("plattform=Oxford Nanopore Technologies\n")
+            prop.write("biblioteksmetod=NA:NA - None\n")
+            prop.write("lanes=1\n")
+
+    def create_fohm_csv(self, result: dict) -> None:
+        """Creates a summary file for FoHMs additional info"""
+        sumfile = os.path.join(
+            self.indir,
+            "{}_komplettering.csv".format(self.ticket),
+        )
+        with open(sumfile, "w") as out:
+            summary = csv.writer(out)
+            summary.writerow(["provnummer", "urvalskriterium", "GISAID_accession"])
+            samples = result.keys()
+            for sample in samples:
+                if result[sample]["qc_pass"] != "TRUE":
+                    continue
+                summary.writerow([sample, result[sample]["selection_criteria"]])
 
     def print_variants(self, variants: list) -> None:
         """Append data to the variant report"""
