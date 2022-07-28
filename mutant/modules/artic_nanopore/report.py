@@ -64,7 +64,7 @@ class ReportPrinterNanopore:
         """Creates a properties file with instrument information"""
         propfile = os.path.join(self.indir, "instrument.properties")
         with open(propfile, "w") as prop:
-            prop.write("instrument=MinION\n")
+            prop.write("instrument=GridION\n")
             prop.write("plattform=Oxford Nanopore Technologies\n")
             prop.write("biblioteksmetod=NA:NA - None\n")
             prop.write("lanes=1\n")
