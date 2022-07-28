@@ -12,7 +12,14 @@ from mutant.modules.generic_parser import get_sarscov2_config
 
 
 class DeliverySC2:
-    def __init__(self, caseinfo: str, indir: str, nanopore: bool, timestamp: str, barcode_to_sampleid: dict):
+    def __init__(
+        self,
+        caseinfo: str,
+        indir: str,
+        nanopore: bool,
+        timestamp: str,
+        barcode_to_sampleid: dict,
+    ):
         self.casefile = caseinfo
         caseinfo = get_sarscov2_config(caseinfo)
         self.caseinfo = caseinfo
@@ -34,10 +41,14 @@ class DeliverySC2:
         illunmina_to_nanopore_base = {}
         for sampleinfo in self.caseinfo:
             illumina_base = "{0}_{1}_{2}".format(
-                sampleinfo["region_code"], sampleinfo["lab_code"], sampleinfo["Customer_ID_sample"]
+                sampleinfo["region_code"],
+                sampleinfo["lab_code"],
+                sampleinfo["Customer_ID_sample"],
             )
             nanopore_base = "{0}_{1}_{2}".format(
-                self.case, self.timestamp, sampleid_to_barcode[sampleinfo["Customer_ID_sample"]]
+                self.case,
+                self.timestamp,
+                sampleid_to_barcode[sampleinfo["Customer_ID_sample"]],
             )
             illunmina_to_nanopore_base[illumina_base] = nanopore_base
         return illunmina_to_nanopore_base
@@ -49,7 +60,11 @@ class DeliverySC2:
         illunmina_to_nanopore_base = {}
         if self.nanopore:
             sampleid_to_barcode = self.map_sampleid_to_barcode()
-            illunmina_to_nanopore_base: dict = self.translate_basename_to_nanopore_format(sampleid_to_barcode=sampleid_to_barcode)
+            illunmina_to_nanopore_base: dict = (
+                self.translate_basename_to_nanopore_format(
+                    sampleid_to_barcode=sampleid_to_barcode
+                )
+            )
 
         # Rename sample files
 
@@ -68,12 +83,14 @@ class DeliverySC2:
                 consensus_path = "{0}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka".format(
                     self.indir
                 )
-                consensus_file = "{0}/{1}.consensus.fasta".format(consensus_path, illunmina_to_nanopore_base[base_sample])
-            else:
-                consensus_path = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(
-                    self.indir
+                consensus_files = "{0}/{1}.consensus.fasta".format(
+                    consensus_path, illunmina_to_nanopore_base[base_sample]
                 )
-                consensus_file = "{0}/{1}.*.fa".format(consensus_path, base_sample)
+            else:
+                consensus_path = (
+                    "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
+                )
+                consensus_files = "{0}/{1}.*.fa".format(consensus_path, base_sample)
             for item in glob.glob(consensus_files):
                 newpath = "{0}/{1}.consensus.fasta".format(consensus_path, base_sample)
                 try:
@@ -89,10 +106,16 @@ class DeliverySC2:
 
             # rename typeVariants
             if self.nanopore:
-                vcf_path = "{0}/articNcovNanopore_Genotyping_typeVariants/vcf".format(self.indir)
-                vcf_files = "{0}/*.csq.vcf".format(vcf_path)
+                vcf_path = "{0}/articNcovNanopore_Genotyping_typeVariants/vcf".format(
+                    self.indir
+                )
+                vcf_files = "{0}/{1}.csq.vcf".format(
+                    vcf_path, illunmina_to_nanopore_base[base_sample]
+                )
             else:
-                vcf_path = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(self.indir)
+                vcf_path = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(
+                    self.indir
+                )
                 vcf_files = "{0}/{1}.csq.vcf".format(vcf_path, base_sample)
             for item in glob.glob(vcf_files):
                 newpath = "{0}/{1}.vcf".format(vcf_path, base_sample)
@@ -104,11 +127,18 @@ class DeliverySC2:
         ## Rename case files
 
         # rename multiqc
-        hit = glob.glob(
-            "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html".format(
-                self.indir
+        if self.nanopore:
+            hit = glob.glob(
+                "{}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc.html".format(
+                    self.indir
+                )
             )
-        )
+        else:
+            hit = glob.glob(
+                "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html".format(
+                    self.indir
+                )
+            )
         if len(hit) == 1:
             hit = hit[0]
             try:
@@ -117,11 +147,18 @@ class DeliverySC2:
                 pass
 
         # rename multiqc json
-        hit = glob.glob(
-            "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json".format(
-                self.indir
+        if self.nanopore:
+            hit = glob.glob(
+                "{}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc_data/multiqc_data.json".format(
+                    self.indir
+                )
             )
-        )
+        else:
+            hit = glob.glob(
+                "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json".format(
+                    self.indir
+                )
+            )
         if len(hit) == 1:
             hit = hit[0]
             try:
