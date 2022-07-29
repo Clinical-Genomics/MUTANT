@@ -150,6 +150,15 @@ profiles {
                 withName:versions {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
+                withName:pangoversions {
+                    container = "file:///${baseDir}/artic-ncov2019-pangolin.sif"
+                }
+                withName:fastqcNanopore {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:multiqcNanopore {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
                 withName:articDownloadScheme {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
@@ -174,22 +183,107 @@ profiles {
                 withName:pangolinTyping {
                     container = "file:///${baseDir}/artic-ncov2019-pangolin.sif"
                 }
+                withName:makeReport {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:nextclade {
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
                 withName:typeVariants {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
                 withName:mergeTypingCSVs {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
-                withName:fastqcNanopore {
+                withName:getVariantDefinitions {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
-                withName:multiqcNanopore {
+                withName:bamToCram {
                     container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
+                }
+                withName:pycoqc {
+                    container = "file:///${baseDir}/pycoqc.sif"
                 }
             }
         }
-        else if (params.illumina) {
-            process.container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+        else if ( params.illumina ) {
+            process {
+                withName:articDownloadScheme {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:indexReference {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:versions {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:pangoversions {
+                    container = "file:///${baseDir}/artic-ncov2019-pangolin.sif"
+                }
+                withName:fastqc {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:readTrimming {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:readMapping {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:flagStat {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:trimPrimerSequences {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:depth {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:callConsensusFreebayes {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:annotationVEP {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:callVariants {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:makeConsensus {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:makeQCCSV {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:writeQCSummaryCSV {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:statsCoverage {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:statsInsert {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:statsAlignment {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:multiqc {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:collateSamples {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:pangolinTyping {
+                    container = "file:///${baseDir}/artic-ncov2019-pangolin.sif"
+                }
+                withName:nextclade {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:getVariantDefinitions {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+                withName:makeReport {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
+            }
         }
         // Temporary directories
         if (params.cache) {
