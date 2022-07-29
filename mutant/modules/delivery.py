@@ -38,7 +38,7 @@ class DeliverySC2:
         return sampleid_to_barcode
 
     def translate_basename_to_nanopore_format(self, sampleid_to_barcode: dict) -> dict:
-        illunmina_to_nanopore_base = {}
+        illumina_to_nanopore_base = {}
         for sampleinfo in self.caseinfo:
             illumina_base = "{0}_{1}_{2}".format(
                 sampleinfo["region_code"],
@@ -50,17 +50,16 @@ class DeliverySC2:
                 self.timestamp,
                 sampleid_to_barcode[sampleinfo["Customer_ID_sample"]],
             )
-            illunmina_to_nanopore_base[illumina_base] = nanopore_base
-        return illunmina_to_nanopore_base
+            illumina_to_nanopore_base[illumina_base] = nanopore_base
+        return illumina_to_nanopore_base
 
     def rename_deliverables(self):
         """Rename result files for delivery: fastq, consensus files, vcf and pangolin"""
 
-        sampleid_to_barcode = {}
-        illunmina_to_nanopore_base = {}
+        illumina_to_nanopore_base = {}
         if self.nanopore:
             sampleid_to_barcode = self.map_sampleid_to_barcode()
-            illunmina_to_nanopore_base: dict = (
+            illumina_to_nanopore_base: dict = (
                 self.translate_basename_to_nanopore_format(
                     sampleid_to_barcode=sampleid_to_barcode
                 )
@@ -93,7 +92,7 @@ class DeliverySC2:
                     self.indir
                 )
                 consensus_files = "{0}/{1}.consensus.fasta".format(
-                    consensus_path, illunmina_to_nanopore_base[base_sample]
+                    consensus_path, illumina_to_nanopore_base[base_sample]
                 )
             else:
                 consensus_path = (
@@ -119,7 +118,7 @@ class DeliverySC2:
                     self.indir
                 )
                 vcf_files = "{0}/{1}.csq.vcf".format(
-                    vcf_path, illunmina_to_nanopore_base[base_sample]
+                    vcf_path, illumina_to_nanopore_base[base_sample]
                 )
             else:
                 vcf_path = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(
