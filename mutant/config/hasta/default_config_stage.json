@@ -283,6 +283,9 @@ profiles {
                 withName:makeReport {
                     container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
                 }
+                withName:typeVariants {
+                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                }
             }
         }
         // Temporary directories
