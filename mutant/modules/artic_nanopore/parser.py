@@ -139,11 +139,11 @@ def get_pangolin_type(raw_pangolin_result: str) -> str:
     return lineage
 
 
-def get_pangoLEARN_version(raw_pangolin_result: str) -> str:
-    """Return the pangoLEARN_version of a sample"""
+def get_pango_version(raw_pangolin_result: str) -> str:
+    """Return version of the lineage predictor used in pangolin"""
     split_on_comma = raw_pangolin_result.split(",")
-    pango_learn_version = split_on_comma[9]
-    return pango_learn_version
+    pango_version = split_on_comma[8]
+    return pango_version
 
 
 def identify_classifications() -> dict:
@@ -166,10 +166,10 @@ def parse_pangolin(results: dict, barcode_to_sampleid: dict, resdir: str) -> dic
         )
         pangolin_type: str = get_pangolin_type(raw_pangolin_result=second_line)
         results[cust_sample_id]["pangolin_type"] = pangolin_type
-        pangoLEARN_version: str = get_pangoLEARN_version(
+        pango_version: str = get_pango_version(
             raw_pangolin_result=second_line
         )
-        results[cust_sample_id]["pangolearn_version"] = pangoLEARN_version
+        results[cust_sample_id]["pangolin_data_version"] = pango_version
         voc_strains: dict = identify_classifications()
         if pangolin_type in voc_strains["lineage"]:
             index = voc_strains["lineage"].index(pangolin_type)

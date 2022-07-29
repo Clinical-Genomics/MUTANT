@@ -12,9 +12,9 @@ from mutant import version, log, WD, TIMESTAMP
 from mutant.modules.artic_illumina.start import RunSC2
 from mutant.modules.artic_nanopore.reformat import reformat_fastq_folder
 from mutant.modules.artic_nanopore.report import ReportPrinterNanopore
+from mutant.modules.delivery import DeliverySC2
 from mutant.modules.generic_parser import get_json
 from mutant.modules.artic_illumina.report import ReportSC2
-from mutant.modules.artic_illumina.delivery import DeliverySC2
 
 
 @click.group()
@@ -90,6 +90,7 @@ def sarscov2(
         WD=WD,
     )
 
+    barcode_to_sampleid = {}
     resdir = run.get_results_dir(config_mutant, outdir)
     if nanopore:
         barcode_to_sampleid: dict = reformat_fastq_folder(
@@ -119,14 +120,17 @@ def sarscov2(
             )
             report.create_all_files()
 
-        # Deliverables
-        if config_case != "":
-            delivery = DeliverySC2(
-                caseinfo=config_case,
-                indir=os.path.abspath(resdir),
-            )
+    # Deliverables
+    if config_case != "":
+        delivery = DeliverySC2(
+            caseinfo=config_case,
+            indir=os.path.abspath(resdir),
+            nanopore=nanopore,
+            timestamp=TIMESTAMP,
+            barcode_to_sampleid=barcode_to_sampleid,
+        )
 
-            delivery.rename_deliverables()
+        delivery.rename_deliverables()
 
 
 @analyse.command()
