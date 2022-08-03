@@ -266,7 +266,7 @@ profiles {
                     container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
                 }
                 withName:multiqc {
-                    container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
+                    container = "file:///${baseDir}/artic-ncov2019-nanopore.sif"
                 }
                 withName:collateSamples {
                     container = "file:///${baseDir}/artic-ncov2019-illumina.sif"
