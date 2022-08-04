@@ -166,9 +166,7 @@ def parse_pangolin(results: dict, barcode_to_sampleid: dict, resdir: str) -> dic
         )
         pangolin_type: str = get_pangolin_type(raw_pangolin_result=second_line)
         results[cust_sample_id]["pangolin_type"] = pangolin_type
-        pango_version: str = get_pango_version(
-            raw_pangolin_result=second_line
-        )
+        pango_version: str = get_pango_version(raw_pangolin_result=second_line)
         results[cust_sample_id]["pangolin_data_version"] = pango_version
         voc_strains: dict = identify_classifications()
         if pangolin_type in voc_strains["lineage"]:
