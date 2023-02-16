@@ -11,6 +11,10 @@ import re
 import yaml
 import json
 from datetime import date
+from typing import List
+from pathlib import Path
+from mutant.constants.artic import NEXTCLADE_HEADER, ILLUMINA_FILES_CASE
+from mutant.modules.artic_illumina.parser import parse_nextclade_files
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
     read_filelines,
@@ -73,6 +77,7 @@ class ReportSC2:
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
         self.create_instrument_properties()
+        self.create_nextclade_summary_file()
 
     def load_lookup_dict(self):
         """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
@@ -346,3 +351,22 @@ class ReportSC2:
             "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
         ) as outfile:
             json.dump(self.articdata, outfile)
+
+    def create_nextclade_summary_file(self):
+        """
+        Function to write the new nextclade file
+        """
+        nextclade_content = parse_nextclade_files(result_dir=self.indir)
+
+        file_path = Path(ILLUMINA_FILES_CASE["nextclade_file"].format(resdir=self.indir))
+        with file_path.open('+w') as fp:
+            header_to_string = ''
+            for elem in NEXTCLADE_HEADER:
+                header_to_string += f"{elem}\t"
+            fp.write(header_to_string + '\n')
+
+            for content in nextclade_content:
+                content_list: List[str] = []
+                for elem in NEXTCLADE_HEADER:
+                    content_list.append(content[elem])
+                fp.write('\t'.join(content_list) + '\n')

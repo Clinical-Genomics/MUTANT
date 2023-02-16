@@ -7,8 +7,10 @@ import pandas
 import glob
 import csv
 import re
+from pathlib import Path
+from typing import Dict, List
 from mutant import WD
-from mutant.constants.artic import MULTIQC_TO_VOGUE
+from mutant.constants.artic import MULTIQC_TO_VOGUE, NEXTCLADE_HEADER
 from mutant.modules.generic_parser import append_dict, parse_classifications
 
 
@@ -228,3 +230,81 @@ def get_artic_results(indir) -> dict:
                 # Add variant class
                 artic_data[sample].update({"VOC": voc_strains["class"][index]})
     return artic_data
+
+
+# Concatenation of nextclade files
+
+
+class NextcladeHeaderError(Exception):
+    """
+    Is raised when a file in a batch does not contain all headers for wanted values or if they are in wrong order
+    """
+
+
+def check_nextclade_header(
+    header_index: Dict[str, int], nextclade_header: List[str]
+) -> None:
+    """
+    Function to check if all headers are actually in the files
+    """
+    # check if header contains the needed headers in nextclade_header and save to list
+    number_of_matches = 0
+    for elem in nextclade_header:
+        if elem in header_index.keys():
+            number_of_matches += 1
+
+    if number_of_matches != len(nextclade_header):
+        message = f"Header error: a file in this batch does not contain all headers for wanted values or the headers are in wrong order"
+        raise NextcladeHeaderError(message)
+
+
+def parse_nextclade_files(result_dir: str) -> List[dict]:
+    """
+    Function to iterate over all files in ncovIllumina_sequenceAnalysis_nextclade directory
+    """
+    nextclade_results: Path = Path(
+        result_dir, "ncovIllumina_sequenceAnalysis_nextclade"
+    )
+    nextclade_content: List[dict] = []
+    for nextclade_filename in nextclade_results.iterdir():
+        # checking if it is a file
+        if nextclade_filename.is_file():
+            nextclade_content.append(
+                parse_nextclade_content(nextclade_filename=nextclade_filename)
+            )
+    return nextclade_content
+
+
+def get_nextclade_header(header_line: str) -> Dict[str, int]:
+    split_header = header_line.split("\t")
+    header_index: Dict[str, int] = {}
+    counter = 0
+    for column in split_header:
+        header_index[column] = counter
+        counter += 1
+    return header_index
+
+
+def parse_nextclade_content(nextclade_filename: Path) -> Dict[str, str]:
+    """
+    Function to save nextclade values to string
+    """
+    with nextclade_filename.open("r") as nf:
+        header_line: str = nf.readline()
+        header_index: Dict[str, int] = get_nextclade_header(header_line=header_line)
+
+        # raise data error if header is not as nextclade_header
+        check_nextclade_header(
+            header_index=header_index, nextclade_header=NEXTCLADE_HEADER
+        )
+
+        # get all values on second line
+        value_list = nf.readline().split("\t")
+
+        # save the values corresponding to header
+        header_and_values_dict: Dict[str, str] = {}
+        for column, position in header_index.items():
+            header_and_values_dict[column] = (
+                value_list[position] if value_list[position] else "-"
+            )
+    return header_and_values_dict

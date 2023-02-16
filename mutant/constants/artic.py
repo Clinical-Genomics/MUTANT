@@ -7,6 +7,7 @@ ILLUMINA_FILES_CASE = {
     "vogue-metrics": "{resdir}/{case}_metrics_deliverables.yaml",
     "results-file": "{resdir}/sars-cov-2_{ticket}_results.csv",
     "versions-file": "{resdir}/ncovIllumina_sequenceAnalysis_versions/*_versions.csv",
+    "nextclade_file": "{resdir}/ncovIllumina_sequenceAnalysis_nextclade/nextclade_summary.csv",
 }
 
 # GMS-Artic and MUTANT output files for Nanopore
@@ -64,3 +65,6 @@ MULTIQC_TO_VOGUE = {
         },
     },
 }
+
+# Header for nextclade concatenation file
+NEXTCLADE_HEADER = ["seqName","clade","Nextclade_pango","partiallyAliased"]

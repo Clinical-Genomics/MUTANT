@@ -63,7 +63,6 @@ def sarscov2(
     profiles,
     nanopore,
 ):
-
     if not config_case:
         log.debug("No case config given, mutant needs a case config to run analysis")
 
@@ -245,3 +244,32 @@ def create_images(ctx):
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
     os.chdir(bdir)
+
+
+@root.group()
+@click.pass_context
+def report(ctx):
+    pass
+
+
+@report.command(name="sarscov2")
+@click.argument("input_folder")
+@click.option(
+    "--config_artic",
+    help="Custom artic configuration file",
+)
+@click.option("--config_case", help="Provided config for the case")
+@click.option("--result_dir", help="The result directory for the case")
+@click.pass_context
+def sarscov2_report(
+    ctx, input_folder: str, config_artic: str, config_case: str, result_dir: str
+):
+    """# Generate all sarscov2 output files"""
+    report = ReportSC2(
+        caseinfo=config_case,
+        indir=os.path.abspath(result_dir),
+        fastq_dir=os.path.abspath(input_folder),
+        config_artic=config_artic,
+        timestamp=TIMESTAMP,
+    )
+    report.create_all_files()
