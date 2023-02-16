@@ -67,4 +67,11 @@ MULTIQC_TO_VOGUE = {
 }
 
 # Header for nextclade concatenation file
-NEXTCLADE_HEADER = ["seqName","clade","Nextclade_pango","partiallyAliased"]
+NEXTCLADE_HEADER = [
+    "seqName",
+    "clade",
+    "Nextclade_pango",
+    "partiallyAliased",
+    "immune_escape",
+    "ace2_binding",
+]
