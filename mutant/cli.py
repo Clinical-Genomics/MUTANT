@@ -264,7 +264,7 @@ def report(ctx):
 def sarscov2_report(
     ctx, input_folder: str, config_artic: str, config_case: str, result_dir: str
 ):
-    """# Generate all sarscov2 output files"""
+    """Generate all sarscov2 output files"""
     report = ReportSC2(
         caseinfo=config_case,
         indir=os.path.abspath(result_dir),
