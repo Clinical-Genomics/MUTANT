@@ -253,22 +253,22 @@ def report(ctx):
 
 
 @report.command(name="sarscov2")
-@click.argument("input_folder")
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
 )
 @click.option("--config_case", help="Provided config for the case")
+@click.option("--fastq_dir", help="The fastq directory of the case")
 @click.option("--result_dir", help="The result directory for the case")
 @click.pass_context
 def sarscov2_report(
-    ctx, input_folder: str, config_artic: str, config_case: str, result_dir: str
+    ctx, config_artic: str, config_case: str, fastq_dir: str, result_dir: str
 ):
     """Generate all sarscov2 output files"""
     report = ReportSC2(
         caseinfo=config_case,
         indir=os.path.abspath(result_dir),
-        fastq_dir=os.path.abspath(input_folder),
+        fastq_dir=os.path.abspath(fastq_dir),
         config_artic=config_artic,
         timestamp=TIMESTAMP,
     )
