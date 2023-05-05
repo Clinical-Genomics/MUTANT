@@ -32,9 +32,7 @@ def get_data_from_config(parsed_config: dict) -> dict:
     for sample in parsed_config:
         cust_sample_id = sample["Customer_ID_sample"]
         data_to_report[cust_sample_id] = {}
-        data_to_report[cust_sample_id]["selection_criteria"] = sample[
-            "selection_criteria"
-        ]
+        data_to_report[cust_sample_id]["selection_criteria"] = sample["selection_criteria"]
         data_to_report[cust_sample_id]["region_code"] = sample["region_code"]
     return data_to_report
 
@@ -54,9 +52,7 @@ def get_fraction_n(input_file: str) -> float:
 
 def parse_assembly(results: dict, resdir: str, barcode_to_sampleid: dict) -> dict:
     """Collects data by parsing the assembly"""
-    base_path = "/".join(
-        [resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka"]
-    )
+    base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka"])
     for filename in os.listdir(base_path):
         if filename.endswith(".consensus.fasta"):
             abs_path = os.path.join(base_path, filename)
@@ -98,34 +94,23 @@ def initiate_coverage_stats_list(file_path: str) -> list:
 
 def calculate_coverage(results: dict, resdir: str, barcode_to_sampleid: dict) -> dict:
     """Collects data for the fraction of each assembly that got 10x coverage or more"""
-    base_path = "/".join(
-        [resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/"]
-    )
+    base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/"])
     for barcode in barcode_to_sampleid:
-        coverage_files_paths: list = get_depth_files_paths(
-            barcode=barcode, base_path=base_path
-        )
-        coverage_stats: list = initiate_coverage_stats_list(
-            file_path=coverage_files_paths[0]
-        )
+        coverage_files_paths: list = get_depth_files_paths(barcode=barcode, base_path=base_path)
+        coverage_stats: list = initiate_coverage_stats_list(file_path=coverage_files_paths[0])
         with open(coverage_files_paths[1], "r") as file2:
             for line in file2:
                 stripped_line = line.strip()
                 columns: list = stripped_line.split("\t")
                 coverage_stats[int(columns[2])] += int(columns[3])
-        bases_w_10x_cov_or_more: int = count_bases_w_10x_cov_or_more(
-            coverage_stats=coverage_stats
-        )
+        bases_w_10x_cov_or_more: int = count_bases_w_10x_cov_or_more(coverage_stats=coverage_stats)
         percentage_equal_or_greater_than_10 = round(
             (bases_w_10x_cov_or_more / len(coverage_stats)) * 100, 2
         )
         results[barcode_to_sampleid[barcode]][
             "pct_10x_coverage"
         ] = percentage_equal_or_greater_than_10
-        if (
-            percentage_equal_or_greater_than_10
-            >= QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER
-        ):
+        if percentage_equal_or_greater_than_10 >= QC_PASS_THRESHOLD_COVERAGE_10X_OR_HIGHER:
             results[barcode_to_sampleid[barcode]]["qc_pass"] = "TRUE"
         else:
             results[barcode_to_sampleid[barcode]]["qc_pass"] = "FALSE"
@@ -148,16 +133,14 @@ def get_pango_version(raw_pangolin_result: str) -> str:
 
 def identify_classifications() -> dict:
     """Parse which lineages are classified as VOC/VOI etc"""
-    classifications_path = "{0}/standalone/classifications.csv".format(WD)
+    classifications_path = f"{WD}/standalone/classifications.csv"
     voc_strains: dict = parse_classifications(csv_path=classifications_path)
     return voc_strains
 
 
 def parse_pangolin(results: dict, barcode_to_sampleid: dict, resdir: str) -> dict:
     """Collect data for pangolin types"""
-    base_path = "/".join(
-        [resdir, "articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping"]
-    )
+    base_path = "/".join([resdir, "articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping"])
     for filename in os.listdir(base_path):
         abs_path = os.path.join(base_path, filename)
         second_line: str = get_line(filename=abs_path, line_index_of_interest=1)
@@ -179,7 +162,7 @@ def parse_pangolin(results: dict, barcode_to_sampleid: dict, resdir: str) -> dic
 
 def get_mutations_of_interest() -> list:
     """Collects data for mutations of interest into a list"""
-    mutations_of_interest = "{0}/standalone/spike_mutations.csv".format(WD)
+    mutations_of_interest = f"{WD}/standalone/spike_mutations.csv"
     mutations_list = []
     with open(mutations_of_interest, "r") as csv:
         next(csv)
@@ -210,9 +193,7 @@ def initiate_mutations_dict(results: dict) -> dict:
 def parse_mutations(results: dict, resdir: str, barcode_to_sampleid: dict) -> dict:
     """If a mutation of interest is present in a sample it will be added to a dict"""
     mutations_of_interest: list = get_mutations_of_interest()
-    base_path = "/".join(
-        [resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"]
-    )
+    base_path = "/".join([resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"])
     results: dict = initiate_mutations_dict(results=results)
     for filename in os.listdir(base_path):
         abs_path = os.path.join(base_path, filename)
@@ -263,9 +244,7 @@ def extract_barcode_from_variant_file(filename: str) -> str:
 
 def collect_variants(resdir: str, barcode_to_sampleid: dict) -> list:
     variants_list = []
-    base_path = "/".join(
-        [resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"]
-    )
+    base_path = "/".join([resdir, "articNcovNanopore_Genotyping_typeVariants", "variants"])
     for filename in os.listdir(base_path):
         abs_path = os.path.join(base_path, filename)
         with open(abs_path, "r") as variant_file:
@@ -273,8 +252,6 @@ def collect_variants(resdir: str, barcode_to_sampleid: dict) -> list:
             for line in variant_file:
                 barcode = extract_barcode_from_variant_file(filename=filename)
                 line_except_sampleid = line.split(",")[1] + "," + line.split(",")[2]
-                modified_line = (
-                    barcode_to_sampleid[barcode] + "," + line_except_sampleid
-                )
+                modified_line = barcode_to_sampleid[barcode] + "," + line_except_sampleid
                 variants_list.append(modified_line)
     return variants_list

@@ -12,25 +12,19 @@ from mutant.modules.generic_reporter import GenericReporter
 
 
 class ReportPrinterNanopore:
-    def __init__(
-        self, caseinfo: str, indir: str, barcode_to_sampleid: dict, config_artic: str
-    ):
+    def __init__(self, caseinfo: str, indir: str, barcode_to_sampleid: dict, config_artic: str):
         self.casefile = caseinfo
         self.caseinfo = get_sarscov2_config(self.casefile)
         self.case = self.caseinfo[0]["case_ID"]
         self.ticket = self.caseinfo[0]["Customer_ID_project"]
         self.indir = indir
-        self.fastq_dir = "{0}/../fastq".format(self.indir)
+        self.fastq_dir = f"{self.indir}/../fastq"
         self.config_artic = config_artic
         self.barcode_to_sampleid = barcode_to_sampleid
         self.consensus_path = (
-            "{0}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka".format(
-                self.indir
-            )
+            f"{self.indir}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka"
         )
-        self.consensus_target_files = "{0}/*.consensus.fasta".format(
-            self.consensus_path
-        )
+        self.consensus_target_files = f"{self.consensus_path}/*.consensus.fasta"
 
     def create_all_nanopore_files(self):
         result: dict = collect_results(
@@ -53,10 +47,8 @@ class ReportPrinterNanopore:
         generic_reporter.create_trailblazer_config()
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm(result=result)
-        generic_reporter.create_concat_consensus(
-            target_files=self.consensus_target_files
-        )
-        generic_reporter.create_deliveryfile(fastq_dir=self.fastq_dir)
+        generic_reporter.create_concat_consensus(target_files=self.consensus_target_files)
+        generic_reporter.create_delivery_metrics(fastq_dir=self.fastq_dir)
         self.create_fohm_csv(result=result)
         self.create_instrument_properties()
 
@@ -73,7 +65,7 @@ class ReportPrinterNanopore:
         """Creates a summary file for FoHMs additional info"""
         sumfile = os.path.join(
             self.indir,
-            "{}_komplettering.csv".format(self.ticket),
+            f"{self.ticket}_komplettering.csv",
         )
         with open(sumfile, "w") as out:
             summary = csv.writer(out)
@@ -126,20 +118,17 @@ class ReportPrinterNanopore:
             samples = result.keys()
             for sample in samples:
                 line_to_append = (
-                    "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10}{11}".format(
-                        sample,
-                        result[sample]["selection_criteria"],
-                        result[sample]["region_code"],
-                        self.ticket,
-                        result[sample]["fraction_n_bases"],
-                        result[sample]["pct_10x_coverage"],
-                        result[sample]["qc_pass"],
-                        result[sample]["pangolin_type"],
-                        result[sample]["pangolin_data_version"],
-                        result[sample]["voc"],
-                        result[sample]["mutations"],
-                        "\n",
-                    )
+                    f"{sample},"
+                    f"{result[sample]['selection_criteria']},"
+                    f"{result[sample]['region_code']},"
+                    f"{self.ticket},"
+                    f"{result[sample]['fraction_n_bases']},"
+                    f"{result[sample]['pct_10x_coverage']},"
+                    f"{result[sample]['qc_pass']},"
+                    f"{result[sample]['pangolin_type']},"
+                    f"{result[sample]['pangolin_data_version']},"
+                    f"{result[sample]['voc']},"
+                    f"{result[sample]['mutations']}\n"
                 )
                 file_to_append.write(line_to_append)
         file_to_append.close()
@@ -152,11 +141,9 @@ class ReportPrinterNanopore:
 
     def create_concat_pangolin(self) -> None:
         """Concatenate nanopore pangolin results"""
-        indir = "{0}/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping".format(
-            self.indir
-        )
-        concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
-        pango_csvs = glob.glob("{0}/*.pangolin.csv".format(indir))
+        indir = f"{self.indir}/articNcovNanopore_sequenceAnalysisMedaka_pangolinTyping"
+        concatfile = f"{self.indir}/{self.ticket}.pangolin.csv"
+        pango_csvs = glob.glob(f"{indir}/*.pangolin.csv")
 
         header = read_filelines(pango_csvs[0])[0]
         with open(concatfile, "w") as concat:
@@ -166,9 +153,7 @@ class ReportPrinterNanopore:
                 data: list = read_filelines(csv)[1:]
                 for line in data:
                     split_on_comma = line.split(",")
-                    barcode = self.extract_barcode_from_pangolin_csv(
-                        line=split_on_comma[0]
-                    )
+                    barcode = self.extract_barcode_from_pangolin_csv(line=split_on_comma[0])
                     split_on_comma[0] = self.barcode_to_sampleid[barcode]
                     concatenated_line = ""
                     for section in split_on_comma:
@@ -178,9 +163,9 @@ class ReportPrinterNanopore:
 
     def create_concat_pangolin_fohm(self, result: dict) -> None:
         """Prints concatenated pangolin csv for samples passing QC"""
-        concatenated_pangolin = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
-        pango_fohm = "{0}/{1}_{2}_pangolin_classification_format4.txt".format(
-            self.indir, self.ticket, str(date.today())
+        concatenated_pangolin = f"{self.indir}/{self.ticket}.pangolin.csv"
+        pango_fohm = (
+            f"{self.indir}/{self.ticket}_{date.today()}_pangolin_classification_format4.txt"
         )
         with open(concatenated_pangolin) as f:
             lines = f.readlines()

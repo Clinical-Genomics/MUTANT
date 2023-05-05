@@ -120,6 +120,7 @@ def get_artic_results(indir) -> dict:
 
     artic_data = dict()
     var_all = dict()
+    
     var_voc = dict()
 
     # Files of interest. ONLY ADD TO END OF THIS LIST
