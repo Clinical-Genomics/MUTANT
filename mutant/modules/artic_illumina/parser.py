@@ -111,16 +111,16 @@ def get_artic_results(indir) -> dict:
     """Parse artic output directory for analysis results. Returns dictionary data object"""
 
     voc_pos = range(475, 486)
-    muts = pandas.read_csv("{0}/standalone/spike_mutations.csv".format(WD), sep=",")
+    muts = pandas.read_csv(f"{WD}/standalone/spike_mutations.csv")
     # Magical unpacking into single list
     voc_pos_aa = sum(muts.values.tolist(), [])
 
-    classifications_path = "{0}/standalone/classifications.csv".format(WD)
+    classifications_path = f"{WD}/standalone/classifications.csv"
     voc_strains: dict = parse_classifications(csv_path=classifications_path)
 
     artic_data = dict()
     var_all = dict()
-    
+
     var_voc = dict()
 
     # Files of interest. ONLY ADD TO END OF THIS LIST
@@ -135,12 +135,10 @@ def get_artic_results(indir) -> dict:
             if len(hits) == 0:
                 raise Exception("File not found")
             if len(hits) > 1:
-                print(
-                    "Multiple hits for {0}/{1}, picking {2}".format(indir, f, hits[0])
-                )
+                print(f"Multiple hits for {indir}/{f}, picking {hits[0]}")
             paths.append(hits[0])
         except Exception as e:
-            print("Unable to find {0} in {1} ({2})".format(f, indir, e))
+            print(f"Unable to find {f} in {indir} ({e})")
             sys.exit(-1)
 
     # Parse qc report data
@@ -176,8 +174,8 @@ def get_artic_results(indir) -> dict:
                 append_dict(var_all, sample, variant)
 
     # Parse Pangolin report data
-    pangodir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(indir)
-    pangolins = glob.glob("{0}/*.pangolin.csv".format(pangodir))
+    pangodir = f"{indir}/ncovIllumina_sequenceAnalysis_pangolinTyping"
+    pangolins = glob.glob(f"{pangodir}/*.pangolin.csv")
     for path in pangolins:
         with open(path) as f:
             content = csv.reader(f)
@@ -242,9 +240,7 @@ class NextcladeHeaderError(Exception):
     """
 
 
-def check_nextclade_header(
-    header_index: Dict[str, int], nextclade_header: List[str]
-) -> None:
+def check_nextclade_header(header_index: Dict[str, int], nextclade_header: List[str]) -> None:
     """
     Function to check if all headers are actually in the files
     """
@@ -255,7 +251,7 @@ def check_nextclade_header(
             number_of_matches += 1
 
     if number_of_matches != len(nextclade_header):
-        message = f"Header error: a file in this batch does not contain all headers for wanted values or the headers are in wrong order"
+        message = "Header error: a file in this batch does not contain all headers for wanted values or the headers are in wrong order"
         raise NextcladeHeaderError(message)
 
 
@@ -263,16 +259,12 @@ def parse_nextclade_files(result_dir: str) -> List[dict]:
     """
     Function to iterate over all files in ncovIllumina_sequenceAnalysis_nextclade directory
     """
-    nextclade_results: Path = Path(
-        result_dir, "ncovIllumina_sequenceAnalysis_nextclade"
-    )
+    nextclade_results: Path = Path(result_dir, "ncovIllumina_sequenceAnalysis_nextclade")
     nextclade_content: List[dict] = []
     for nextclade_filename in nextclade_results.iterdir():
         # checking if it is a file
         if nextclade_filename.is_file():
-            nextclade_content.append(
-                parse_nextclade_content(nextclade_filename=nextclade_filename)
-            )
+            nextclade_content.append(parse_nextclade_content(nextclade_filename=nextclade_filename))
     return nextclade_content
 
 
@@ -295,9 +287,7 @@ def parse_nextclade_content(nextclade_filename: Path) -> Dict[str, str]:
         header_index: Dict[str, int] = get_nextclade_header(header_line=header_line)
 
         # raise data error if header is not as nextclade_header
-        check_nextclade_header(
-            header_index=header_index, nextclade_header=NEXTCLADE_HEADER
-        )
+        check_nextclade_header(header_index=header_index, nextclade_header=NEXTCLADE_HEADER)
 
         # get all values on second line
         value_list = nf.readline().split("\t")
@@ -305,7 +295,5 @@ def parse_nextclade_content(nextclade_filename: Path) -> Dict[str, str]:
         # save the values corresponding to header
         header_and_values_dict: Dict[str, str] = {}
         for column, position in header_index.items():
-            header_and_values_dict[column] = (
-                value_list[position] if value_list[position] else "-"
-            )
+            header_and_values_dict[column] = value_list[position] if value_list[position] else "-"
     return header_and_values_dict
