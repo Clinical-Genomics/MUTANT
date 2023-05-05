@@ -42,9 +42,7 @@ def get_json(config) -> dict:
             with open(config) as json_file:
                 data = json.load(json_file)
         except Exception as e:
-            click.echo(
-                f"Unable to read provided json file: {config}. Exiting.."
-            )
+            click.echo(f"Unable to read provided json file: {config}. Exiting..")
             click.echo(e)
             sys.exit(-1)
     else:
