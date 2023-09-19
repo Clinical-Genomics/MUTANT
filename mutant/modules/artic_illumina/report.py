@@ -1,7 +1,5 @@
 """ This class creates reports. Specifically it acts on the sarscov2 pipeline,
     and creates report files for Clinical Genomics Infrastructure
-
-    By: Isak Sylvin & Tanja Normark
 """
 import os
 import sys
@@ -188,7 +186,7 @@ class ReportSC2:
 
         sumfile = os.path.join(
             self.indir,
-            "{}_komplettering.csv".format(self.ticket),
+            f"{self.ticket}_komplettering.csv",
         )
         with open(sumfile, "w") as out:
             summary = csv.writer(out)

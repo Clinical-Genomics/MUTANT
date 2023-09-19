@@ -1,8 +1,5 @@
 """ This class modifies existing files to fit the Clinical Genomics infrastructure.
     Specifically it acts on the sarscov2 pipeline.
-
-    By: Isak Sylvin & Tanja Normark
-
 """
 
 import glob
@@ -88,19 +85,13 @@ class DeliverySC2:
 
             # rename makeConsensus
             if self.nanopore:
-                consensus_path = "{0}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka".format(
-                    self.indir
-                )
-                consensus_files = "{0}/{1}.consensus.fasta".format(
-                    consensus_path, illumina_to_nanopore_base[base_sample]
-                )
+                consensus_path = f"{self.indir}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka"
+                consensus_files = f"{consensus_path}/{illumina_to_nanopore_base[base_sample]}.consensus.fasta"
             else:
-                consensus_path = (
-                    "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(self.indir)
-                )
-                consensus_files = "{0}/{1}.*.fa".format(consensus_path, base_sample)
+                consensus_path = f"{self.indir}/ncovIllumina_sequenceAnalysis_makeConsensus"
+                consensus_files = f"{consensus_path}/{base_sample}.*.fa"
             for item in glob.glob(consensus_files):
-                newpath = "{0}/{1}.consensus.fasta".format(consensus_path, base_sample)
+                newpath = f"{consensus_path}/{base_sample}.consensus.fasta"
                 try:
                     with open(item, "r") as old_consensus_io:
                         with open(newpath, "w") as new_consensus_io:
@@ -114,19 +105,13 @@ class DeliverySC2:
 
             # rename typeVariants
             if self.nanopore:
-                vcf_path = "{0}/articNcovNanopore_Genotyping_typeVariants/vcf".format(
-                    self.indir
-                )
-                vcf_files = "{0}/{1}.csq.vcf".format(
-                    vcf_path, illumina_to_nanopore_base[base_sample]
-                )
+                vcf_path = f"{self.indir}/articNcovNanopore_Genotyping_typeVariants/vcf"
+                vcf_files = f"{vcf_path}/{illumina_to_nanopore_base[base_sample]}.csq.vcf"
             else:
-                vcf_path = "{0}/ncovIllumina_Genotyping_typeVariants/vcf".format(
-                    self.indir
-                )
-                vcf_files = "{0}/{1}.csq.vcf".format(vcf_path, base_sample)
+                vcf_path = f"{self.indir}/ncovIllumina_Genotyping_typeVariants/vcf"
+                vcf_files = f"{vcf_path}/{base_sample}.csq.vcf"
             for item in glob.glob(vcf_files):
-                newpath = "{0}/{1}.vcf".format(vcf_path, base_sample)
+                newpath = f"{vcf_path}/{base_sample}.vcf"
                 try:
                     os.symlink(item, newpath)
                 except Exception as e:
@@ -137,40 +122,32 @@ class DeliverySC2:
         # rename multiqc
         if self.nanopore:
             hit = glob.glob(
-                "{}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc.html".format(
-                    self.indir
-                )
+                f"{self.indir}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc.html"
             )
         else:
             hit = glob.glob(
-                "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html".format(
-                    self.indir
-                )
+                f"{self.indir}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc.html"
             )
         if len(hit) == 1:
             hit = hit[0]
             try:
-                os.symlink(hit, "{}/{}_multiqc.html".format(self.indir, self.ticket))
+                os.symlink(hit, f"{self.indir}/{self.ticket}_multiqc.html")
             except Exception as e:
                 pass
 
         # rename multiqc json
         if self.nanopore:
             hit = glob.glob(
-                "{}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc_data/multiqc_data.json".format(
-                    self.indir
-                )
+                f"{self.indir}/QCStats/articNcovNanopore_sequenceAnalysisMedaka_multiqcNanopore/*_multiqc_data/multiqc_data.json"
             )
         else:
             hit = glob.glob(
-                "{}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json".format(
-                    self.indir
-                )
+                f"{self.indir}/QCStats/ncovIllumina_sequenceAnalysis_multiqc/*_multiqc_data/multiqc_data.json"
             )
         if len(hit) == 1:
             hit = hit[0]
             try:
-                os.symlink(hit, "{}/{}_multiqc.json".format(self.indir, self.ticket))
+                os.symlink(hit, f"{self.indir}/{self.ticket}_multiqc.json")
             except Exception as e:
                 pass
 
@@ -180,10 +157,10 @@ class DeliverySC2:
             ".variant_summary.csv",
         ]
         for thing in core_suffix:
-            hit = glob.glob("{0}/*{1}".format(self.indir, thing))
+            hit = glob.glob(f"{self.indir}/*{thing}")
             if len(hit) == 1:
                 hit = hit[0]
                 try:
-                    os.symlink(hit, "{0}/{1}{2}".format(self.indir, self.ticket, thing))
+                    os.symlink(hit, f"{self.indir}/{self.ticket}{thing}")
                 except Exception as e:
                     pass

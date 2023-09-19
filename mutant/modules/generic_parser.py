@@ -71,7 +71,7 @@ def read_filelines(infile) -> list:
         with open(infile, "r") as f:
             contents = f.readlines()
     except Exception as e:
-        click.echo(f"Unable to read file: {infile}. Exiting..".format)
+        click.echo(f"Unable to read file: {infile}. Exiting..")
         click.echo(e)
         sys.exit(-1)
     return contents
