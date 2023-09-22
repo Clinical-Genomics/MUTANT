@@ -53,7 +53,7 @@ class GenericReporter:
     def create_concat_consensus(self, target_files: str) -> None:
         """Concatenate consensus files"""
 
-        concat_consensus = "{0}/{1}.consensus.fa".format(self.indir, self.ticket)
+        concat_consensus = f"{self.indir}/{self.ticket}.consensus.fa"
         concat = open(concat_consensus, "w+")
         for item in glob.glob(target_files):
             single = open(item, "r")
@@ -61,106 +61,113 @@ class GenericReporter:
             concat.write("\n")
         concat.close()
 
-    def create_deliveryfile(self, fastq_dir: str) -> None:
+    def create_delivery_metrics(self, fastq_dir: str) -> None:
         """Create deliverables file"""
 
-        deliv = {"files": []}
-        delivfile = "{}/{}_deliverables.yaml".format(self.indir, self.case)
+        deliverables = {"files": []}
+        deliverables_file = f"{self.indir}/{self.case}_deliverables.yaml"
 
-        ## Per Case
         # Instrument properties
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "txt",
                 "id": self.case,
-                "path": "{}/instrument.properties".format(self.indir),
+                "path": f"{self.indir}/instrument.properties",
                 "path_index": "~",
                 "step": "report",
                 "tag": "instrument-properties",
             }
         )
         # KS Report
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/sars-cov-2_{}_results.csv".format(self.indir, self.ticket),
+                "path": f"{self.indir}/sars-cov-2_{self.ticket}_results.csv",
                 "path_index": "~",
                 "step": "report",
                 "tag": "ks-results",
             }
         )
         # KS Aux report
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/sars-cov-2_{}_variants.csv".format(self.indir, self.ticket),
+                "path": f"{self.indir}/sars-cov-2_{self.ticket}_variants.csv",
                 "path_index": "~",
                 "step": "report",
                 "tag": "ks-aux-results",
             }
         )
         # Pangolin typing
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/{}.pangolin.csv".format(self.indir, self.ticket),
+                "path": f"{self.indir}/{self.ticket}.pangolin.csv",
                 "path_index": "~",
                 "step": "report",
                 "tag": "pangolin-typing",
             }
         )
         # Pangolin typing for FOHM (only qcpass files)
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
-                "path": "{}/{}_{}_pangolin_classification_format4.txt".format(
-                    self.indir, self.ticket, str(date.today())
-                ),
+                "path": f"{self.indir}/{self.ticket}_{date.today()}_pangolin_classification_format4.txt",
                 "path_index": "~",
                 "step": "report",
                 "tag": "pangolin-typing-fohm",
             }
         )
         # Consensus file
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "fasta",
                 "id": self.case,
-                "path": "{}/{}.consensus.fa".format(self.indir, self.ticket),
+                "path": f"{self.indir}/{self.ticket}.consensus.fa",
                 "path_index": "~",
                 "step": "analysis",
                 "tag": "consensus",
             }
         )
         # Multiqc report
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "html",
                 "id": self.case,
-                "path": "{}/{}_multiqc.html".format(self.indir, self.ticket),
+                "path": f"{self.indir}/{self.ticket}_multiqc.html",
                 "path_index": "~",
                 "step": "report",
                 "tag": "multiqc-html",
             }
         )
         # MultiQC json
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "json",
                 "id": self.case,
-                "path": "{}/{}_multiqc.json".format(self.indir, self.ticket),
+                "path": f"{self.indir}/{self.ticket}_multiqc.json",
                 "path_index": "~",
                 "step": "report",
                 "tag": "multiqc-json",
             }
         )
+        deliverables["files"].append(
+            {
+                "format": "csv",
+                "id": self.case,
+                "path": f"{self.indir}/nextclade_summary.csv",
+                "path_index": "~",
+                "step": "report",
+                "tag": "nextclade-summary",
+            }
+        )
         if not self.nanopore:
             # Artic yaml (Vogue) data
-            deliv["files"].append(
+            deliverables["files"].append(
                 {
                     "format": "yaml",
                     "id": self.case,
@@ -171,7 +178,7 @@ class GenericReporter:
                 }
             )
         # Provided CG CASE info from StatusDB
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "json",
                 "id": self.case,
@@ -182,7 +189,7 @@ class GenericReporter:
             }
         )
         # Input settings dump
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "txt",
                 "id": self.case,
@@ -193,7 +200,7 @@ class GenericReporter:
             }
         )
         # Software versions
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
@@ -204,23 +211,23 @@ class GenericReporter:
             }
         )
         # Execution log
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "txt",
                 "id": self.case,
-                "path": "{}/nextflow.log".format(self.indir),
+                "path": f"{self.indir}/nextflow.log",
                 "path_index": "~",
                 "step": "runinfo",
                 "tag": "logfile",
             }
         )
         # FoHM delivery file
-        deliv["files"].append(
+        deliverables["files"].append(
             {
                 "format": "csv",
                 "id": self.case,
                 "path": os.path.join(
-                    self.indir, "{}_komplettering.csv".format(self.ticket)
+                    self.indir, f"{self.ticket}_komplettering.csv"
                 ),
                 "path_index": "~",
                 "step": "report",
@@ -234,42 +241,36 @@ class GenericReporter:
             sample = record["Customer_ID_sample"]
             region = record["region_code"]
             lab = record["lab_code"]
-            base_sample = "{0}_{1}_{2}".format(region, lab, sample)
+            base_sample = f"{region}_{lab}_{sample}"
             if self.nanopore:
                 # Concat reads forwards
-                deliv["files"].append(
+                deliverables["files"].append(
                     {
                         "format": "fastq",
                         "id": sampleID,
-                        "path": "{0}/{1}/{2}_1.fastq.gz".format(
-                            fastq_dir, sample, base_sample
-                        ),
+                        "path": f"{fastq_dir}/{sample}/{base_sample}_1.fastq.gz",
                         "path_index": "~",
                         "step": "concatination",
                         "tag": "forward-reads",
                     }
                 )
                 # Variants (vcf)
-                deliv["files"].append(
+                deliverables["files"].append(
                     {
                         "format": "vcf",
                         "id": sampleID,
-                        "path": "{}/articNcovNanopore_Genotyping_typeVariants/vcf/{}.vcf".format(
-                            self.indir, base_sample
-                        ),
+                        "path": f"{self.indir}/articNcovNanopore_Genotyping_typeVariants/vcf/{base_sample}.vcf",
                         "path_index": "~",
                         "step": "genotyping",
                         "tag": "vcf-covid",
                     }
                 )
                 # Single-file fasta
-                deliv["files"].append(
+                deliverables["files"].append(
                     {
                         "format": "fasta",
                         "id": sampleID,
-                        "path": "{}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/{}.consensus.fasta".format(
-                            self.indir, base_sample
-                        ),
+                        "path": f"{self.indir}/articNcovNanopore_sequenceAnalysisMedaka_articMinIONMedaka/{base_sample}.consensus.fasta",
                         "path_index": "~",
                         "step": "consensus",
                         "tag": "consensus-sample",
@@ -279,52 +280,50 @@ class GenericReporter:
                 if not record["sequencing_qc_pass"]:
                     continue
                 # Concat reads forwards
-                deliv["files"].append(
+                deliverables["files"].append(
                     {
                         "format": "fastq",
                         "id": sampleID,
-                        "path": "{0}/{1}_1.fastq.gz".format(fastq_dir, base_sample),
+                        "path": f"{fastq_dir}/{base_sample}_1.fastq.gz",
                         "path_index": "~",
                         "step": "concatination",
                         "tag": "forward-reads",
                     }
                 )
                 # Concat reads reverse
-                deliv["files"].append(
+                deliverables["files"].append(
                     {
                         "format": "fastq",
                         "id": sampleID,
-                        "path": "{0}/{1}_2.fastq.gz".format(fastq_dir, base_sample),
+                        "path": f"{fastq_dir}/{base_sample}_2.fastq.gz",
                         "path_index": "~",
                         "step": "concatination",
                         "tag": "reverse-reads",
                     }
                 )
                 # Variants (vcf)
-                deliv["files"].append(
+                deliverables["files"].append(
                     {
                         "format": "vcf",
                         "id": sampleID,
-                        "path": "{}/ncovIllumina_Genotyping_typeVariants/vcf/{}.vcf".format(
-                            self.indir, base_sample
-                        ),
+                        "path": f"{self.indir}/ncovIllumina_Genotyping_typeVariants/vcf/{base_sample}.vcf",
                         "path_index": "~",
                         "step": "genotyping",
                         "tag": "vcf-covid",
                     }
                 )
                 # Single-file fasta
-                deliv["files"].append(
+                deliverables["files"].append(
                     {
                         "format": "fasta",
                         "id": sampleID,
-                        "path": "{}/ncovIllumina_sequenceAnalysis_makeConsensus/{}.consensus.fasta".format(
-                            self.indir, base_sample
+                        "path": (
+                            f"{self.indir}/ncovIllumina_sequenceAnalysis_makeConsensus/{base_sample}.consensus.fasta"
                         ),
                         "path_index": "~",
                         "step": "consensus",
                         "tag": "consensus-sample",
                     }
                 )
-        with open(delivfile, "w") as out:
-            yaml.dump(deliv, out)
+        with open(deliverables_file, "w") as out:
+            yaml.dump(deliverables, out)

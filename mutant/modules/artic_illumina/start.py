@@ -2,18 +2,13 @@
     and creates a deliverables file for Clinical Genomics Infrastructure"""
 
 import os
-import sys
-import click
-import json
 import subprocess
-from mutant import version, log
+from mutant import log
 from mutant.modules.generic_parser import get_json
 
 
 class RunSC2:
-    def __init__(
-        self, input_folder, caseID, prefix, profiles, timestamp, WD, config_artic=""
-    ):
+    def __init__(self, input_folder, caseID, prefix, profiles, timestamp, WD, config_artic=""):
         self.fastq = input_folder
         self.timestamp = timestamp
         self.WD = WD
@@ -23,7 +18,6 @@ class RunSC2:
         self.profiles = profiles
 
     def get_results_dir(self, config, outdir):
-
         """Return result output directory"""
 
         if outdir != "":
@@ -33,7 +27,7 @@ class RunSC2:
             resdir = os.path.abspath(
                 os.path.join(
                     general_config["SARS-CoV-2"]["folders"]["results"],
-                    "{}_{}".format(self.case, self.timestamp),
+                    f"{self.case}_{self.timestamp}",
                 )
             )
         else:
@@ -41,40 +35,29 @@ class RunSC2:
         return resdir
 
     def run_case(self, resdir, nanopore):
-
         """Run SARS-CoV-2 analysis"""
 
-        resultsline = "--outdir {}".format(resdir)
-        workline = "-work-dir {}".format(os.path.join(resdir, "work"))
+        resultsline = f"--outdir {resdir}"
+        workline = f"-work-dir {os.path.join(resdir, 'work')}"
         nflog = os.path.join(resdir, "nextflow.log")
         confline = ""
         if self.config_artic != "":
-            confline = "-C {0}".format(self.config_artic)
+            confline = f"-C {self.config_artic}"
 
         if nanopore:
-            cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --medaka --prefix {5} --basecalled_fastq {6} {7}".format(
-                confline,
-                nflog,
-                workline,
-                self.WD,
-                self.profiles,
-                self.prefix,
-                self.fastq,
-                resultsline,
+            cmd = (
+                f"nextflow {confline} -log {nflog} run {workline} "
+                f"{self.WD}/externals/gms-artic/main.nf -profile {self.profiles} --medaka "
+                f"--prefix {self.prefix} --basecalled_fastq {self.fastq} {resultsline}"
             )
         else:
-            cmd = "nextflow {0} -log {1} run {2} {3}/externals/gms-artic/main.nf -profile {4} --illumina --prefix {5} --directory {6} {7}".format(
-                confline,
-                nflog,
-                workline,
-                self.WD,
-                self.profiles,
-                self.prefix,
-                self.fastq,
-                resultsline,
+            cmd = (
+                f"nextflow {confline} -log {nflog} run {workline} "
+                f"{self.WD}/externals/gms-artic/main.nf -profile {self.profiles} --illumina "
+                f"--prefix {self.prefix} --directory {self.fastq} {resultsline}"
             )
 
-        log.debug("Command ran: {}".format(cmd))
+        log.debug(f"Command ran: {cmd}")
         proc = subprocess.Popen(cmd.split())
         out, err = proc.communicate()
         log.info(out)

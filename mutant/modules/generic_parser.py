@@ -42,13 +42,11 @@ def get_json(config) -> dict:
             with open(config) as json_file:
                 data = json.load(json_file)
         except Exception as e:
-            click.echo(
-                "Unable to read provided json file: {}. Exiting..".format(config)
-            )
+            click.echo(f"Unable to read provided json file: {config}. Exiting..")
             click.echo(e)
             sys.exit(-1)
     else:
-        click.echo("Could not find supplied config: {}. Exiting..".format(config))
+        click.echo(f"Could not find supplied config: {config}. Exiting..")
         sys.exit(-1)
     return data
 
@@ -73,7 +71,7 @@ def read_filelines(infile) -> list:
         with open(infile, "r") as f:
             contents = f.readlines()
     except Exception as e:
-        click.echo("Unable to read file: {}. Exiting..".format(infile))
+        click.echo(f"Unable to read file: {infile}. Exiting..")
         click.echo(e)
         sys.exit(-1)
     return contents

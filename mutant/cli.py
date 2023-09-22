@@ -41,7 +41,7 @@ def analyse(ctx):
 @click.option(
     "--config_mutant",
     help="General configuration file for MUTANT",
-    default="{}/config/hasta/mutant.json".format(WD),
+    default=f"{WD}/config/hasta/mutant.json",
 )
 @click.option(
     "--outdir", help="Output folder to override general configutations", default=""
@@ -63,18 +63,16 @@ def sarscov2(
     profiles,
     nanopore,
 ):
-
     if not config_case:
         log.debug("No case config given, mutant needs a case config to run analysis")
 
     caseinfo = get_json(config_case)
     caseID = caseinfo[0]["case_ID"]
-    prefix = "{}_{}".format(caseID, TIMESTAMP)
+    prefix = f"{caseID}_{TIMESTAMP}"
 
     primer_json = caseinfo[0]["primer"].replace(" ", "_")
     if not config_artic:
-        primer_config = "{}/config/hasta/" + primer_json.lower() + ".json"
-        config_artic = primer_config.format(WD)
+        config_artic = f"{WD}/config/hasta/" + primer_json.lower() + ".json"
 
     if "nanopore" in primer_json.lower():
         nanopore = True
@@ -156,7 +154,7 @@ def sarscov2(ctx):
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
-    default="{}/config/hasta/default_config.json".format(WD),
+    default=f"{WD}/config/hasta/default_config.json",
 )
 @click.option("--fastq_folder", help="Sequence data folder for the case", required=True)
 @click.option("--config_case", help="Provided config for the case", required=True)
@@ -191,7 +189,7 @@ def postproc(ctx, input_folder, config_artic, fastq_folder, config_case):
 @click.option(
     "--config_artic",
     help="Custom artic configuration file",
-    default="{}/config/hasta/default_config.json".format(WD),
+    default=f"{WD}/config/hasta/default_config.json",
 )
 @click.option("--config_case", help="Provided config for the case", required=True)
 @click.pass_context
@@ -222,14 +220,10 @@ def rename(ctx, input_folder, config_artic, config_case):
 def concatenate(ctx, input_folder, app_tag, date):
     """Concatenates fastq files if needed"""
     if date:
-        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2} --date {3}".format(
-            WD, input_folder, app_tag, date
-        )
+        cmd = f"python {WD}/standalone/concatenate.py --input_folder {input_folder} --app_tag {app_tag} --date {date}"
     else:
-        cmd = "python {0}/standalone/concatenate.py --input_folder {1} --app_tag {2}".format(
-            WD, input_folder, app_tag
-        )
-    log.debug("Command ran: {}".format(cmd))
+        cmd = f"python {WD}/standalone/concatenate.py --input_folder {input_folder} --app_tag {app_tag}"
+    log.debug(f"Command ran: {cmd}")
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
 
@@ -239,9 +233,38 @@ def concatenate(ctx, input_folder, app_tag, date):
 def create_images(ctx):
     """Builds the sarscov2 pipeline images"""
     bdir = os.getcwd()
-    os.chdir("{0}/externals/gms-artic".format(WD))
+    os.chdir(f"{WD}/externals/gms-artic")
     cmd = "bash scripts/build_singularity_containers.sh && chmod 0777 *.sif"
-    log.debug("Command ran: {}".format(cmd))
+    log.debug(f"Command ran: {cmd}")
     proc = subprocess.Popen(cmd.split())
     out, err = proc.communicate()
     os.chdir(bdir)
+
+
+@root.group()
+@click.pass_context
+def report(ctx):
+    pass
+
+
+@report.command(name="sarscov2")
+@click.option(
+    "--config_artic",
+    help="Custom artic configuration file",
+)
+@click.option("--config_case", help="Provided config for the case")
+@click.option("--fastq_dir", help="The fastq directory of the case")
+@click.option("--result_dir", help="The result directory for the case")
+@click.pass_context
+def sarscov2_report(
+    ctx, config_artic: str, config_case: str, fastq_dir: str, result_dir: str
+):
+    """Generate all sarscov2 output files"""
+    report = ReportSC2(
+        caseinfo=config_case,
+        indir=os.path.abspath(result_dir),
+        fastq_dir=os.path.abspath(fastq_dir),
+        config_artic=config_artic,
+        timestamp=TIMESTAMP,
+    )
+    report.create_all_files()

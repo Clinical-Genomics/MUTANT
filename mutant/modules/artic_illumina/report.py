@@ -1,7 +1,5 @@
 """ This class creates reports. Specifically it acts on the sarscov2 pipeline,
     and creates report files for Clinical Genomics Infrastructure
-
-    By: Isak Sylvin & Tanja Normark
 """
 import os
 import sys
@@ -11,6 +9,10 @@ import re
 import yaml
 import json
 from datetime import date
+from typing import List
+from pathlib import Path
+from mutant.constants.artic import NEXTCLADE_HEADER, ILLUMINA_FILES_CASE
+from mutant.modules.artic_illumina.parser import parse_nextclade_files
 from mutant.modules.generic_parser import (
     get_sarscov2_config,
     read_filelines,
@@ -45,10 +47,8 @@ class ReportSC2:
         self.fastq_dir = fastq_dir
         self.filepaths = get_results_paths(self.indir, self.case, self.ticket, False)
         self.articdata = dict()
-        self.consensus_path = "{0}/ncovIllumina_sequenceAnalysis_makeConsensus".format(
-            self.indir
-        )
-        self.consensus_target_files = "{0}/*.consensus.fa".format(self.consensus_path)
+        self.consensus_path = f"{self.indir}/ncovIllumina_sequenceAnalysis_makeConsensus"
+        self.consensus_target_files = f"{self.consensus_path}/*.consensus.fa"
 
     def create_all_files(self):
         generic_reporter = GenericReporter(
@@ -63,16 +63,15 @@ class ReportSC2:
         self.create_concat_pangolin()
         self.create_concat_pangolin_fohm()
         # This works off concat pango and needs to occur after
-        generic_reporter.create_concat_consensus(
-            target_files=self.consensus_target_files
-        )
-        generic_reporter.create_deliveryfile(fastq_dir=self.fastq_dir)
+        generic_reporter.create_concat_consensus(target_files=self.consensus_target_files)
+        generic_reporter.create_delivery_metrics(fastq_dir=self.fastq_dir)
         self.create_vogue_metrics_file()
         self.create_fohm_csv()
         self.create_sarscov2_resultfile()
         self.create_sarscov2_variantfile()
         self.create_jsonfile()
         self.create_instrument_properties()
+        self.create_nextclade_summary_file()
 
     def load_lookup_dict(self):
         """Loads articdata with data from various sources. Atm, artic output and the case config input file"""
@@ -107,9 +106,7 @@ class ReportSC2:
         out_yaml = {"metrics": []}
         # Get multiqc-data
         out_yaml["metrics"].extend(
-            get_vogue_multiqc_data(
-                self.filepaths[self.case]["multiqc-json"], self.caseinfo
-            )
+            get_vogue_multiqc_data(self.filepaths[self.case]["multiqc-json"], self.caseinfo)
         )
         # Add info about failed/passed QC
         for record in self.caseinfo:
@@ -117,9 +114,7 @@ class ReportSC2:
                 sample_yaml = {
                     "header": "~",
                     "id": record["CG_ID_sample"],
-                    "input": os.path.basename(
-                        self.filepaths[self.case]["results-file"]
-                    ),
+                    "input": os.path.basename(self.filepaths[self.case]["results-file"]),
                     "name": "passed-qc",
                     "step": "QC-threshold",
                     "value": self.articdata[record["Customer_ID_sample"]]["qc"],
@@ -129,9 +124,7 @@ class ReportSC2:
                 sample_yaml = {
                     "header": "~",
                     "id": record["CG_ID_sample"],
-                    "input": os.path.basename(
-                        self.filepaths[self.case]["results-file"]
-                    ),
+                    "input": os.path.basename(self.filepaths[self.case]["results-file"]),
                     "name": "passed-qc",
                     "step": "QC-threshold",
                     "value": "FALSE",
@@ -144,9 +137,9 @@ class ReportSC2:
     def create_concat_pangolin(self):
         """Concatenate pangolin results"""
 
-        indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
-        concatfile = "{0}/{1}.pangolin.csv".format(self.indir, self.ticket)
-        pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
+        indir = f"{self.indir}/ncovIllumina_sequenceAnalysis_pangolinTyping"
+        concatfile = f"{self.indir}/{self.ticket}.pangolin.csv"
+        pangolins = glob.glob(f"{indir}/*.pangolin.csv")
         # Copy header
         header = read_filelines(pangolins[0])[0]
         with open(concatfile, "w") as concat:
@@ -156,12 +149,10 @@ class ReportSC2:
                 data = read_filelines(pango)[1:]
                 for line in data:
                     # Use sample name at taxon field
-                    taxon_regex = "(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
+                    taxon_regex = r"(\w+)_(\w+)_(\w+)_(?P<name>\w+).(\S+)"
                     sample, subs = re.subn(taxon_regex, r"\g<name>", line.split(",")[0])
                     if subs == 0:
-                        print(
-                            "Unable to rename taxon - using original: {}".format(pango)
-                        )
+                        print(f"Unable to rename taxon - using original: {pango}")
                     else:
                         line = sample + line[line.find(",") :]
                     concat.write(line)
@@ -169,11 +160,11 @@ class ReportSC2:
     def create_concat_pangolin_fohm(self):
         """Concatenate pangolin results and format for fohm"""
 
-        indir = "{0}/ncovIllumina_sequenceAnalysis_pangolinTyping".format(self.indir)
-        concatfile = "{0}/{1}_{2}_pangolin_classification_format4.txt".format(
-            self.indir, self.ticket, str(date.today())
+        indir = f"{self.indir}/ncovIllumina_sequenceAnalysis_pangolinTyping"
+        concatfile = (
+            f"{self.indir}/{self.ticket}_{str(date.today())}_pangolin_classification_format4.txt"
         )
-        pangolins = glob.glob("{0}/*.pangolin.csv".format(indir))
+        pangolins = glob.glob(f"{indir}/*.pangolin.csv")
         # Copy header
         header = read_filelines(pangolins[0])[0]
         with open(concatfile, "w") as concat:
@@ -195,7 +186,7 @@ class ReportSC2:
 
         sumfile = os.path.join(
             self.indir,
-            "{}_komplettering.csv".format(self.ticket),
+            f"{self.ticket}_komplettering.csv",
         )
         with open(sumfile, "w") as out:
             summary = csv.writer(out)
@@ -233,10 +224,10 @@ class ReportSC2:
                 ms = "INCONSISTENT"
 
         with open(propfile, "w") as prop:
-            prop.write("instrument={}\n".format(ms))
-            prop.write("plattform={}\n".format(plfrm))
-            prop.write("biblioteksmetod={}\n".format(ml))
-            prop.write("lanes={}\n".format(lanes))
+            prop.write(f"instrument={ms}\n")
+            prop.write(f"plattform={plfrm}\n")
+            prop.write(f"biblioteksmetod={ml}\n")
+            prop.write(f"lanes={lanes}\n")
 
     def create_sarscov2_resultfile(self):
         """Write summary csv report of Artic and Pangolin results"""
@@ -286,10 +277,7 @@ class ReportSC2:
                         qc_status = data["qc"]
                 if "lineage" in data:
                     lineage = data["lineage"]
-                if (
-                    "pangolin_data_version" in data
-                    and data["pangolin_data_version"] != ""
-                ):
+                if "pangolin_data_version" in data and data["pangolin_data_version"] != "":
                     verzion = data["pangolin_data_version"]
                 if "VOC" in data:
                     vocs = data["VOC"]
@@ -318,9 +306,8 @@ class ReportSC2:
 
         indir = self.indir
         ticket = self.ticket
-        today = self.today
         varRep = glob.glob(os.path.join(indir, "*variant_summary.csv"))[0]
-        varout = os.path.join(indir, "sars-cov-2_{}_variants.csv".format(ticket, today))
+        varout = os.path.join(indir, f"sars-cov-2_{ticket}_variants.csv")
         if os.stat(varRep).st_size != 0:
             with open(varRep) as f, open(varout, mode="w") as out:
                 variants = f.readlines()
@@ -333,7 +320,7 @@ class ReportSC2:
             try:
                 open(varout, "a").close()
             except Exception as e:
-                print("Failed creating file {}\n{}".format(varout, e))
+                print(f"Failed creating file {varout}\n{e}")
 
     def create_jsonfile(self):
         """Output all result data in a json format for easy parsing"""
@@ -342,7 +329,26 @@ class ReportSC2:
             print("No artic results loaded. Quitting create_jsonfile")
             sys.exit(-1)
 
-        with open(
-            "{}/{}_artic.json".format(self.indir, self.ticket, self.today), "w"
-        ) as outfile:
+        with open(f"{self.indir}/{self.ticket}_{self.today}_artic.json", "w") as outfile:
             json.dump(self.articdata, outfile)
+
+    def create_nextclade_summary_file(self):
+        """
+        Function to write the new nextclade file
+        """
+        nextclade_content = parse_nextclade_files(result_dir=self.indir)
+
+        file_path = Path(ILLUMINA_FILES_CASE["nextclade_file"].format(resdir=self.indir))
+        with file_path.open('+w') as fp:
+            header_to_string = ''
+            for elem in NEXTCLADE_HEADER:
+                header_to_string += f"{elem}\t"
+            fp.write(header_to_string + '\n')
+
+            for content in nextclade_content:
+                content_list: List[str] = []
+                for elem in NEXTCLADE_HEADER:
+                    content_list.append(content[elem])
+                samplename = content_list[0].split(".")[0].split("_")[3]
+                content_list[0] = samplename
+                fp.write('\t'.join(content_list) + '\n')
