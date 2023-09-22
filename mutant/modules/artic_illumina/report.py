@@ -349,6 +349,6 @@ class ReportSC2:
                 content_list: List[str] = []
                 for elem in NEXTCLADE_HEADER:
                     content_list.append(content[elem])
-                    samplename = content_list[0].split(".")[0].split("_")[3]
-                    content_list[0] = samplename
+                samplename = content_list[0].split(".")[0].split("_")[3]
+                content_list[0] = samplename
                 fp.write('\t'.join(content_list) + '\n')
