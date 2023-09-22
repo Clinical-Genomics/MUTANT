@@ -31,5 +31,7 @@ git submodule update
 #git submodule foreach 'git fetch origin; git checkout $(git rev-parse --abbrev-ref HEAD); git reset --hard origin/$(git rev-parse --abbrev-ref HEAD); git submodule update --recursive; git clean -dfx'
 
 # Pull latest image
-singularity pull --force /home/proj/${INSTANCE}/mutant/MUTANT/mutant/externals/gms-artic/artic-ncov2019-illumina.sif docker://genomicmedicinesweden/gms-artic-illumina:latest
+singularity pull --force /home/proj/${INSTANCE}/mutant/MUTANT/mutant/externals/gms-artic/artic-ncov2019-illumina.sif docker://genomicmedicinesweden/gms-artic-illumina:0c599b9
+singularity pull --force /home/proj/${INSTANCE}/mutant/MUTANT/mutant/externals/gms-artic/artic-ncov2019-pangolin.sif docker://genomicmedicinesweden/gms-artic-pangolin:latest
 chmod u=rwx,g=rx,o=rx mutant/externals/gms-artic/artic-ncov2019-illumina.sif
+chmod u=rwx,g=rx,o=rx mutant/externals/gms-artic/artic-ncov2019-pangolin.sif
