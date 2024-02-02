@@ -93,13 +93,13 @@ if ( params.illumina ) {
         // Mpileup depth for ivar (although undocumented in mpileup, setting to zero removes limit)
         mpileupDepth = 100000
         // iVar frequency threshold for consensus variant (ivar consensus: -t)
-        ivarFreqThreshold = 0.75
+        varFreqThreshold = 0.75
         // Minimum coverage depth to call variant (ivar consensus: -m; ivar variants -m)
-        ivarMinDepth = 10
+        varMinDepth = 10
         // iVar frequency threshold to call variant (ivar variants: -t )
-        ivarMinFreqThreshold = 0.03
+        varMinFreqThreshold = 0.03
         // iVar minimum mapQ to call variant (ivar variants: -q)
-        ivarMinVariantQuality = 20
+        varMinVariantQuality = 20
         // Typing frequency threshold to call aa consequences of variant. Set to ivarFreqThreshold for consistency with consensus
         csqAfThreshold = 0.75
         // Minimum coverage depth to call aa consequences of variant. Set to ivarMinDepth for consistency with consensus
