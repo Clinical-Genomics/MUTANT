@@ -18,6 +18,9 @@ def get_results_paths(indir, case, ticket, nanopore) -> dict:
         files_to_iterate = NANOPORE_FILES_CASE
     else:
         files_to_iterate = ILLUMINA_FILES_CASE
+
+    if not files_to_iterate:
+        click.echo("No files to iterate.")
     for stepname, filepath in files_to_iterate.items():
         fullpath = filepath.format(resdir=indir, case=case, ticket=ticket)
         if "*" in fullpath:
