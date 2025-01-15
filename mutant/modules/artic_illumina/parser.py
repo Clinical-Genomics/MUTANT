@@ -147,7 +147,7 @@ def get_artic_results(indir) -> dict:
         next(content)
         for line in content:
             sample = line[0].split("_")[-1]
-            if float(line[2]) >= 67:
+            if float(line[2]) >= MULTIQC_TO_VOGUE["multiqc_picard_wgsmetrics"]["fields"]["PCT_10X"]:
                 qc_flag = "TRUE"
             else:
                 qc_flag = "FALSE"
