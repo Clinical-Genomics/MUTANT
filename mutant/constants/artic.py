@@ -75,3 +75,7 @@ NEXTCLADE_HEADER = [
     "immune_escape",
     "ace2_binding",
 ]
+
+
+# Cut-off threshold for uploading to FOHM
+PCT_10X_THRESHOLD = 67
