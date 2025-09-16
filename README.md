@@ -1,9 +1,7 @@
 # MUTANT
 [Current Version](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L5)
 
-Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
-
-Please add information here about what the pipeline does, what analysis it does. Can it determine a resistance profile? Does it have a filter to find genes linked to resistance? Can it only sequence the genome of the virus and provide info on what strain it is? Do additionally please add a logo as your earliest convenience. /MAR 250916
+Microbial Utility Toolbox And wrapper for data traNsmission and Transformation (MUTANT) is an analysis pipeline that reconstructs the genome of a sequenced virus based to a reference genome and then identifies how it deviates from that reference. As part of the workflow, MUTANT incorporates [Pangolin](https://github.com/cov-lineages/pangolin), which interpretates the identified variants to assign the viral strain. Furthermore, the analysis also generates a VCF file, allowing users to examine specific mutations and view a typing summary of the isolates.
 
 ## Installation
 
