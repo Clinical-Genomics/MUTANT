@@ -3,6 +3,8 @@
 
 Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
 
+Please add information here about what the pipeline does, what analysis it does. Can it determine a resistance profile? Does it have a filter to find genes linked to resistance? Can it only sequence the genome of the virus and provide info on what strain it is? Do additionally please add a logo as your earliest convenience. /MAR 250916
+
 ## Installation
 
 ### Prereq
