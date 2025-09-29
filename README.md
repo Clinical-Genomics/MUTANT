@@ -1,7 +1,7 @@
 # MUTANT
 [Current Version](https://github.com/Clinical-Genomics/MUTANT/blob/main/mutant/__init__.py#L5)
 
-Microbial Utility Toolbox And wrapper for data traNsmission and Transformation
+Microbial Utility Toolbox And wrapper for data traNsmission and Transformation (MUTANT) is an analysis pipeline for SARS-CoV2 that reconstructs the genome of a sequenced virus based to a reference genome and then identifies how it deviates from that reference. As part of the workflow, MUTANT incorporates [Pangolin](https://github.com/cov-lineages/pangolin), which interprets the identified variants to assign the viral strain. Furthermore, the analysis also generates a VCF file, allowing users to examine specific mutations and view a typing summary of the isolates.
 
 ## Installation
 
