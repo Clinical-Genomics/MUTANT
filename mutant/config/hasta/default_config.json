@@ -7,7 +7,8 @@ profiles {
         process.memory = '16 GB'
         process.cpus = 4
         process.errorStrategy = 'retry'
-        process.maxRetries = 2
+        process.maxRetries = 3
+        process.containerOptions = "--bind /home/proj/production/mutant/tmp:/tmp"
     }
 }
 process {
