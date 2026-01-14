@@ -226,9 +226,7 @@ class GenericReporter:
             {
                 "format": "csv",
                 "id": self.case,
-                "path": os.path.join(
-                    self.indir, f"{self.ticket}_komplettering.csv"
-                ),
+                "path": os.path.join(self.indir, f"{self.ticket}_komplettering.csv"),
                 "path_index": "~",
                 "step": "report",
                 "tag": "SARS-CoV-2-info",
@@ -258,7 +256,7 @@ class GenericReporter:
                 deliverables["files"].append(
                     {
                         "format": "vcf",
-                        "id": sampleID,
+                        "id": self.case,
                         "path": f"{self.indir}/articNcovNanopore_Genotyping_typeVariants/vcf/{base_sample}.vcf",
                         "path_index": "~",
                         "step": "genotyping",
@@ -305,7 +303,7 @@ class GenericReporter:
                 deliverables["files"].append(
                     {
                         "format": "vcf",
-                        "id": sampleID,
+                        "id": self.case,
                         "path": f"{self.indir}/ncovIllumina_Genotyping_typeVariants/vcf/{base_sample}.vcf",
                         "path_index": "~",
                         "step": "genotyping",
