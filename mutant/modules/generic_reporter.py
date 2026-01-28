@@ -226,9 +226,7 @@ class GenericReporter:
             {
                 "format": "csv",
                 "id": self.case,
-                "path": os.path.join(
-                    self.indir, f"{self.ticket}_komplettering.csv"
-                ),
+                "path": os.path.join(self.indir, f"{self.ticket}_komplettering.csv"),
                 "path_index": "~",
                 "step": "report",
                 "tag": "SARS-CoV-2-info",
@@ -279,28 +277,6 @@ class GenericReporter:
             else:
                 if not record["sequencing_qc_pass"]:
                     continue
-                # Concat reads forwards
-                deliverables["files"].append(
-                    {
-                        "format": "fastq",
-                        "id": sampleID,
-                        "path": f"{fastq_dir}/{base_sample}_1.fastq.gz",
-                        "path_index": "~",
-                        "step": "concatination",
-                        "tag": "forward-reads",
-                    }
-                )
-                # Concat reads reverse
-                deliverables["files"].append(
-                    {
-                        "format": "fastq",
-                        "id": sampleID,
-                        "path": f"{fastq_dir}/{base_sample}_2.fastq.gz",
-                        "path_index": "~",
-                        "step": "concatination",
-                        "tag": "reverse-reads",
-                    }
-                )
                 # Variants (vcf)
                 deliverables["files"].append(
                     {
