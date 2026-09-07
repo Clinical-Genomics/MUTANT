@@ -1,0 +1,12 @@
+includeConfig "$baseDir/../../config/mammut/default_config_stage.json"
+
+if ( params.medaka || params.nanopolish ) {
+    params {
+        min_length = 150
+        max_length = 1200
+        schemeRepoURL = 'https://github.com/Clinical-Genomics/primer-schemes.git'
+        schemeDir = 'primer-schemes'
+        scheme = 'midnight_nanopore'
+        schemeVersion = 'V1'
+    }
+}
