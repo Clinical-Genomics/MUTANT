@@ -1,0 +1,18 @@
+includeConfig "$baseDir/../../config/hasta/default_config.json"
+
+profiles {
+    slurm {
+        process.executor = 'slurm'
+        process.clusterOptions = { "-A production --qos high" }
+        process.time = '1h'
+        process.memory = '16 GB'
+        process.cpus = 4
+        process.errorStrategy = 'retry'
+        process.maxRetries = 3
+        process.containerOptions = "--bind /home/proj/production/mutant/tmp:/tmp"
+    }
+}
+
+params {
+    cache = "/home/proj/production/mutant/nf-cache/"
+}

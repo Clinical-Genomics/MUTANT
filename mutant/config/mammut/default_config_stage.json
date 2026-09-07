@@ -1,0 +1,18 @@
+includeConfig "$baseDir/../../config/mammut/default_config.json"
+
+profiles {
+    slurm {
+        process.executor = 'slurm'
+        process.clusterOptions = { "-A development --qos low" }
+        process.time = '1h'
+        process.memory = '16 GB'
+        process.cpus = 4
+        process.errorStrategy = 'retry'
+        process.maxRetries = 2
+        process.containerOptions = "--bind /home/proj/stage/mutant/tmp:/tmp"
+    }
+}
+
+params {
+    cache = "/home/proj/stage/mutant/nf-cache/"
+}
